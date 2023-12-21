@@ -2,8 +2,10 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:random_color/random_color.dart'; // Il pacchetto per generare colori casuali
 
-void main() => runApp(const MaterialApp(
+void main() => runApp(MaterialApp(
       home: VotiPage(),
+      theme: ThemeData.dark(),
+      //darkTheme: ThemeData.dark(),
     ));
 
 class VotiPage extends StatefulWidget {
@@ -162,8 +164,8 @@ class _VotiPageState extends State<VotiPage> {
             for (int i = 0; i < numero; i++) {
               // Crea un nome casuale per il candidato
               String nome = "Candidato ${i + 1}";
-              // Crea un numero casuale di voti per il candidato
-              int voti = (10 + i) * (i + 1);
+              // Partono tutti da 0
+              int voti = 0;
               // Crea un colore casuale per il candidato
               charts.Color barColor =
                   charts.ColorUtil.fromDartColor(randomColor.randomColor());
@@ -202,6 +204,23 @@ class _VotiPageState extends State<VotiPage> {
     );
   }
 
+  Widget colorValue(int index) {
+    return Container(
+        height: 80,
+        width: 80,
+        decoration: BoxDecoration(
+          color: charts.ColorUtil.toDartColor(dati[index].barColor),
+          borderRadius: BorderRadius.circular(50),
+          border: Border.all(color: Colors.white, width: 8),
+        ),
+        child: Center(
+            child: Text(dati[index].voti.toString(),
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20))));
+  }
+
   @override
   Widget build(BuildContext context) {
     // Il widget della pagina
@@ -237,7 +256,9 @@ class _VotiPageState extends State<VotiPage> {
                   children: [
                     Text(dati[index].nome),
                     creaBottone(dati[index].nome, index, false),
+                    colorValue(index),
                     creaBottone(dati[index].nome, index, true),
+                    Text((dati[index].voti - dati[0].voti).toString()),
                   ],
                 );
               },
