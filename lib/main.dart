@@ -2,7 +2,9 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:random_color/random_color.dart'; // Il pacchetto per generare colori casuali
 
-void main() => runApp(VotiPage());
+void main() => runApp(MaterialApp(
+      home: VotiPage(),
+    ));
 
 class VotiPage extends StatefulWidget {
   @override
@@ -196,47 +198,51 @@ class _VotiPageState extends State<VotiPage> {
   @override
   Widget build(BuildContext context) {
     // Il widget della pagina
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Grafico dei voti"),
-      ),
-      body: Column(
-        children: [
-          // Il widget del grafico
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: creaGrafico(),
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      // This is the default text direction for Flutter
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Grafico dei voti"),
+        ),
+        body: Column(
+          children: [
+            // Il widget del grafico
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: creaGrafico(),
+              ),
             ),
-          ),
-          // Il widget del TextField
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: creaTextField(),
-          ),
-          // Il widget dei bottoni
-          ListView.builder(
-            shrinkWrap: true,
-            itemCount: dati.length,
-            itemBuilder: (context, index) {
-              // Il widget di una riga con il nome del candidato e i bottoni per aumentare o decrescere i voti
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text(dati[index].nome),
-                  creaBottone(dati[index].nome, index, false),
-                  creaBottone(dati[index].nome, index, true),
-                ],
-              );
-            },
-          ),
-          // Il widget del messaggio del vincitore
-          if (vincitore != "")
+            // Il widget del TextField
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text("Il vincitore è $vincitore!"),
+              child: creaTextField(),
             ),
-        ],
+            // Il widget dei bottoni
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: dati.length,
+              itemBuilder: (context, index) {
+                // Il widget di una riga con il nome del candidato e i bottoni per aumentare o decrescere i voti
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(dati[index].nome),
+                    creaBottone(dati[index].nome, index, false),
+                    creaBottone(dati[index].nome, index, true),
+                  ],
+                );
+              },
+            ),
+            // Il widget del messaggio del vincitore
+            if (vincitore != "")
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text("Il vincitore è $vincitore!"),
+              ),
+          ],
+        ),
       ),
     );
   }
