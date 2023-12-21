@@ -2,11 +2,13 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:random_color/random_color.dart'; // Il pacchetto per generare colori casuali
 
-void main() => runApp(MaterialApp(
+void main() => runApp(const MaterialApp(
       home: VotiPage(),
     ));
 
 class VotiPage extends StatefulWidget {
+  const VotiPage({super.key});
+
   @override
   _VotiPageState createState() => _VotiPageState();
 }
@@ -71,7 +73,7 @@ class _VotiPageState extends State<VotiPage> {
         colorFn: (VotoData voto, _) => voto.barColor,
         // La funzione che restituisce il colore della barra
         labelAccessorFn: (VotoData voto, _) =>
-            '${voto.voti}', // La funzione che restituisce il numero dei voti da mostrare sulle barre
+            '${voto.voti} ${voto.nome}', // La funzione che restituisce il numero dei voti da mostrare sulle barre
       )
     ];
 
@@ -84,7 +86,8 @@ class _VotiPageState extends State<VotiPage> {
       // Rende il grafico orizzontale
       barRendererDecorator: charts.BarLabelDecorator<String>(),
       // Mostra le etichette sulle barre
-      domainAxis: charts.OrdinalAxisSpec(renderSpec: charts.NoneRenderSpec()),
+      domainAxis:
+          const charts.OrdinalAxisSpec(renderSpec: charts.NoneRenderSpec()),
       // Nasconde le etichette sull'asse X
       behaviors: [
         charts.ChartTitle('Grafico dei voti', // Il titolo del grafico
@@ -139,7 +142,7 @@ class _VotiPageState extends State<VotiPage> {
       // Il controller del TextField
       keyboardType: TextInputType.number,
       // La tipologia di tastiera da mostrare
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         labelText: "Inserisci il numero dei candidati",
         // L'etichetta del TextField
         border: OutlineInputBorder(), // Il bordo del TextField
@@ -207,7 +210,7 @@ class _VotiPageState extends State<VotiPage> {
       // This is the default text direction for Flutter
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Grafico dei voti"),
+          title: const Text("Grafico dei voti"),
         ),
         body: Column(
           children: [
