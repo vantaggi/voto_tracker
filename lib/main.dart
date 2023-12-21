@@ -24,25 +24,29 @@ class _VotiPageState extends State<VotiPage> {
   // La lista dei dati del grafico
   List<VotoData> dati = [
     VotoData(
-        nome: "Alice",
-        voti: 10,
+        nome: "Farneti",
+        voti: 0,
         barColor: charts.ColorUtil.fromDartColor(Colors.blue)),
     VotoData(
-        nome: "Bob",
-        voti: 15,
+        nome: "Provvedi",
+        voti: 0,
         barColor: charts.ColorUtil.fromDartColor(Colors.red)),
     VotoData(
-        nome: "Carlo",
-        voti: 20,
+        nome: "Cappannelli",
+        voti: 0,
         barColor: charts.ColorUtil.fromDartColor(Colors.green)),
     VotoData(
+        nome: "Marcelli",
+        voti: 0,
+        barColor: charts.ColorUtil.fromDartColor(Colors.amber)),
+    VotoData(
         nome: "Schede bianche",
-        voti: 5,
+        voti: 0,
         barColor: charts.ColorUtil.fromDartColor(Colors.grey)),
     // L'elemento per le schede bianche
     VotoData(
         nome: "Schede nulle",
-        voti: 3,
+        voti: 0,
         barColor: charts.ColorUtil.fromDartColor(Colors.grey)),
     // L'elemento per le schede nulle
   ];
@@ -169,11 +173,11 @@ class _VotiPageState extends State<VotiPage> {
             // Aggiunge le schede bianche e nulle alla lista dei dati
             dati.add(VotoData(
                 nome: "Schede bianche",
-                voti: 5,
+                voti: 0,
                 barColor: charts.ColorUtil.fromDartColor(Colors.grey)));
             dati.add(VotoData(
                 nome: "Schede nulle",
-                voti: 3,
+                voti: 0,
                 barColor: charts.ColorUtil.fromDartColor(Colors.grey)));
             // Ordina la lista dei dati in base al numero dei voti
             dati.sort((a, b) => b.voti.compareTo(a.voti));
