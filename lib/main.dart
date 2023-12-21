@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:flutter/material.dart';
 import 'package:random_color/random_color.dart'; // Il pacchetto per generare colori casuali
 
 class VotiPage extends StatefulWidget {
@@ -10,7 +10,7 @@ class VotoData {
   String nome; // Il nome del candidato
   int voti; // Il numero dei voti ricevuti
   charts.Color barColor; // Il colore della barra nel grafico
-  VotoData({required this.nome, required this.voti, this.barColor});
+  VotoData({required this.nome, required this.voti, required this.barColor});
 }
 class _VotiPageState extends State<VotiPage> {
   // La classe che rappresenta i dati del grafico
@@ -57,8 +57,8 @@ class _VotiPageState extends State<VotiPage> {
   behaviorPosition: charts.BehaviorPosition.top, // La posizione del titolo
   titleOutsideJustification: charts.OutsideJustification.start, // L'allineamento del titolo
   innerPadding: 18), // Il padding del titolo
-  charts.Legend(), // La legenda del grafico
-  ],
+        //charts.Legend(), // La legenda del grafico
+      ],
   );
   }
 
@@ -190,11 +190,11 @@ class _VotiPageState extends State<VotiPage> {
   },
   ),
   // Il widget del messaggio del vincitore
-  if (vincitore != null)
-  Padding(
-  padding: const EdgeInsets.all(8.0),
-  child: Text("Il vincitore è $vincitore!"),
-  ),
+    if (vincitore != "")
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text("Il vincitore è $vincitore!"),
+            ),
   ],
   ),
   );
