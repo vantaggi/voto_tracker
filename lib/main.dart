@@ -2,10 +2,13 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:random_color/random_color.dart'; // Il pacchetto per generare colori casuali
 
+void main() => runApp(VotiPage());
+
 class VotiPage extends StatefulWidget {
   @override
   _VotiPageState createState() => _VotiPageState();
 }
+
 class VotoData {
   String nome; // Il nome del candidato
   int voti; // Il numero dei voti ricevuti
