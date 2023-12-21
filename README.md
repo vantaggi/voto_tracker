@@ -20,6 +20,7 @@ Once you have the necessary prerequisites, you can follow these steps to get sta
 Clone the project repository:
 Bash
 git clone https://github.com/vantaggi/voto_tracker.git
+
 Change directory to the project directory:
 
 Bash
