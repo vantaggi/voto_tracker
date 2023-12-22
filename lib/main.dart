@@ -44,12 +44,12 @@ class _VotiPageState extends State<VotiPage> {
         voti: 0,
         barColor: charts.ColorUtil.fromDartColor(Colors.amber)),
     VotoData(
-        nome: "Schede bianche",
+        nome: "bianche",
         voti: 0,
         barColor: charts.ColorUtil.fromDartColor(Colors.grey)),
     // L'elemento per le schede bianche
     VotoData(
-        nome: "Schede nulle",
+        nome: "nulle",
         voti: 0,
         barColor: charts.ColorUtil.fromDartColor(Colors.black38)),
     // L'elemento per le schede nulle
