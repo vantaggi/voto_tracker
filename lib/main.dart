@@ -51,7 +51,7 @@ class _VotiPageState extends State<VotiPage> {
     VotoData(
         nome: "Schede nulle",
         voti: 0,
-        barColor: charts.ColorUtil.fromDartColor(Colors.grey)),
+        barColor: charts.ColorUtil.fromDartColor(Colors.black38)),
     // L'elemento per le schede nulle
   ];
 
@@ -98,7 +98,7 @@ class _VotiPageState extends State<VotiPage> {
             titleOutsideJustification: charts.OutsideJustification.start,
             // L'allineamento del titolo
             innerPadding: 18), // Il padding del titolo
-        //charts.Legend(), // La legenda del grafico
+        //charts.LegendEntryLayout, // La legenda del grafico
       ],
     );
   }
@@ -131,6 +131,31 @@ class _VotiPageState extends State<VotiPage> {
             // Azzera il vincitore
             vincitore = "";
           }
+        });
+      },
+    );
+  }
+
+  // Il metodo che crea il widget del TextField
+  Widget creaCandidateField(int index) {
+    // Il widget del TextField
+    TextEditingController controllerCandidate = TextEditingController();
+    return TextField(
+      // Il controller per il widget TextField
+      controller: controllerCandidate,
+
+      // Il controller del TextField
+      keyboardType: TextInputType.text,
+      // La tipologia di tastiera da mostrare
+      decoration: InputDecoration(
+        labelText: dati[index].nome,
+        // L'etichetta del TextField
+        border: OutlineInputBorder(), // Il bordo del TextField
+      ),
+      onSubmitted: (value) {
+        // La logica da eseguire quando il valore viene inviato
+        setState(() {
+          dati[index].nome = value;
         });
       },
     );
@@ -205,20 +230,22 @@ class _VotiPageState extends State<VotiPage> {
   }
 
   Widget colorValue(int index) {
-    return Container(
-        height: 80,
-        width: 80,
-        decoration: BoxDecoration(
-          color: charts.ColorUtil.toDartColor(dati[index].barColor),
-          borderRadius: BorderRadius.circular(50),
-          border: Border.all(color: Colors.white, width: 8),
-        ),
-        child: Center(
-            child: Text(dati[index].voti.toString(),
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20))));
+    return Center(
+      child: Container(
+          height: 50,
+          width: 50,
+          decoration: BoxDecoration(
+            color: charts.ColorUtil.toDartColor(dati[index].barColor),
+            borderRadius: BorderRadius.circular(35),
+            border: Border.all(color: Colors.white, width: 5),
+          ),
+          child: Center(
+              child: Text(dati[index].voti.toString(),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20)))),
+    );
   }
 
   @override
@@ -229,7 +256,7 @@ class _VotiPageState extends State<VotiPage> {
       // This is the default text direction for Flutter
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Grafico dei voti"),
+          title: const Text("Voto Tracker"),
         ),
         body: Column(
           children: [
@@ -240,11 +267,14 @@ class _VotiPageState extends State<VotiPage> {
                 child: creaGrafico(),
               ),
             ),
-            // Il widget del TextField
+            //TODO
+            /*  // Il widget del TextField
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: creaTextField(),
             ),
+
+           */
             // Il widget dei bottoni
             ListView.builder(
               shrinkWrap: true,
@@ -252,9 +282,11 @@ class _VotiPageState extends State<VotiPage> {
               itemBuilder: (context, index) {
                 // Il widget di una riga con il nome del candidato e i bottoni per aumentare o decrescere i voti
                 return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Text(dati[index].nome),
+                    SizedBox(
+                        child: creaCandidateField(index),
+                        width: MediaQuery.of(context).size.width / 4),
                     creaBottone(dati[index].nome, index, false),
                     colorValue(index),
                     creaBottone(dati[index].nome, index, true),
@@ -265,9 +297,12 @@ class _VotiPageState extends State<VotiPage> {
             ),
             // Il widget del messaggio del vincitore
             if (vincitore != "")
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text("Il vincitore è $vincitore!"),
+              PopupMenuButton(
+                itemBuilder: (BuildContext context) => [
+                  PopupMenuItem(
+                    child: Text("Il vincitore è $vincitore!"),
+                  ),
+                ],
               ),
           ],
         ),
