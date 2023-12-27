@@ -1,6 +1,7 @@
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
-import 'package:random_color/random_color.dart'; // Il pacchetto per generare colori casuali
+import 'package:random_color/random_color.dart';
+import 'package:voto_tracker/settings.dart'; // Il pacchetto per generare colori casuali
 
 void main() => runApp(MaterialApp(
       home: VotiPage(),
@@ -21,9 +22,11 @@ class VotoData {
   charts.Color barColor; // Il colore della barra nel grafico
   VotoData({required this.nome, required this.voti, required this.barColor});
 }
+
 class _VotiPageState extends State<VotiPage> {
   // La classe che rappresenta i dati del grafico
 
+  Settings settings = Settings();
 
   // La lista dei dati del grafico
   List<VotoData> dati = [
@@ -56,7 +59,7 @@ class _VotiPageState extends State<VotiPage> {
   ];
 
   // La variabile che tiene traccia del vincitore
-  String vincitore ="";
+  String vincitore = "";
 
   // Il controller per il widget TextField
   TextEditingController controller = TextEditingController();
@@ -257,6 +260,13 @@ class _VotiPageState extends State<VotiPage> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Voto Tracker"),
+          actions: [
+            IconButton(
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => SettingsPage(settings: settings,),
+                    )).then((value) => setState((){})),
+                icon: const Icon(Icons.settings))
+          ],
         ),
         body: Column(
           children: [
@@ -278,7 +288,7 @@ class _VotiPageState extends State<VotiPage> {
             // Il widget dei bottoni
             ListView.builder(
               shrinkWrap: true,
-              itemCount: dati.length,
+              itemCount: settings.numPartecipanti,
               itemBuilder: (context, index) {
                 // Il widget di una riga con il nome del candidato e i bottoni per aumentare o decrescere i voti
                 return Row(
