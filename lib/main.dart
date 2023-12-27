@@ -4,7 +4,7 @@ import 'package:random_color/random_color.dart';
 import 'package:voto_tracker/settings.dart'; // Il pacchetto per generare colori casuali
 
 void main() => runApp(MaterialApp(
-      home: VotiPage(),
+      home: const VotiPage(),
       theme: ThemeData.dark(),
       //darkTheme: ThemeData.dark(),
     ));
@@ -153,7 +153,7 @@ class _VotiPageState extends State<VotiPage> {
       decoration: InputDecoration(
         labelText: dati[index].nome,
         // L'etichetta del TextField
-        border: OutlineInputBorder(), // Il bordo del TextField
+        border: const OutlineInputBorder(), // Il bordo del TextField
       ),
       onSubmitted: (value) {
         // La logica da eseguire quando il valore viene inviato
@@ -233,22 +233,39 @@ class _VotiPageState extends State<VotiPage> {
   }
 
   Widget colorValue(int index) {
+    TextEditingController controllerColorValue = TextEditingController();
     return Center(
-      child: Container(
-          height: 50,
-          width: 50,
-          decoration: BoxDecoration(
-            color: charts.ColorUtil.toDartColor(dati[index].barColor),
-            borderRadius: BorderRadius.circular(35),
-            border: Border.all(color: Colors.white, width: 5),
-          ),
-          child: Center(
-              child: Text(dati[index].voti.toString(),
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20)))),
-    );
+        child: Container(
+            height: 50,
+            width: 50,
+            decoration: BoxDecoration(
+              color: charts.ColorUtil.toDartColor(dati[index].barColor),
+              borderRadius: BorderRadius.circular(35),
+              border: Border.all(color: Colors.white, width: 5),
+            ),
+            child: Center(
+                child: TextField(
+              // Il controller per il widget TextField
+              controller: controllerColorValue,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.bold),
+              // Il controller del TextField
+              keyboardType: TextInputType.number,
+              // La tipologia di tastiera da mostrare
+              decoration: InputDecoration(
+                hintText: dati[index].voti.toString(),
+                // L'etichetta del TextField
+                border: InputBorder.none, // Il bordo del TextField
+              ),
+              onSubmitted: (value) {
+                // La logica da eseguire quando il valore viene inviato
+                setState(() {
+                  int numeroVoti = int.tryParse(value) ?? 0;
+                  dati[index].voti = numeroVoti;
+                });
+              },
+            ))));
   }
 
   @override
@@ -262,9 +279,13 @@ class _VotiPageState extends State<VotiPage> {
           title: const Text("Voto Tracker"),
           actions: [
             IconButton(
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => SettingsPage(settings: settings,),
-                    )).then((value) => setState((){})),
+                onPressed: () => Navigator.of(context)
+                    .push(MaterialPageRoute(
+                      builder: (context) => SettingsPage(
+                        settings: settings,
+                      ),
+                    ))
+                    .then((value) => setState(() {})),
                 icon: const Icon(Icons.settings))
           ],
         ),
@@ -277,14 +298,6 @@ class _VotiPageState extends State<VotiPage> {
                 child: creaGrafico(),
               ),
             ),
-            //TODO
-            /*  // Il widget del TextField
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: creaTextField(),
-            ),
-
-           */
             // Il widget dei bottoni
             ListView.builder(
               shrinkWrap: true,
@@ -306,14 +319,15 @@ class _VotiPageState extends State<VotiPage> {
               },
             ),
             // Il widget del messaggio del vincitore
-            if (vincitore != "")
-              PopupMenuButton(
-                itemBuilder: (BuildContext context) => [
-                  PopupMenuItem(
-                    child: Text("Il vincitore è $vincitore!"),
-                  ),
-                ],
-              ),
+            //TODO
+            // if (vincitore != "")
+            //   PopupMenuButton(
+            //     itemBuilder: (BuildContext context) => [
+            //       PopupMenuItem(
+            //         child: Text("Il vincitore è $vincitore!"),
+            //       ),
+            //     ],
+            //   ),
           ],
         ),
       ),

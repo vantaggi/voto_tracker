@@ -73,8 +73,14 @@ class Settings{
   bool get schedeNulle => _schedeNulle;
   int get numPartecipanti => _numPartecipanti;
 
-  Settings({int numPartecipanti = 4,bool schedeBianche = true, bool schedeNulle = true}) : _numPartecipanti = numPartecipanti, _schedeNulle = schedeNulle, _schedeBianche = schedeBianche;
-  
+  Settings(
+      {int numPartecipanti = 6,
+      bool schedeBianche = true,
+      bool schedeNulle = true})
+      : _numPartecipanti = numPartecipanti,
+        _schedeNulle = schedeNulle,
+        _schedeBianche = schedeBianche;
+
   updateNumPartecipanti(int num){
     if(num > 1){
       _numPartecipanti = num;
