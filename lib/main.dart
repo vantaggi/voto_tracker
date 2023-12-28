@@ -1,4 +1,4 @@
-import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:random_color/random_color.dart';
 import 'package:voto_tracker/settings.dart'; // Il pacchetto per generare colori casuali
@@ -19,7 +19,7 @@ class VotiPage extends StatefulWidget {
 class VotoData {
   String nome; // Il nome del candidato
   int voti; // Il numero dei voti ricevuti
-  charts.Color barColor; // Il colore della barra nel grafico
+  Color barColor; // Il colore della barra nel grafico
   VotoData({required this.nome, required this.voti, required this.barColor});
 }
 
@@ -33,28 +33,28 @@ class _VotiPageState extends State<VotiPage> {
     VotoData(
         nome: "Farneti",
         voti: 0,
-        barColor: charts.ColorUtil.fromDartColor(Colors.blue)),
+        barColor: Colors.blue),
     VotoData(
         nome: "Provvedi",
         voti: 0,
-        barColor: charts.ColorUtil.fromDartColor(Colors.red)),
+        barColor: Colors.red),
     VotoData(
         nome: "Cappannelli",
         voti: 0,
-        barColor: charts.ColorUtil.fromDartColor(Colors.green)),
+        barColor: Colors.green),
     VotoData(
         nome: "Marcelli",
         voti: 0,
-        barColor: charts.ColorUtil.fromDartColor(Colors.amber)),
+        barColor: Colors.amber),
     VotoData(
         nome: "bianche",
         voti: 0,
-        barColor: charts.ColorUtil.fromDartColor(Colors.grey)),
+        barColor: Colors.grey),
     // L'elemento per le schede bianche
     VotoData(
         nome: "nulle",
         voti: 0,
-        barColor: charts.ColorUtil.fromDartColor(Colors.black38)),
+        barColor: Colors.black38),
     // L'elemento per le schede nulle
   ];
 
@@ -66,42 +66,45 @@ class _VotiPageState extends State<VotiPage> {
 
   // Il metodo che crea il widget del grafico
   Widget creaGrafico() {
-    // La serie di dati da visualizzare nel grafico
-    List<charts.Series<VotoData, String>> serie = [
-      charts.Series(
-        id: "Voti",
-        data: dati,
-        domainFn: (VotoData voto, _) => voto.nome,
-        // La funzione che restituisce il nome del candidato
-        measureFn: (VotoData voto, _) => voto.voti,
-        // La funzione che restituisce il numero dei voti
-        colorFn: (VotoData voto, _) => voto.barColor,
-        // La funzione che restituisce il colore della barra
-        labelAccessorFn: (VotoData voto, _) =>
-            '${voto.voti} ${voto.nome}', // La funzione che restituisce il numero dei voti da mostrare sulle barre
-      )
-    ];
 
-    // Il widget del grafico a barre
-    return charts.BarChart(
-      serie,
-      animate: true,
-      // Abilita le animazioni
-      vertical: false,
-      // Rende il grafico orizzontale
-      barRendererDecorator: charts.BarLabelDecorator<String>(),
-      // Mostra le etichette sulle barre
-      domainAxis:
-          const charts.OrdinalAxisSpec(renderSpec: charts.NoneRenderSpec()),
-      // Nasconde le etichette sull'asse X
-      behaviors: [
-        charts.ChartTitle('Grafico dei voti', // Il titolo del grafico
-            behaviorPosition: charts.BehaviorPosition.top,
-            // La posizione del titolo
-            titleOutsideJustification: charts.OutsideJustification.start,
-            // L'allineamento del titolo
-            innerPadding: 18), // Il padding del titolo
-        //charts.LegendEntryLayout, // La legenda del grafico
+    BarChartData data = BarChartData(
+      barGroups: [
+        for (VotoData voto in dati)
+          BarChartGroupData(
+            x: dati.indexOf(voto),
+            barRods: [
+              BarChartRodData(
+                toY: voto.voti.toDouble(),
+                color: voto.barColor,
+              )
+            ],
+          )
+      ],
+      titlesData: const FlTitlesData(
+        show: false,
+      ),
+      gridData: const FlGridData(show: false),
+      
+    );
+
+    return Stack(
+      children: [
+        RotatedBox(
+          quarterTurns: 1,
+          child: BarChart(
+            data,
+          ),
+        ),
+        SizedBox(
+          height: 545, //height the size of BarChart
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              for (VotoData voto in dati)
+                Text("${voto.nome} (${voto.voti})"),
+            ],
+          ),
+        )
       ],
     );
   }
@@ -196,8 +199,7 @@ class _VotiPageState extends State<VotiPage> {
               // Partono tutti da 0
               int voti = 0;
               // Crea un colore casuale per il candidato
-              charts.Color barColor =
-                  charts.ColorUtil.fromDartColor(randomColor.randomColor());
+              Color barColor = randomColor.randomColor();
               // Crea un oggetto VotoData con i dati del candidato
               VotoData voto =
                   VotoData(nome: nome, voti: voti, barColor: barColor);
@@ -208,11 +210,11 @@ class _VotiPageState extends State<VotiPage> {
             dati.add(VotoData(
                 nome: "Schede bianche",
                 voti: 0,
-                barColor: charts.ColorUtil.fromDartColor(Colors.grey)));
+                barColor: Colors.grey));
             dati.add(VotoData(
                 nome: "Schede nulle",
                 voti: 0,
-                barColor: charts.ColorUtil.fromDartColor(Colors.grey)));
+                barColor: Colors.grey));
             // Ordina la lista dei dati in base al numero dei voti
             dati.sort((a, b) => b.voti.compareTo(a.voti));
             // Calcola il numero totale dei votanti
@@ -240,37 +242,37 @@ class _VotiPageState extends State<VotiPage> {
             height: 50,
             width: 50,
             decoration: BoxDecoration(
-              color: charts.ColorUtil.toDartColor(dati[index].barColor),
+              color: dati[index].barColor,
               borderRadius: BorderRadius.circular(35),
               border: Border.all(color: Colors.white, width: 5),
             ),
             alignment: Alignment.center,
             child: TextField(
-                          // Il controller per il widget TextField
-                          controller: controllerColorValue,
-                          textAlign: TextAlign.center,
-                          textAlignVertical: TextAlignVertical.center,
-                          expands: true,
-                          minLines: null,
-                          maxLines: null,
-                          style: const TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold),
-                          // Il controller del TextField
-                          keyboardType: TextInputType.number,
-                          // La tipologia di tastiera da mostrare
-                          decoration: InputDecoration(
-            hintText: dati[index].voti.toString(),
-            // L'etichetta del TextField
-            border: InputBorder.none, // Il bordo del TextField
-                          ),
-                          onSubmitted: (value) {
-            // La logica da eseguire quando il valore viene inviato
-            setState(() {
-              int numeroVoti = int.tryParse(value) ?? 0;
-              dati[index].voti = numeroVoti;
-            });
-                          },
-                        )));
+              // Il controller per il widget TextField
+              controller: controllerColorValue,
+              textAlign: TextAlign.center,
+              textAlignVertical: TextAlignVertical.center,
+              expands: true,
+              minLines: null,
+              maxLines: null,
+              style: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.bold),
+              // Il controller del TextField
+              keyboardType: TextInputType.number,
+              // La tipologia di tastiera da mostrare
+              decoration: InputDecoration(
+                hintText: dati[index].voti.toString(),
+                // L'etichetta del TextField
+                border: InputBorder.none, // Il bordo del TextField
+              ),
+              onSubmitted: (value) {
+                // La logica da eseguire quando il valore viene inviato
+                setState(() {
+                  int numeroVoti = int.tryParse(value) ?? 0;
+                  dati[index].voti = numeroVoti;
+                });
+              },
+            )));
   }
 
   @override
@@ -311,7 +313,8 @@ class _VotiPageState extends State<VotiPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Votanti totali: ${settings.numVotanti}"),
-                  Text("Votanti rimasti: "), //TODO: calcolare votanti da scrutinare
+                  Text(
+                      "Votanti rimasti: "), //TODO: calcolare votanti da scrutinare
                 ],
               ),
             ),
