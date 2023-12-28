@@ -244,29 +244,33 @@ class _VotiPageState extends State<VotiPage> {
               borderRadius: BorderRadius.circular(35),
               border: Border.all(color: Colors.white, width: 5),
             ),
-            child: Center(
-                child: TextField(
-              // Il controller per il widget TextField
-              controller: controllerColorValue,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.bold),
-              // Il controller del TextField
-              keyboardType: TextInputType.number,
-              // La tipologia di tastiera da mostrare
-              decoration: InputDecoration(
-                hintText: dati[index].voti.toString(),
-                // L'etichetta del TextField
-                border: InputBorder.none, // Il bordo del TextField
-              ),
-              onSubmitted: (value) {
-                // La logica da eseguire quando il valore viene inviato
-                setState(() {
-                  int numeroVoti = int.tryParse(value) ?? 0;
-                  dati[index].voti = numeroVoti;
-                });
-              },
-            ))));
+            alignment: Alignment.center,
+            child: TextField(
+                          // Il controller per il widget TextField
+                          controller: controllerColorValue,
+                          textAlign: TextAlign.center,
+                          textAlignVertical: TextAlignVertical.center,
+                          expands: true,
+                          minLines: null,
+                          maxLines: null,
+                          style: const TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold),
+                          // Il controller del TextField
+                          keyboardType: TextInputType.number,
+                          // La tipologia di tastiera da mostrare
+                          decoration: InputDecoration(
+            hintText: dati[index].voti.toString(),
+            // L'etichetta del TextField
+            border: InputBorder.none, // Il bordo del TextField
+                          ),
+                          onSubmitted: (value) {
+            // La logica da eseguire quando il valore viene inviato
+            setState(() {
+              int numeroVoti = int.tryParse(value) ?? 0;
+              dati[index].voti = numeroVoti;
+            });
+                          },
+                        )));
   }
 
   @override
