@@ -127,6 +127,7 @@ class _VotiPageState extends State<VotiPage> {
           // Calcola la maggioranza dei voti
           int maggioranza = (totale / 2).ceil();
           // Controlla se il primo candidato ha raggiunto la maggioranza
+          //TODO: controlla se lo scarto tra primo e secondo è maggiore dei voti rimasti da scrutinare
           if (dati[0].voti >= maggioranza) {
             // Imposta il vincitore con il nome del primo candidato
             vincitore = dati[0].nome;
@@ -298,6 +299,19 @@ class _VotiPageState extends State<VotiPage> {
                 child: creaGrafico(),
               ),
             ),
+
+            //widget che mostra il numero dei votanti
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Votanti totali: ${settings.numVotanti}"),
+                  Text("Votanti rimasti: "), //TODO: calcolare votanti da scrutinare
+                ],
+              ),
+            ),
+
             // Il widget dei bottoni
             ListView.builder(
               shrinkWrap: true,
