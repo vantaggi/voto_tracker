@@ -51,31 +51,29 @@ class _VotiPageState extends State<VotiPage> {
         voti: 0,
         barColor: Colors.grey),
     // L'elemento per le schede bianche
-    VotoData(
-        nome: "nulle",
-        voti: 0,
-        barColor: Colors.black38),
+    VotoData(nome: "nulle", voti: 0, barColor: Colors.black38),
     // L'elemento per le schede nulle
   ];
 
   // La variabile che tiene traccia del vincitore
   String vincitore = "";
+  int totaleVotiAssegnati = 0;
+  int votiRimanenti = 0;
 
   // Il controller per il widget TextField
   TextEditingController controller = TextEditingController();
 
   // Il metodo che crea il widget del grafico
   Widget creaGrafico() {
-
     BarChartData data = BarChartData(
       barGroups: [
-        for (VotoData voto in dati)
+        for (VotoData dato in dati)
           BarChartGroupData(
-            x: dati.indexOf(voto),
+            x: dati.indexOf(dato),
             barRods: [
               BarChartRodData(
-                toY: voto.voti.toDouble(),
-                color: voto.barColor,
+                toY: dato.voti.toDouble(),
+                color: dato.barColor,
               )
             ],
           )
@@ -84,7 +82,6 @@ class _VotiPageState extends State<VotiPage> {
         show: false,
       ),
       gridData: const FlGridData(show: false),
-      
     );
 
     return Stack(
@@ -98,15 +95,31 @@ class _VotiPageState extends State<VotiPage> {
         SizedBox(
           height: 545, //height the size of BarChart
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              for (VotoData voto in dati)
-                Text("${voto.nome} (${voto.voti})"),
+              for (VotoData voto in dati) Text("${voto.nome} ${voto.voti}"),
             ],
           ),
         )
       ],
     );
+  }
+
+  void calcolaVotanti() {
+    // Ordina la lista dei dati in base al numero dei voti
+    dati.sort((a, b) => b.voti.compareTo(a.voti));
+    // Calcola il numero totale dei votanti
+    totaleVotiAssegnati = dati.fold(0, (sum, voto) => sum + voto.voti);
+    // Calcola la maggioranza dei voti
+    votiRimanenti = settings.numVotanti - totaleVotiAssegnati;
+    // Controlla se il primo candidato ha raggiunto la maggioranza
+    if (dati[0].voti > dati[1].voti + votiRimanenti) {
+      // Imposta il vincitore con il nome del primo candidato
+      vincitore = dati[0].nome;
+    } else {
+      // Azzera il vincitore
+      vincitore = "";
+    }
   }
 
   // Il metodo che crea il widget del bottone
@@ -123,21 +136,7 @@ class _VotiPageState extends State<VotiPage> {
           } else {
             dati[index].voti--;
           }
-          // Ordina la lista dei dati in base al numero dei voti
-          dati.sort((a, b) => b.voti.compareTo(a.voti));
-          // Calcola il numero totale dei votanti
-          int totale = dati.fold(0, (sum, voto) => sum + voto.voti);
-          // Calcola la maggioranza dei voti
-          int maggioranza = (totale / 2).ceil();
-          // Controlla se il primo candidato ha raggiunto la maggioranza
-          //TODO: controlla se lo scarto tra primo e secondo è maggiore dei voti rimasti da scrutinare
-          if (dati[0].voti >= maggioranza) {
-            // Imposta il vincitore con il nome del primo candidato
-            vincitore = dati[0].nome;
-          } else {
-            // Azzera il vincitore
-            vincitore = "";
-          }
+          calcolaVotanti();
         });
       },
     );
@@ -208,27 +207,10 @@ class _VotiPageState extends State<VotiPage> {
             }
             // Aggiunge le schede bianche e nulle alla lista dei dati
             dati.add(VotoData(
-                nome: "Schede bianche",
-                voti: 0,
-                barColor: Colors.grey));
-            dati.add(VotoData(
-                nome: "Schede nulle",
-                voti: 0,
-                barColor: Colors.grey));
-            // Ordina la lista dei dati in base al numero dei voti
-            dati.sort((a, b) => b.voti.compareTo(a.voti));
-            // Calcola il numero totale dei votanti
-            int totale = dati.fold(0, (sum, voto) => sum + voto.voti);
-            // Calcola la maggioranza dei voti
-            int maggioranza = (totale / 2).ceil();
-            // Controlla se il primo candidato ha raggiunto la maggioranza
-            if (dati[0].voti >= maggioranza) {
-              // Imposta il vincitore con il nome del primo candidato
-              vincitore = dati[0].nome;
-            } else {
-              // Azzera il vincitore
-              vincitore = "";
-            }
+                nome: "Schede bianche", voti: 0, barColor: Colors.grey));
+            dati.add(
+                VotoData(nome: "Schede nulle", voti: 0, barColor: Colors.grey));
+            calcolaVotanti();
           }
         });
       },
@@ -271,6 +253,7 @@ class _VotiPageState extends State<VotiPage> {
                   int numeroVoti = int.tryParse(value) ?? 0;
                   dati[index].voti = numeroVoti;
                 });
+                calcolaVotanti();
               },
             )));
   }
@@ -313,8 +296,9 @@ class _VotiPageState extends State<VotiPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Votanti totali: ${settings.numVotanti}"),
-                  Text(
-                      "Votanti rimasti: "), //TODO: calcolare votanti da scrutinare
+                  // Il widget del messaggio del vincitore
+                  if (vincitore != "") Text("Il vincitore è $vincitore!"),
+                  Text("Votanti rimasti: ${votiRimanenti}"),
                 ],
               ),
             ),
@@ -329,8 +313,8 @@ class _VotiPageState extends State<VotiPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     SizedBox(
-                        child: creaCandidateField(index),
-                        width: MediaQuery.of(context).size.width / 4),
+                        width: MediaQuery.of(context).size.width / 4,
+                        child: creaCandidateField(index)),
                     creaBottone(dati[index].nome, index, false),
                     colorValue(index),
                     creaBottone(dati[index].nome, index, true),
@@ -339,16 +323,6 @@ class _VotiPageState extends State<VotiPage> {
                 );
               },
             ),
-            // Il widget del messaggio del vincitore
-            //TODO
-            // if (vincitore != "")
-            //   PopupMenuButton(
-            //     itemBuilder: (BuildContext context) => [
-            //       PopupMenuItem(
-            //         child: Text("Il vincitore è $vincitore!"),
-            //       ),
-            //     ],
-            //   ),
           ],
         ),
       ),
