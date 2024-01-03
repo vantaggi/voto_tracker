@@ -48,8 +48,7 @@ class _VotiPageState extends State<VotiPage> {
         barColor: Colors.amber),
     VotoData(
         nome: "bianche",
-        voti: 0,
-        barColor: Colors.grey),
+        voti: 0, barColor: Colors.grey),
     // L'elemento per le schede bianche
     VotoData(nome: "nulle", voti: 0, barColor: Colors.black38),
     // L'elemento per le schede nulle
@@ -59,6 +58,7 @@ class _VotiPageState extends State<VotiPage> {
   String vincitore = "";
   int totaleVotiAssegnati = 0;
   int votiRimanenti = 0;
+  int soglia = 0;
 
   // Il controller per il widget TextField
   TextEditingController controller = TextEditingController();
@@ -66,23 +66,40 @@ class _VotiPageState extends State<VotiPage> {
   // Il metodo che crea il widget del grafico
   Widget creaGrafico() {
     BarChartData data = BarChartData(
-      barGroups: [
-        for (VotoData dato in dati)
-          BarChartGroupData(
-            x: dati.indexOf(dato),
+        barGroups: [
+          for (VotoData dato in dati)
+            BarChartGroupData(x: dati.indexOf(dato),
             barRods: [
               BarChartRodData(
                 toY: dato.voti.toDouble(),
                 color: dato.barColor,
               )
-            ],
-          )
-      ],
-      titlesData: const FlTitlesData(
-        show: false,
-      ),
-      gridData: const FlGridData(show: false),
-    );
+            ], showingTooltipIndicators: [
+              0
+            ])
+        ],
+        titlesData: const FlTitlesData(
+          show: false,
+        ),
+        gridData: const FlGridData(show: false),
+        barTouchData: BarTouchData(
+            touchTooltipData: BarTouchTooltipData(
+                fitInsideHorizontally: true,
+                getTooltipItem: (
+                  BarChartGroupData group,
+                  int groupIndex,
+                  BarChartRodData rod,
+                  int rodIndex,
+                ) {
+                  String value = dati[groupIndex].nome +
+                      " " +
+                      dati[groupIndex].voti.toString();
+
+                  return BarTooltipItem(
+                      value,
+                      TextStyle(
+                          color: dati[groupIndex].barColor, fontSize: 12));
+                })));
 
     return Stack(
       children: [
@@ -92,15 +109,14 @@ class _VotiPageState extends State<VotiPage> {
             data,
           ),
         ),
-        SizedBox(
-          height: 545, //height the size of BarChart
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              for (VotoData voto in dati) Text("${voto.nome} ${voto.voti}"),
-            ],
-          ),
-        )
+        // SizedBox(
+        //   child: Column(
+        //     mainAxisAlignment: MainAxisAlignment.spaceAround,
+        //     children: [
+        //       for (VotoData voto in dati) Text("${voto.nome} ${voto.voti}"),
+        //     ],
+        //   ),
+        // )
       ],
     );
   }
@@ -134,9 +150,10 @@ class _VotiPageState extends State<VotiPage> {
           if (incrementa) {
             dati[index].voti++;
           } else {
-            dati[index].voti--;
+            if (dati[index].voti != 0) dati[index].voti--;
           }
           calcolaVotanti();
+          calcolaVotiperVincere();
         });
       },
     );
@@ -258,6 +275,11 @@ class _VotiPageState extends State<VotiPage> {
             )));
   }
 
+  int calcolaVotiperVincere() {
+    soglia = ((dati[1].voti + votiRimanenti + 1 - dati[0].voti) / 2).round();
+    return soglia;
+  }
+
   @override
   Widget build(BuildContext context) {
     // Il widget della pagina
@@ -298,7 +320,8 @@ class _VotiPageState extends State<VotiPage> {
                   Text("Votanti totali: ${settings.numVotanti}"),
                   // Il widget del messaggio del vincitore
                   if (vincitore != "") Text("Il vincitore è $vincitore!"),
-                  Text("Votanti rimasti: ${votiRimanenti}"),
+                  if (vincitore == "") Text("Voti per vincere $soglia"),
+                  Text("Votanti rimasti: $votiRimanenti"),
                 ],
               ),
             ),
