@@ -66,7 +66,7 @@ class _VotiPageState extends State<VotiPage> {
   // Il metodo che crea il widget del grafico
   Widget creaGrafico() {
     BarChartData data = BarChartData(
-        maxY: dati[0].voti + (dati[0].voti * 20 / 100),
+        maxY: dati[0].voti + (dati[0].voti * 35 / 100),
         barGroups: [
           for (VotoData dato in dati)
             BarChartGroupData(x: dati.indexOf(dato), barRods: [
@@ -135,6 +135,7 @@ class _VotiPageState extends State<VotiPage> {
       // Azzera il vincitore
       vincitore = "";
     }
+    calcolaVotiperVincere();
   }
 
   // Il metodo che crea il widget del bottone
@@ -152,7 +153,6 @@ class _VotiPageState extends State<VotiPage> {
             if (dati[index].voti != 0) dati[index].voti--;
           }
           calcolaVotanti();
-          calcolaVotiperVincere();
         });
       },
     );
@@ -289,15 +289,30 @@ class _VotiPageState extends State<VotiPage> {
         appBar: AppBar(
           title: const Text("Voto Tracker"),
           actions: [
-            IconButton(
-                onPressed: () => Navigator.of(context)
-                    .push(MaterialPageRoute(
-                      builder: (context) => SettingsPage(
-                        settings: settings,
-                      ),
-                    ))
-                    .then((value) => setState(() {})),
-                icon: const Icon(Icons.settings))
+            Row(
+              children: [
+                IconButton(
+                    onPressed: () {
+                      // La logica da eseguire quando il bottone viene premuto
+                      setState(() {
+                        for (var dato in dati) {
+                          dato.voti = 0;
+                        }
+                        calcolaVotanti();
+                      });
+                    },
+                    icon: const Icon(Icons.delete_forever)),
+                IconButton(
+                    onPressed: () => Navigator.of(context)
+                        .push(MaterialPageRoute(
+                          builder: (context) => SettingsPage(
+                            settings: settings,
+                          ),
+                        ))
+                        .then((value) => setState(() {})),
+                    icon: const Icon(Icons.settings)),
+              ],
+            )
           ],
         ),
         body: Column(
