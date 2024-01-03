@@ -96,9 +96,8 @@ class _VotiPageState extends State<VotiPage> {
                   BarChartRodData rod,
                   int rodIndex,
                 ) {
-                  String value = dati[groupIndex].nome +
-                      " " +
-                      dati[groupIndex].voti.toString();
+                  String value =
+                      "${dati[groupIndex].nome} ${dati[groupIndex].voti}";
 
                   return BarTooltipItem(
                       value,
