@@ -66,10 +66,10 @@ class _VotiPageState extends State<VotiPage> {
   // Il metodo che crea il widget del grafico
   Widget creaGrafico() {
     BarChartData data = BarChartData(
+        maxY: dati[0].voti + (dati[0].voti * 20 / 100),
         barGroups: [
           for (VotoData dato in dati)
-            BarChartGroupData(x: dati.indexOf(dato),
-            barRods: [
+            BarChartGroupData(x: dati.indexOf(dato), barRods: [
               BarChartRodData(
                 toY: dato.voti.toDouble(),
                 color: dato.barColor,
@@ -84,7 +84,12 @@ class _VotiPageState extends State<VotiPage> {
         gridData: const FlGridData(show: false),
         barTouchData: BarTouchData(
             touchTooltipData: BarTouchTooltipData(
-                fitInsideHorizontally: true,
+                rotateAngle: -90,
+                tooltipBorder: const BorderSide(
+                  width: 2,
+                  color: Colors.white30,
+                ),
+                tooltipPadding: const EdgeInsets.all(8.0),
                 getTooltipItem: (
                   BarChartGroupData group,
                   int groupIndex,
@@ -98,7 +103,9 @@ class _VotiPageState extends State<VotiPage> {
                   return BarTooltipItem(
                       value,
                       TextStyle(
-                          color: dati[groupIndex].barColor, fontSize: 12));
+                        color: dati[groupIndex].barColor,
+                        fontWeight: FontWeight.bold,
+                      ));
                 })));
 
     return Stack(
@@ -109,14 +116,6 @@ class _VotiPageState extends State<VotiPage> {
             data,
           ),
         ),
-        // SizedBox(
-        //   child: Column(
-        //     mainAxisAlignment: MainAxisAlignment.spaceAround,
-        //     children: [
-        //       for (VotoData voto in dati) Text("${voto.nome} ${voto.voti}"),
-        //     ],
-        //   ),
-        // )
       ],
     );
   }
