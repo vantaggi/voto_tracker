@@ -66,7 +66,7 @@ class _VotiPageState extends State<VotiPage> {
   // Il metodo che crea il widget del grafico
   Widget creaGrafico() {
     BarChartData data = BarChartData(
-        maxY: dati[0].voti + (dati[0].voti * 35 / 100),
+        maxY: dati[0].voti + (dati[0].voti * 0.40),
         barGroups: [
           for (VotoData dato in dati)
             BarChartGroupData(x: dati.indexOf(dato), barRods: [
@@ -89,7 +89,7 @@ class _VotiPageState extends State<VotiPage> {
                   width: 2,
                   color: Colors.white30,
                 ),
-                tooltipPadding: const EdgeInsets.all(8.0),
+                tooltipPadding: const EdgeInsets.all(2.0),
                 getTooltipItem: (
                   BarChartGroupData group,
                   int groupIndex,
@@ -274,7 +274,8 @@ class _VotiPageState extends State<VotiPage> {
   }
 
   int calcolaVotiperVincere() {
-    soglia = ((dati[1].voti + votiRimanenti + 1 - dati[0].voti) / 2).round();
+    soglia = (dati[0].voti +
+        ((dati[1].voti + votiRimanenti + 1 - dati[0].voti) / 2).round());
     return soglia;
   }
 
@@ -288,36 +289,35 @@ class _VotiPageState extends State<VotiPage> {
         appBar: AppBar(
           title: const Text("Voto Tracker"),
           actions: [
-            Row(
-              children: [
-                IconButton(
-                    onPressed: () {
-                      // La logica da eseguire quando il bottone viene premuto
-                      setState(() {
-                        for (var dato in dati) {
-                          dato.voti = 0;
-                        }
-                        calcolaVotanti();
-                      });
-                    },
-                    icon: const Icon(Icons.delete_forever)),
-                IconButton(
-                    onPressed: () => Navigator.of(context)
-                        .push(MaterialPageRoute(
-                          builder: (context) => SettingsPage(
-                            settings: settings,
-                          ),
-                        ))
-                        .then((value) => setState(() {})),
-                    icon: const Icon(Icons.settings)),
-              ],
-            )
+            // Il widget del messaggio del vincitore
+            Text("Votanti: ${settings.numVotanti}"),
+            IconButton(
+                onPressed: () {
+                  // La logica da eseguire quando il bottone viene premuto
+                  setState(() {
+                    for (var dato in dati) {
+                      dato.voti = 0;
+                    }
+                    calcolaVotanti();
+                  });
+                },
+                icon: const Icon(Icons.delete_forever)),
+            IconButton(
+                onPressed: () => Navigator.of(context)
+                    .push(MaterialPageRoute(
+                      builder: (context) => SettingsPage(
+                        settings: settings,
+                      ),
+                    ))
+                    .then((value) => setState(() {})),
+                icon: const Icon(Icons.settings))
           ],
         ),
         body: Column(
           children: [
             // Il widget del grafico
-            Expanded(
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.40,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: creaGrafico(),
@@ -328,36 +328,40 @@ class _VotiPageState extends State<VotiPage> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Text("Votanti totali: ${settings.numVotanti}"),
-                  // Il widget del messaggio del vincitore
-                  if (vincitore != "") Text("Il vincitore è $vincitore!"),
-                  if (vincitore == "") Text("Voti per vincere $soglia"),
-                  Text("Votanti rimasti: $votiRimanenti"),
+                  if (vincitore != "")
+                    Text("Il vincitore è $vincitore!",
+                        style: TextStyle(
+                            color: dati[0].barColor,
+                            backgroundColor: Colors.white)),
+                  if (vincitore == "") Text("Soglia vincitore $soglia"),
+                  Text("Schede rimaste: $votiRimanenti"),
                 ],
               ),
             ),
 
             // Il widget dei bottoni
-            ListView.builder(
-              shrinkWrap: true,
-              itemCount: settings.numPartecipanti,
-              itemBuilder: (context, index) {
-                // Il widget di una riga con il nome del candidato e i bottoni per aumentare o decrescere i voti
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    SizedBox(
-                        width: MediaQuery.of(context).size.width / 4,
-                        child: creaCandidateField(index)),
-                    creaBottone(dati[index].nome, index, false),
-                    colorValue(index),
-                    creaBottone(dati[index].nome, index, true),
-                    Text((dati[index].voti - dati[0].voti).toString()),
-                  ],
-                );
-              },
+            Expanded(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: settings.numPartecipanti,
+                itemBuilder: (context, index) {
+                  // Il widget di una riga con il nome del candidato e i bottoni per aumentare o decrescere i voti
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      SizedBox(
+                          width: MediaQuery.of(context).size.width / 4,
+                          child: creaCandidateField(index)),
+                      creaBottone(dati[index].nome, index, false),
+                      colorValue(index),
+                      creaBottone(dati[index].nome, index, true),
+                      Text((dati[index].voti - dati[0].voti).toString()),
+                    ],
+                  );
+                },
+              ),
             ),
           ],
         ),

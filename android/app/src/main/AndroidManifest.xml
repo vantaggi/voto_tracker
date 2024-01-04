@@ -2,6 +2,7 @@
     <application
         android:label="voto_tracker"
         android:name="${applicationName}"
+        android:enableOnBackInvokedCallback="true"
         android:icon="@drawable/ic_vototracker">
         <activity
             android:name=".MainActivity"
