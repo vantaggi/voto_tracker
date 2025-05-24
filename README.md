@@ -1,11 +1,11 @@
-# Voto Tracker Pro
+# Voto Tracker
 
 Un'applicazione Flutter avanzata per il monitoraggio e l'analisi di scrutini elettorali in tempo
 reale.
 
 ![Screenshot dell'App](https://i.imgur.com/your-screenshot-url.png) ## Caratteristiche Principali
 
-Voto Tracker Pro è evoluto da un semplice contatore a uno strumento di analisi completo, che offre:
+Voto Tracker è evoluto da un semplice contatore a uno strumento di analisi completo, che offre:
 
 - **Tracciamento Voti in Tempo Reale**: Aggiungi o rimuovi voti per ogni candidato con
   un'interfaccia semplice e reattiva.

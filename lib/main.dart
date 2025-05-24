@@ -10,7 +10,7 @@ class VotoTrackerApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Voto Tracker Pro',
+      title: 'Voto Tracker',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.dark,
@@ -380,18 +380,26 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
   }
 
   PreferredSizeWidget _buildAppBar() {
-    // ... (invariato)
     return AppBar(
-      title: Row(mainAxisSize: MainAxisSize.min, children: [
-        Container(
-            padding: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-                borderRadius: BorderRadius.circular(8)),
-            child: Icon(Icons.how_to_vote, color: Colors.white, size: 20)),
-        SizedBox(width: 12),
-        Text('Voto Tracker Pro'),
-      ]),
+      title: Row(
+        mainAxisSize: MainAxisSize.min, // Keep this
+        children: [
+          Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  borderRadius: BorderRadius.circular(8)),
+              child: Icon(Icons.how_to_vote, color: Colors.white, size: 20)),
+          SizedBox(width: 12),
+          Expanded(
+            // <--- Add Expanded here
+            child: Text(
+              'Voto Tracker',
+              overflow: TextOverflow.ellipsis, // Optional: handle long text
+            ),
+          ),
+        ],
+      ),
       actions: [
         _buildVotersCount(),
         _buildResetButton(),
