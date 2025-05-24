@@ -1,65 +1,80 @@
-# voto_tracker
+# Voto Tracker Pro
 
-A Flutter application to track the votes during an election.
+Un'applicazione Flutter avanzata per il monitoraggio e l'analisi di scrutini elettorali in tempo
+reale.
 
-Features
+![Screenshot dell'App](https://i.imgur.com/your-screenshot-url.png) ## Caratteristiche Principali
 
-- Add and remove candidates
-- Add and remove votes for each candidate
-- Display a real-time vote count chart
-- Determine the winner of the election
+Voto Tracker Pro è evoluto da un semplice contatore a uno strumento di analisi completo, che offre:
+
+- **Tracciamento Voti in Tempo Reale**: Aggiungi o rimuovi voti per ogni candidato con
+  un'interfaccia semplice e reattiva.
+- **Dashboard Avanzata**: Visualizza i dati attraverso tre diversi grafici interattivi:
+    - **Grafico a Barre**: Per un'istantanea dei risultati correnti.
+    - **Grafico a Torta**: Per analizzare le percentuali di voto.
+    - **Grafico Storico Sincronizzato**: Per confrontare l'andamento dei candidati nel tempo, con
+      una linea del tempo unificata che gestisce correttamente le correzioni.
+- **Calcolo del Vincitore Intelligente**:
+    - Determina il vincitore non appena raggiunge un **vantaggio matematicamente incolmabile**.
+    - Dichiara il vincitore o un pareggio alla fine dello scrutinio.
+- **Pannelli di Analisi Dettagliata**:
+    - **Statistiche**: Tieni traccia dell'affluenza e del numero di schede scrutinate.
+    - **Confronto Diretto**: Isola e confronta i primi due candidati per analizzare il distacco.
+- **Alta Configurabilità**:
+    - Imposta il numero totale di votanti.
+    - Scegli il numero di candidati (da 2 a 8).
+    - Includi o escludi le schede bianche e nulle.
+    - **Personalizza i nomi** dei candidati.
+- **Esportazione Dati**: Esporta i risultati finali in formati standard come **CSV** e **JSON**.
+- **Tema Scuro Predefinito**: Un'interfaccia moderna e gradevole, con un tema chiaro alternativo.
+- **Layout Responsivo**: L'interfaccia si adatta elegantemente a schermi di diverse dimensioni (
+  mobile, tablet e desktop).
 
 ## Getting Started
 
-To get started with this project, you will need the following:
+Per avviare il progetto in locale, assicurati di avere un ambiente di sviluppo Flutter funzionante e
+segui questi passaggi:
 
-A Flutter development environment
-A basic understanding of Flutter development
-Once you have the necessary prerequisites, you can follow these steps to get started:
+1. **Clona il repository del progetto:**
+   ```bash
+   git clone [https://github.com/vantaggi/voto_tracker.git](https://github.com/vantaggi/voto_tracker.git)
+   ```
 
-Clone the project repository:
-Bash
-git clone https://github.com/vantaggi/voto_tracker.git
+2. **Entra nella cartella del progetto:**
+   ```bash
+   cd voto_tracker
+   ```
 
-Change directory to the project directory:
+3. **Installa le dipendenze:**
+   ```bash
+   flutter pub get
+   ```
 
-Bash
-cd voto_tracker
+4. **Avvia l'applicazione:**
+   ```bash
+   flutter run
+   ```
 
-Install the project dependencies:
+## Utilizzo
 
-Bash
-flutter pub get
+L'interfaccia è divisa in due sezioni principali:
 
-Run the development server:
+1. **Area Grafici (sinistra o in alto)**: Naviga tra le schede "Corrente", "Storico" e "Percentuali"
+   per analizzare i dati da diverse prospettive.
+2. **Area Controlli e Statistiche (destra o in basso)**:
+    - Visualizza le statistiche generali e il confronto tra i primi due candidati.
+    - Modifica i nomi dei candidati cliccando sull'icona a forma di matita.
+    - Aggiungi e rimuovi i voti usando i pulsanti `+` e `-`.
+    - Esporta i dati usando i pulsanti in fondo al pannello.
 
-Bash
-flutter run
+Usa il pulsante delle impostazioni (icona a forma di ingranaggio) nell'AppBar per configurare lo
+scrutinio.
 
-This will build the application and run it in the development mode. You can then start adding
-candidates and votes and monitor the real-time vote count chart.
+## Contributi
 
-Example Usage
-Here is an example of how to use the application to track the votes for an election with three
-candidates:
+I contributi a questo progetto sono i benvenuti. Sentiti libero di aprire pull request per
+correggere bug, aggiungere nuove funzionalità o proporre altri miglioramenti.
 
-Add three candidates:
-Candidate 1
-Candidate 2
-Candidate 3
+## Licenza
 
-Add some initial votes for each candidate:
-Candidate 1: 10 votes
-Candidate 2: 20 votes
-Candidate 3: 30 votes
-
-Watch the real-time vote count chart as you add and remove votes for each candidate.
-
-Determine the winner of the election by observing the candidate with the most votes.
-
-Contributing
-Contributions to this project are welcome. Please feel free to submit pull requests for bug fixes,
-feature enhancements, and other improvements.
-
-License
-This project is licensed under the MIT License - see the LICENSE: LICENSE file for details.
+Questo progetto è rilasciato sotto la licenza MIT - vedi il file `LICENSE` per i dettagli.
