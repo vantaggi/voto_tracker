@@ -3,14 +3,17 @@ import 'dart:math' as math;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:voto_tracker/utils/app_constants.dart'; // Import constants
 
-void main() => runApp(VotoTrackerApp());
+void main() => runApp(const VotoTrackerApp());
 
 class VotoTrackerApp extends StatelessWidget {
+  const VotoTrackerApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Voto Tracker',
+      title: AppStrings.appTitle,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.dark,
@@ -22,7 +25,6 @@ class VotoTrackerApp extends StatelessWidget {
 
 //========= THEME DEFINITION =========
 class AppTheme {
-  // ... (invariato)
   static const Color primaryBlue = Color(0xFF2563EB);
   static const Color secondaryTeal = Color(0xFF059669);
   static const Color accentOrange = Color(0xFFF59E0B);
@@ -37,6 +39,61 @@ class AppTheme {
   static const Color textGrey = Color(0xFF94A3B8);
   static const Color borderDark = Color(0xFF475569);
 
+  static TextTheme _buildLightTextTheme(TextTheme base) {
+    return base.copyWith(
+      displayLarge: base.displayLarge?.copyWith(
+          fontSize: 96, fontWeight: FontWeight.w300, color: textDark),
+      displayMedium: base.displayMedium?.copyWith(
+          fontSize: 60, fontWeight: FontWeight.w400, color: textDark),
+      displaySmall: base.displaySmall?.copyWith(
+          fontSize: 48, fontWeight: FontWeight.w400, color: textDark),
+      headlineMedium: base.headlineMedium?.copyWith(
+          fontSize: 34, fontWeight: FontWeight.w400, color: textDark),
+      headlineSmall: base.headlineSmall?.copyWith(
+          fontSize: 24, fontWeight: FontWeight.w400, color: textDark),
+      titleLarge: base.titleLarge?.copyWith(
+          fontSize: 20, fontWeight: FontWeight.w600, color: textDark),
+      // Used for titles like "Statistiche Scrutinio"
+      titleMedium: base.titleMedium?.copyWith(
+          fontSize: 16, fontWeight: FontWeight.w500, color: textDark),
+      // Used for smaller titles
+      bodyLarge: base.bodyLarge?.copyWith(fontSize: 16, color: textDark),
+      // Default body text
+      bodyMedium: base.bodyMedium?.copyWith(fontSize: 14, color: textDark),
+      // Default body text
+      labelLarge: base.labelLarge?.copyWith(
+          fontSize: 14, fontWeight: FontWeight.w500, color: primaryBlue),
+      // Buttons text
+      labelSmall: base.labelSmall?.copyWith(
+          fontSize: 11, fontWeight: FontWeight.w400, color: textLight),
+    );
+  }
+
+  static TextTheme _buildDarkTextTheme(TextTheme base) {
+    return base.copyWith(
+      displayLarge: base.displayLarge?.copyWith(
+          fontSize: 96, fontWeight: FontWeight.w300, color: textWhite),
+      displayMedium: base.displayMedium?.copyWith(
+          fontSize: 60, fontWeight: FontWeight.w400, color: textWhite),
+      displaySmall: base.displaySmall?.copyWith(
+          fontSize: 48, fontWeight: FontWeight.w400, color: textWhite),
+      headlineMedium: base.headlineMedium?.copyWith(
+          fontSize: 34, fontWeight: FontWeight.w400, color: textWhite),
+      headlineSmall: base.headlineSmall?.copyWith(
+          fontSize: 24, fontWeight: FontWeight.w400, color: textWhite),
+      titleLarge: base.titleLarge?.copyWith(
+          fontSize: 20, fontWeight: FontWeight.w600, color: textWhite),
+      titleMedium: base.titleMedium?.copyWith(
+          fontSize: 16, fontWeight: FontWeight.w500, color: textWhite),
+      bodyLarge: base.bodyLarge?.copyWith(fontSize: 16, color: textWhite),
+      bodyMedium: base.bodyMedium?.copyWith(fontSize: 14, color: textWhite),
+      labelLarge: base.labelLarge?.copyWith(
+          fontSize: 14, fontWeight: FontWeight.w500, color: primaryBlue),
+      labelSmall: base.labelSmall?.copyWith(
+          fontSize: 11, fontWeight: FontWeight.w400, color: textGrey),
+    );
+  }
+
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
@@ -50,7 +107,7 @@ class AppTheme {
       onSurface: textDark,
     ),
     scaffoldBackgroundColor: backgroundLight,
-    appBarTheme: AppBarTheme(
+    appBarTheme: const AppBarTheme(
         backgroundColor: surfaceWhite,
         foregroundColor: textDark,
         elevation: 0,
@@ -60,17 +117,23 @@ class AppTheme {
     cardTheme: CardTheme(
         color: surfaceWhite,
         elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+        shape: RoundedRectangleBorder(
+            borderRadius:
+                BorderRadius.circular(AppDimensions.borderRadiusCard))),
     elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
             backgroundColor: primaryBlue,
             foregroundColor: Colors.white,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12))),
+            shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(AppDimensions.borderRadiusButton)),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12))),
     dialogTheme: DialogTheme(
         backgroundColor: surfaceWhite,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+        shape: RoundedRectangleBorder(
+            borderRadius:
+                BorderRadius.circular(AppDimensions.borderRadiusCard))),
+    textTheme: _buildLightTextTheme(ThemeData.light().textTheme),
   );
 
   static ThemeData darkTheme = ThemeData(
@@ -86,7 +149,7 @@ class AppTheme {
       onSurface: textWhite,
     ),
     scaffoldBackgroundColor: backgroundDark,
-    appBarTheme: AppBarTheme(
+    appBarTheme: const AppBarTheme(
         backgroundColor: surfaceDark,
         foregroundColor: textWhite,
         elevation: 0,
@@ -96,32 +159,38 @@ class AppTheme {
     cardTheme: CardTheme(
         color: surfaceDark,
         elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+        shape: RoundedRectangleBorder(
+            borderRadius:
+                BorderRadius.circular(AppDimensions.borderRadiusCard))),
     elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
             backgroundColor: primaryBlue,
             foregroundColor: Colors.white,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12))),
+            shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(AppDimensions.borderRadiusButton)),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12))),
     dialogTheme: DialogTheme(
         backgroundColor: surfaceDark,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+        shape: RoundedRectangleBorder(
+            borderRadius:
+                BorderRadius.circular(AppDimensions.borderRadiusCard))),
     inputDecorationTheme: InputDecorationTheme(
       border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: borderDark)),
+          borderRadius: BorderRadius.circular(AppDimensions.borderRadiusButton),
+          borderSide: const BorderSide(color: borderDark)),
       enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: borderDark)),
+          borderRadius: BorderRadius.circular(AppDimensions.borderRadiusButton),
+          borderSide: const BorderSide(color: borderDark)),
       focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: primaryBlue)),
-      labelStyle: TextStyle(color: textGrey),
+          borderRadius: BorderRadius.circular(AppDimensions.borderRadiusButton),
+          borderSide: const BorderSide(color: primaryBlue)),
+      labelStyle: const TextStyle(color: textGrey),
       prefixIconColor: textGrey,
     ),
     textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(foregroundColor: Colors.white)),
+    textTheme: _buildDarkTextTheme(ThemeData.dark().textTheme),
   );
 }
 
@@ -139,7 +208,6 @@ class CandidateData {
 }
 
 class Settings {
-  // ... (invariato)
   int _totalVoters;
   int _participantsCount;
   bool _showBlankVotes;
@@ -163,7 +231,7 @@ class Settings {
   void updateTotalVoters(int count) => _totalVoters = math.max(1, count);
 
   void updateParticipantsCount(int count) =>
-      _participantsCount = math.max(2, count);
+      _participantsCount = math.max(AppStrings.minParticipants, count);
   void updateShowBlankVotes(bool show) => _showBlankVotes = show;
   void updateShowNullVotes(bool show) => _showNullVotes = show;
 }
@@ -185,6 +253,9 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
 
   // MODIFICATO: Storico basato su Map per gestire le correzioni
   Map<int, Map<String, int>> historyByScrutinyCount = {};
+  List<int> _historySnapshots = []; // Stores totalVotesAssigned for undo
+  int _currentHistoryIndex = -1; // Points to the current state in history
+
   String winner = "";
   int totalVotesAssigned = 0;
   int remainingVotes = 0;
@@ -222,9 +293,11 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
     final oldNames = {for (var c in candidates) c.name: c};
     candidates.clear();
     historyByScrutinyCount.clear();
+    _historySnapshots.clear();
+    _currentHistoryIndex = -1;
 
     for (int i = 0; i < settings.participantsCount; i++) {
-      final defaultName = "Candidato ${i + 1}";
+      final defaultName = "${AppStrings.candidatePrefix} ${i + 1}";
       candidates.add(CandidateData(
         name: oldNames.containsKey(defaultName)
             ? oldNames[defaultName]!.name
@@ -236,14 +309,67 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
 
     if (settings.showBlankVotes) {
       candidates.add(CandidateData(
-          name: "Schede Bianche", votes: 0, color: Colors.grey.shade400));
+          name: AppStrings.blankVotes, votes: 0, color: Colors.grey.shade400));
     }
     if (settings.showNullVotes) {
       candidates.add(CandidateData(
-          name: "Schede Nulle", votes: 0, color: Colors.grey.shade600));
+          name: AppStrings.nullVotes, votes: 0, color: Colors.grey.shade600));
     }
 
     _calculateResults();
+    _saveCurrentStateToHistory(); // Save initial state
+  }
+
+  void _saveCurrentStateToHistory() {
+    final currentVotesMap = {for (var c in candidates) c.name: c.votes};
+
+    // If we undo and then make a change, clear any "future" history
+    if (_currentHistoryIndex < _historySnapshots.length - 1) {
+      _historySnapshots =
+          _historySnapshots.sublist(0, _currentHistoryIndex + 1);
+      historyByScrutinyCount.removeWhere((key, value) {
+        return !_historySnapshots.contains(key);
+      });
+    }
+
+    // Add current state
+    historyByScrutinyCount[totalVotesAssigned] = currentVotesMap;
+    _historySnapshots.add(totalVotesAssigned);
+    _currentHistoryIndex = _historySnapshots.length - 1;
+  }
+
+  void _undoLastVote() {
+    setState(() {
+      if (_currentHistoryIndex > 0) {
+        _currentHistoryIndex--;
+        final previousTotalVotes = _historySnapshots[_currentHistoryIndex];
+        final previousState = historyByScrutinyCount[previousTotalVotes];
+
+        if (previousState != null) {
+          for (var candidate in candidates) {
+            candidate.votes = previousState[candidate.name] ?? 0;
+          }
+        }
+        _calculateResults();
+      }
+    });
+  }
+
+  void _redoLastVote() {
+    setState(() {
+      if (_currentHistoryIndex < _historySnapshots.length - 1) {
+        _currentHistoryIndex++;
+        final nextTotalVotes = _historySnapshots[_currentHistoryIndex];
+        final nextState = historyByScrutinyCount[nextTotalVotes];
+
+        if (nextState != null) {
+          for (var candidate in candidates) {
+            candidate.votes = nextState[candidate.name] ?? 0;
+          }
+        }
+        _calculateResults();
+      }
+    });
   }
 
   // LOGICA DI CALCOLO COMPLETAMENTE RIVISTA
@@ -256,7 +382,8 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
     winner = ""; // Resetta il vincitore ad ogni calcolo
 
     final validCandidates = candidates
-        .where((c) => c.name != "Schede Bianche" && c.name != "Schede Nulle")
+        .where((c) =>
+            c.name != AppStrings.blankVotes && c.name != AppStrings.nullVotes)
         .toList();
 
     if (validCandidates.isEmpty) return;
@@ -279,7 +406,7 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
       if (validCandidates.length >= 2 &&
           validCandidates[0].votes == validCandidates[1].votes &&
           validCandidates[0].votes > 0) {
-        winner = "Pareggio";
+        winner = AppStrings.tie;
       } else {
         winner = validCandidates.first.name;
       }
@@ -299,14 +426,7 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
         }
       }
       _calculateResults();
-
-      // MODIFICATO: Lo storico ora usa una Map per gestire le correzioni
-      final currentVotes = {for (var c in candidates) c.name: c.votes};
-      historyByScrutinyCount[totalVotesAssigned] = currentVotes;
-
-      // Rimuove la storia "futura" se si torna indietro con i voti
-      historyByScrutinyCount
-          .removeWhere((key, value) => key > totalVotesAssigned);
+      _saveCurrentStateToHistory(); // Save state after each vote update
     });
     HapticFeedback.lightImpact();
   }
@@ -317,15 +437,19 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
         candidate.votes = 0;
       }
       historyByScrutinyCount.clear(); // Pulisce anche lo storico
+      _historySnapshots.clear();
+      _currentHistoryIndex = -1;
       _calculateResults();
+      _saveCurrentStateToHistory(); // Save the reset state
     });
   }
 
   void _showEditNameDialog(int index) {
-    // ... (invariato)
     final candidate = candidates[index];
-    if (candidate.name == "Schede Bianche" || candidate.name == "Schede Nulle")
+    if (candidate.name == AppStrings.blankVotes ||
+        candidate.name == AppStrings.nullVotes) {
       return;
+    }
 
     final TextEditingController nameController =
         TextEditingController(text: candidate.name);
@@ -334,35 +458,32 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Modifica Nome'),
+          title: const Text(AppStrings.editName),
           content: TextField(
-              controller: nameController,
-              autofocus: true,
-              decoration: InputDecoration(labelText: 'Nome Candidato')),
+            controller: nameController,
+            autofocus: true,
+            decoration:
+                const InputDecoration(labelText: AppStrings.candidateName),
+            onSubmitted: (_) {
+              // Added onSubmitted
+              if (nameController.text.isNotEmpty) {
+                _applyNameChange(index, nameController.text);
+                Navigator.of(context).pop();
+              }
+            },
+          ),
           actions: [
             TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text('Annulla')),
+                child: const Text(AppStrings.cancel)),
             ElevatedButton(
               onPressed: () {
                 if (nameController.text.isNotEmpty) {
-                  setState(() {
-                    // Aggiorna il nome anche nello storico se necessario
-                    final oldName = candidates[index].name;
-                    final newName = nameController.text;
-                    historyByScrutinyCount.forEach((key, value) {
-                      if (value.containsKey(oldName)) {
-                        value[newName] = value[oldName]!;
-                        value.remove(oldName);
-                      }
-                    });
-                    candidates[index].name = newName;
-                    _calculateResults();
-                  });
+                  _applyNameChange(index, nameController.text);
                   Navigator.of(context).pop();
                 }
               },
-              child: Text('Salva'),
+              child: const Text(AppStrings.save),
             ),
           ],
         );
@@ -370,9 +491,27 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
     );
   }
 
+  void _applyNameChange(int index, String newName) {
+    setState(() {
+      final oldName = candidates[index].name;
+      // Update name in history (iterate over a copy to avoid concurrent modification)
+      final tempHistory =
+          Map<int, Map<String, int>>.from(historyByScrutinyCount);
+      tempHistory.forEach((key, value) {
+        if (value.containsKey(oldName)) {
+          value[newName] = value[oldName]!;
+          value.remove(oldName);
+        }
+      });
+      historyByScrutinyCount = tempHistory; // Assign updated history
+      candidates[index].name = newName;
+      _calculateResults();
+      _saveCurrentStateToHistory(); // Save the state after name change
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // ... (invariato)
     return Scaffold(
       appBar: _buildAppBar(),
       body: FadeTransition(opacity: _fadeAnimation, child: _buildBody(context)),
@@ -382,26 +521,41 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
       title: Row(
-        mainAxisSize: MainAxisSize.min, // Keep this
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.all(AppDimensions.paddingAppBarIcon),
               decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.primary,
-                  borderRadius: BorderRadius.circular(8)),
-              child: Icon(Icons.how_to_vote, color: Colors.white, size: 20)),
-          SizedBox(width: 12),
+                  borderRadius: BorderRadius.circular(
+                      AppDimensions.borderRadiusCircular)),
+              child: const Icon(Icons.how_to_vote,
+                  color: Colors.white, size: AppDimensions.iconSizeAppBar)),
+          const SizedBox(width: AppDimensions.paddingIconText),
           Expanded(
-            // <--- Add Expanded here
             child: Text(
-              'Voto Tracker',
-              overflow: TextOverflow.ellipsis, // Optional: handle long text
+              AppStrings.appTitlePro,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
       ),
       actions: [
         _buildVotersCount(),
+        IconButton(
+          // Undo Button
+          onPressed: _currentHistoryIndex > 0 ? _undoLastVote : null,
+          icon: const Icon(Icons.undo_rounded),
+          tooltip: 'Annulla ultima azione',
+        ),
+        IconButton(
+          // Redo Button
+          onPressed: _currentHistoryIndex < _historySnapshots.length - 1
+              ? _redoLastVote
+              : null,
+          icon: const Icon(Icons.redo_rounded),
+          tooltip: 'Ripeti ultima azione',
+        ),
         _buildResetButton(),
         _buildSettingsButton()
       ],
@@ -409,17 +563,17 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
   }
 
   Widget _buildVotersCount() {
-    // ... (invariato)
     final theme = Theme.of(context);
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      margin: const EdgeInsets.symmetric(
+          vertical: AppDimensions.paddingAppBarIcon, horizontal: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: theme.colorScheme.secondary.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppDimensions.borderRadiusToggle),
         border: Border.all(color: theme.colorScheme.secondary.withOpacity(0.3)),
       ),
-      child: Text('Votanti: ${settings.totalVoters}',
+      child: Text('${AppStrings.totalVoters}: ${settings.totalVoters}',
           style: TextStyle(
               color: theme.colorScheme.secondary,
               fontWeight: FontWeight.w600,
@@ -429,16 +583,15 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
 
   Widget _buildResetButton() => IconButton(
       onPressed: _showResetDialog,
-      icon: Icon(Icons.refresh_rounded),
-      tooltip: 'Reset voti');
+      icon: const Icon(Icons.refresh_rounded),
+      tooltip: AppStrings.resetButtonTooltip);
 
   Widget _buildSettingsButton() => IconButton(
       onPressed: _openSettings,
-      icon: Icon(Icons.settings_rounded),
-      tooltip: 'Impostazioni');
+      icon: const Icon(Icons.settings_rounded),
+      tooltip: AppStrings.settingsButtonTooltip);
 
   Widget _buildBody(BuildContext context) {
-    // ... (invariato)
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
     final screenWidth = MediaQuery.of(context).size.width;
@@ -450,7 +603,6 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
 
   //========= LAYOUTS =========
   Widget _buildDesktopLayout() {
-    // ... (invariato)
     return Row(children: [
       Expanded(flex: 2, child: _buildChartsSection()),
       Expanded(flex: 1, child: _buildControlsAndStatsSection()),
@@ -458,15 +610,16 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
   }
 
   Widget _buildTabletLayout() {
-    // ... (invariato)
     return Row(children: [
       Expanded(child: _buildChartsSection()),
+      const SizedBox(width: 350, child: Text('')),
+      // Placeholder for now, original was SizedBox(width: 350, child: _buildControlsAndStatsSection()),
+      // this will be handled by the next section below
       SizedBox(width: 350, child: _buildControlsAndStatsSection()),
     ]);
   }
 
   Widget _buildMobileLayout() {
-    // ... (invariato)
     return Column(children: [
       SizedBox(
           height: MediaQuery.of(context).size.height * 0.4,
@@ -477,9 +630,9 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
 
   //========= UI SECTIONS =========
   Widget _buildChartsSection() {
-    // ... (invariato)
     return Container(
-      padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.fromLTRB(AppDimensions.paddingAll,
+          AppDimensions.paddingAll, AppDimensions.paddingAll, 0),
       child: DefaultTabController(
         length: 3,
         child: Column(children: [
@@ -496,7 +649,6 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
   }
 
   Widget _buildControlsAndStatsSection() {
-    // ... (invariato)
     final leadingCandidate = candidates.isNotEmpty ? candidates[0] : null;
     final turnout = settings.totalVoters > 0
         ? (totalVotesAssigned / settings.totalVoters) * 100
@@ -510,29 +662,36 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
       'turnout': turnout
     };
 
-    return ListView(padding: EdgeInsets.all(16), children: [
-      if (winner.isNotEmpty && winner != "Pareggio")
-        Card(
+    return ListView(
+        padding: const EdgeInsets.all(AppDimensions.paddingAll),
+        children: [
+          if (winner.isNotEmpty && winner != AppStrings.tie)
+            Card(
           color: AppTheme.accentOrange.withOpacity(0.1),
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
+                padding: const EdgeInsets.all(AppDimensions.paddingAll),
+                child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.emoji_events,
-                    color: AppTheme.accentOrange, size: 24),
-                SizedBox(width: 12),
-                Column(
+                    const Icon(Icons.emoji_events,
+                        color: AppTheme.accentOrange,
+                        size: AppDimensions.statIconSize),
+                    const SizedBox(width: AppDimensions.paddingIconText),
+                    Column(
                   children: [
-                    Text('VINCITORE',
-                        style: TextStyle(
-                            color: AppTheme.accentOrange,
-                            fontSize: 12,
+                        Text(AppStrings.winner,
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelSmall
+                                ?.copyWith(
+                                    color: AppTheme.accentOrange,
                             fontWeight: FontWeight.bold)),
                     Text(winner,
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 18,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                    color: Theme.of(context).colorScheme.onSurface,
                             fontWeight: FontWeight.bold)),
                   ],
                 ),
@@ -546,40 +705,38 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
           leadingCandidate: leadingCandidate?.name ?? "N/A",
           leadingVotes: leadingCandidate?.votes ?? 0,
           turnoutPercentage: turnout),
-      SizedBox(height: 16),
-      ComparisonChart(candidates: candidateMap),
-      SizedBox(height: 16),
-      Text('Candidati',
-          style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onSurface)),
-      SizedBox(height: 16),
-      ...List.generate(
+          const SizedBox(height: AppDimensions.paddingAll),
+          ComparisonChart(candidates: candidateMap),
+          const SizedBox(height: AppDimensions.paddingAll),
+          Text(AppStrings.candidatePrefix,
+              style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: AppDimensions.paddingAll),
+          ...List.generate(
           candidates.length, (index) => _buildCandidateCard(index)),
-      SizedBox(height: 16),
-      ExportPanel(candidates: candidateMap, statistics: statsMap)
+          const SizedBox(height: AppDimensions.paddingAll),
+          ExportPanel(candidates: candidateMap, statistics: statsMap)
     ]);
   }
 
   Widget _buildTabBar() {
-    // ... (invariato)
     final theme = Theme.of(context);
     return Container(
-      margin: EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: AppDimensions.paddingAll),
       decoration: BoxDecoration(
           color: theme.scaffoldBackgroundColor.withOpacity(0.8),
-          borderRadius: BorderRadius.circular(12)),
+          borderRadius:
+              BorderRadius.circular(AppDimensions.borderRadiusButton)),
       child: TabBar(
         indicator: BoxDecoration(
             color: theme.colorScheme.primary,
-            borderRadius: BorderRadius.circular(12)),
+            borderRadius:
+                BorderRadius.circular(AppDimensions.borderRadiusButton)),
         labelColor: Colors.white,
         unselectedLabelColor: theme.unselectedWidgetColor,
-        tabs: [
-          Tab(text: 'Corrente'),
-          Tab(text: 'Storico'),
-          Tab(text: 'Percentuali')
+        tabs: const [
+          Tab(text: AppStrings.current),
+          Tab(text: AppStrings.history),
+          Tab(text: AppStrings.percentages)
         ],
       ),
     );
@@ -587,13 +744,15 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
 
   //========= CHARTS =========
   Widget _buildCurrentResultsChart() {
-    // ... (invariato)
-    if (candidates.isEmpty)
-      return Center(child: Text('Nessun dato disponibile'));
+    if (candidates.isEmpty) {
+      return Center(
+          child: Text(AppStrings.noDataAvailable,
+              style: Theme.of(context).textTheme.bodyMedium));
+    }
     final theme = Theme.of(context);
     return Card(
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppDimensions.paddingAll),
         child: BarChart(BarChartData(
           alignment: BarChartAlignment.spaceAround,
           maxY: (candidates.first.votes + 5).toDouble(),
@@ -601,8 +760,8 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
               touchTooltipData: BarTouchTooltipData(
                   getTooltipItem: (group, groupIndex, rod, rodIndex) =>
                       BarTooltipItem(
-                          '${candidates[groupIndex].name}\n${candidates[groupIndex].votes} voti',
-                          TextStyle(
+                          '${candidates[groupIndex].name}\n${candidates[groupIndex].votes} ${AppStrings.votes}',
+                          const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold)))),
           titlesData: FlTitlesData(
@@ -614,16 +773,19 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
                       if (value.toInt() < candidates.length) {
                         final name = candidates[value.toInt()].name;
                         return Padding(
-                            padding: EdgeInsets.only(top: 8),
+                            padding: const EdgeInsets.only(
+                                top: AppDimensions.paddingAppBarIcon),
                             child: Text(
                                 name.length > 8
                                     ? '${name.substring(0, 8)}...'
                                     : name,
-                                style: TextStyle(
-                                    fontSize: 10,
-                                    color: theme.colorScheme.onSurface)));
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall
+                                    ?.copyWith(
+                                        color: theme.colorScheme.onSurface)));
                       }
-                      return Text('');
+                      return const Text('');
                     })),
             leftTitles: AxisTitles(
                 sideTitles: SideTitles(
@@ -631,11 +793,14 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
                     reservedSize: 32,
                     getTitlesWidget: (value, meta) => Text(
                         value.toInt().toString(),
-                        style: TextStyle(
-                            fontSize: 10,
-                            color: theme.colorScheme.onSurface)))),
-            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelSmall
+                            ?.copyWith(color: theme.colorScheme.onSurface)))),
+            topTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           ),
           borderData: FlBorderData(show: false),
           barGroups: candidates
@@ -645,8 +810,9 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
                     BarChartRodData(
                         toY: entry.value.votes.toDouble(),
                         color: entry.value.color,
-                        width: 20,
-                        borderRadius: BorderRadius.circular(4))
+                        width: AppDimensions.chartBarWidth,
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.chartBarRadius))
                   ]))
               .toList(),
         )),
@@ -657,16 +823,20 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
   // GRAFICO STORICO COMPLETAMENTE MODIFICATO
   Widget _buildHistoryChart() {
     final theme = Theme.of(context);
-    if (historyByScrutinyCount.isEmpty) {
+    if (historyByScrutinyCount.isEmpty || _historySnapshots.length <= 1) {
+      // Only show history if there's actual change
       return Card(
           child: Center(
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
             Icon(Icons.timeline, size: 48, color: theme.hintColor),
-            SizedBox(height: 16),
-            Text('Nessuno storico disponibile',
-                style: TextStyle(color: theme.hintColor))
+            const SizedBox(height: AppDimensions.paddingAll),
+            Text(AppStrings.noHistoryAvailable,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(color: theme.hintColor))
           ])));
     }
 
@@ -675,12 +845,14 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+        padding: const EdgeInsets.fromLTRB(AppDimensions.paddingAll,
+            AppDimensions.paddingAll, AppDimensions.paddingAll, 8),
         child: LineChart(
           LineChartData(
             lineBarsData: candidates
                 .where((c) =>
-                    c.name != "Schede Bianche" && c.name != "Schede Nulle")
+                    c.name != AppStrings.blankVotes &&
+                    c.name != AppStrings.nullVotes)
                 .map((candidate) {
               return LineChartBarData(
                 spots: sortedHistory.map((entry) {
@@ -690,38 +862,47 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
                 }).toList(),
                 isCurved: true,
                 color: candidate.color,
-                barWidth: 3,
-                dotData: FlDotData(show: false),
+                barWidth: AppDimensions.chartLineBarWidth,
+                dotData: const FlDotData(show: false),
                 belowBarData: BarAreaData(
                     show: true, color: candidate.color.withOpacity(0.1)),
               );
             }).toList(),
             titlesData: FlTitlesData(
               bottomTitles: AxisTitles(
-                  axisNameWidget: Text("Voti Scrutinati",
-                      style: TextStyle(color: theme.hintColor, fontSize: 10)),
+                  axisNameWidget: Text(AppStrings.scrutinisedVotes,
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelSmall
+                          ?.copyWith(color: theme.hintColor)),
                   sideTitles: SideTitles(
                       showTitles: true,
                       reservedSize: 24,
                       getTitlesWidget: (value, meta) => Text(
                           value.toInt().toString(),
-                          style: TextStyle(
-                              fontSize: 10,
-                              color: theme.colorScheme.onSurface)))),
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelSmall
+                              ?.copyWith(color: theme.colorScheme.onSurface)))),
               leftTitles: AxisTitles(
-                  axisNameWidget: Text("Voti",
-                      style: TextStyle(color: theme.hintColor, fontSize: 10)),
+                  axisNameWidget: Text(AppStrings.votesShort,
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelSmall
+                          ?.copyWith(color: theme.hintColor)),
                   sideTitles: SideTitles(
                       showTitles: true,
                       reservedSize: 32,
                       getTitlesWidget: (value, meta) => Text(
                           value.toInt().toString(),
-                          style: TextStyle(
-                              fontSize: 10,
-                              color: theme.colorScheme.onSurface)))),
-              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelSmall
+                              ?.copyWith(color: theme.colorScheme.onSurface)))),
+              topTitles:
+                  const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               rightTitles:
-                  AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             ),
             gridData: FlGridData(
                 show: true,
@@ -730,7 +911,7 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
                 horizontalInterval: 5),
             borderData: FlBorderData(
                 show: true, border: Border.all(color: theme.dividerColor)),
-            clipData: FlClipData.all(),
+            clipData: const FlClipData.all(),
           ),
         ),
       ),
@@ -738,13 +919,16 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
   }
 
   Widget _buildPercentageChart() {
-    // ... (invariato)
-    if (candidates.isEmpty || totalVotesAssigned == 0)
-      return Card(child: Center(child: Text('Nessun voto registrato')));
+    if (candidates.isEmpty || totalVotesAssigned == 0) {
+      return Card(
+          child: Center(
+              child: Text(AppStrings.noVotesRecorded,
+                  style: Theme.of(context).textTheme.bodyMedium)));
+    }
 
     return Card(
         child: Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.paddingAll),
             child: PieChart(PieChartData(
                 sections: candidates.where((c) => c.votes > 0).map((candidate) {
                   final percentage =
@@ -753,30 +937,29 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
                       color: candidate.color,
                       value: candidate.votes.toDouble(),
                       title: '${percentage.toStringAsFixed(1)}%',
-                      radius: 60,
-                      titleStyle: TextStyle(
+                      radius: AppDimensions.chartPieRadius,
+                      titleStyle: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                           color: Colors.white));
                 }).toList(),
-                centerSpaceRadius: 40,
-                sectionsSpace: 2))));
+                centerSpaceRadius: AppDimensions.chartPieCenterSpaceRadius,
+                sectionsSpace: AppDimensions.chartPieSpace))));
   }
 
   Widget _buildCandidateCard(int index) {
-    // ... (invariato)
     final candidate = candidates[index];
     final isWinner = winner == candidate.name;
     final theme = Theme.of(context);
-    final isEditable =
-        candidate.name != "Schede Bianche" && candidate.name != "Schede Nulle";
+    final isEditable = candidate.name != AppStrings.blankVotes &&
+        candidate.name != AppStrings.nullVotes;
 
     return AnimatedContainer(
-        duration: Duration(milliseconds: 300),
-        margin: EdgeInsets.only(bottom: 12),
+        duration: const Duration(milliseconds: 300),
+        margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
           color: theme.cardColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.borderRadiusCard),
           border: Border.all(
               color: isWinner ? AppTheme.accentOrange : theme.dividerColor,
               width: isWinner ? 2 : 1),
@@ -784,11 +967,11 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
             BoxShadow(
                 color: Colors.black.withOpacity(0.05),
                 blurRadius: 8,
-                offset: Offset(0, 2))
+                offset: const Offset(0, 2))
           ],
         ),
         child: Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.paddingAll),
             child: Row(children: [
               Expanded(
                   flex: 2,
@@ -798,11 +981,14 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
                         height: 12,
                         decoration: BoxDecoration(
                             color: candidate.color, shape: BoxShape.circle)),
-                    SizedBox(width: 12),
+                    const SizedBox(width: AppDimensions.paddingIconText),
                     Expanded(
                         child: Text(candidate.name,
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                    fontWeight: FontWeight.w600,
                                 color: theme.colorScheme.onSurface),
                             overflow: TextOverflow.ellipsis)),
                   ])),
@@ -811,25 +997,29 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
                     icon: Icons.edit,
                     onPressed: () => _showEditNameDialog(index),
                     color: theme.hintColor),
-              if (isEditable) SizedBox(width: 8),
+              if (isEditable)
+                const SizedBox(width: AppDimensions.paddingAppBarIcon),
               _buildVoteButton(
                   icon: Icons.remove,
                   onPressed: () => _updateVote(index, false),
                   color: Colors.red.shade400),
-              SizedBox(width: 16),
+              const SizedBox(width: AppDimensions.paddingAll),
               Container(
-                  constraints: BoxConstraints(minWidth: 40),
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  constraints: const BoxConstraints(minWidth: 40),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: AppDimensions.paddingAppBarIcon),
                   decoration: BoxDecoration(
                       color: candidate.color.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20)),
+                      borderRadius: BorderRadius.circular(
+                          AppDimensions.borderRadiusToggle)),
                   child: Text('${candidate.votes}',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: candidate.color,
                           fontSize: 16))),
-              SizedBox(width: 16),
+              const SizedBox(width: AppDimensions.paddingAll),
               _buildVoteButton(
                   icon: Icons.add,
                   onPressed: totalVotesAssigned < settings.totalVoters
@@ -843,10 +1033,9 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
       {required IconData icon,
       required VoidCallback? onPressed,
       required Color color}) {
-    // ... (invariato)
     return SizedBox(
-        width: 36,
-        height: 36,
+        width: AppDimensions.iconButtonSize,
+        height: AppDimensions.iconButtonSize,
         child: ElevatedButton(
             onPressed: onPressed,
             style: ElevatedButton.styleFrom(
@@ -854,22 +1043,21 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
                     onPressed != null ? color : Theme.of(context).disabledColor,
                 foregroundColor: Colors.white,
                 padding: EdgeInsets.zero,
-                shape: CircleBorder(),
+                shape: const CircleBorder(),
                 elevation: onPressed != null ? 2 : 0),
-            child: Icon(icon, size: 18)));
+            child: Icon(icon, size: AppDimensions.iconButtonIconSize)));
   }
 
   void _showResetDialog() {
-    // ... (invariato)
     showDialog(
         context: context,
         builder: (BuildContext context) => AlertDialog(
-                title: Text('Conferma Reset'),
-                content: Text('Sei sicuro di voler azzerare tutti i voti?'),
+                title: const Text(AppStrings.confirmReset),
+                content: const Text(AppStrings.resetConfirmation),
                 actions: [
                   TextButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      child: Text('Annulla')),
+                      child: const Text(AppStrings.cancel)),
                   ElevatedButton(
                       onPressed: () {
                         Navigator.of(context).pop();
@@ -877,12 +1065,11 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
                       },
                       style:
                           ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                      child: Text('Reset'))
+                      child: const Text(AppStrings.reset))
                 ]));
   }
 
   void _openSettings() {
-    // ... (invariato)
     Navigator.of(context)
         .push(MaterialPageRoute(
             builder: (context) => SettingsPage(settings: settings)))
@@ -891,7 +1078,6 @@ class _VotiPageState extends State<VotiPage> with TickerProviderStateMixin {
 }
 
 //========= SETTINGS PAGE =========
-// (Questa parte è rimasta invariata)
 class SettingsPage extends StatefulWidget {
   final Settings settings;
   const SettingsPage({super.key, required this.settings});
@@ -919,25 +1105,26 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('Impostazioni')),
-        body: ListView(padding: EdgeInsets.all(16), children: [
-          _buildSettingsCard('Configurazione Scrutinio', [
-            _buildVotersCountSetting(),
-            SizedBox(height: 16),
-            _buildParticipantsCountSetting()
+        appBar: AppBar(title: const Text(AppStrings.settingsButtonTooltip)),
+        body: ListView(
+            padding: const EdgeInsets.all(AppDimensions.paddingAll),
+            children: [
+              _buildSettingsCard(AppStrings.scrutinyConfiguration, [
+                _buildVotersCountSetting(),
+                const SizedBox(height: AppDimensions.paddingAll),
+                _buildParticipantsCountSetting()
           ]),
-          SizedBox(height: 16),
-          _buildSettingsCard('Opzioni Schede', [
-            _buildToggleSetting(
-                'Schede Bianche',
-                widget.settings.showBlankVotes,
-                (value) => setState(
-                    () => widget.settings.updateShowBlankVotes(value))),
-            _buildToggleSetting(
-                'Schede Nulle',
-                widget.settings.showNullVotes,
-                (value) =>
-                    setState(() => widget.settings.updateShowNullVotes(value)))
+              const SizedBox(height: AppDimensions.paddingAll),
+              _buildSettingsCard(AppStrings.cardOptions, [
+                _buildToggleSetting(
+                    AppStrings.blankVotes,
+                    widget.settings.showBlankVotes,
+                    (value) => setState(
+                        () => widget.settings.updateShowBlankVotes(value))),
+                _buildToggleSetting(
+                    AppStrings.nullVotes,
+                    widget.settings.showNullVotes,
+                    (value) => setState(() => widget.settings.updateShowNullVotes(value)))
           ])
         ]));
   }
@@ -946,15 +1133,11 @@ class _SettingsPageState extends State<SettingsPage> {
     final theme = Theme.of(context);
     return Card(
         child: Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.paddingAll),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(title,
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.onSurface)),
-              SizedBox(height: 16),
+              Text(title, style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: AppDimensions.paddingAll),
               ...children
             ])));
   }
@@ -962,15 +1145,18 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildVotersCountSetting() {
     final theme = Theme.of(context);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('Numero Totale Votanti',
-          style: TextStyle(
+      Text(AppStrings.totalVotersNumber,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w500, color: theme.colorScheme.onSurface)),
-      SizedBox(height: 8),
+      const SizedBox(height: AppDimensions.paddingAppBarIcon),
       TextField(
           controller: _votersController,
           keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          // Only allow digits
           decoration: InputDecoration(
-              prefixIcon: Icon(Icons.people), suffixText: 'votanti'),
+              prefixIcon: const Icon(Icons.people),
+              suffixText: AppStrings.totalVoters),
           onSubmitted: (value) {
             final count = int.tryParse(value) ?? widget.settings.totalVoters;
             setState(() {
@@ -984,15 +1170,16 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildParticipantsCountSetting() {
     final theme = Theme.of(context);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('Numero Candidati: ${widget.settings.participantsCount}',
-          style: TextStyle(
+      Text(
+          '${AppStrings.participantsCount}: ${widget.settings.participantsCount}',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w500, color: theme.colorScheme.onSurface)),
-      SizedBox(height: 8),
+      const SizedBox(height: AppDimensions.paddingAppBarIcon),
       Slider(
           value: widget.settings.participantsCount.toDouble(),
-          min: 2,
-          max: 8,
-          divisions: 6,
+          min: AppStrings.minParticipants.toDouble(),
+          max: AppStrings.maxParticipants.toDouble(),
+          divisions: AppStrings.maxParticipants - AppStrings.minParticipants,
           label: widget.settings.participantsCount.toString(),
           onChanged: (value) => setState(
               () => widget.settings.updateParticipantsCount(value.round())))
@@ -1005,7 +1192,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return ListTile(
         contentPadding: EdgeInsets.zero,
         title: Text(title,
-            style: TextStyle(
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w500,
                 color: theme.colorScheme.onSurface)),
         trailing: Switch(
@@ -1022,30 +1209,26 @@ class StatisticsPanel extends StatelessWidget {
   final int leadingVotes;
   final double turnoutPercentage;
 
-  const StatisticsPanel(
-      {Key? key,
-      required this.totalVotes,
-      required this.totalVoters,
-      required this.leadingCandidate,
-      required this.leadingVotes,
-      required this.turnoutPercentage})
-      : super(key: key);
+  const StatisticsPanel({super.key,
+    required this.totalVotes,
+    required this.totalVoters,
+    required this.leadingCandidate,
+    required this.leadingVotes,
+    required this.turnoutPercentage});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Card(
-        margin: EdgeInsets.symmetric(vertical: 8),
+        margin: const EdgeInsets.symmetric(
+            vertical: AppDimensions.paddingAppBarIcon),
         child: Padding(
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('Statistiche Scrutinio',
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.onSurface)),
-              SizedBox(height: 16),
+                  style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: AppDimensions.paddingAll),
               Row(children: [
                 Expanded(
                     child: _buildStatItem(
@@ -1054,19 +1237,19 @@ class StatisticsPanel extends StatelessWidget {
                         '${turnoutPercentage.toStringAsFixed(1)}%',
                         Icons.people,
                         AppTheme.secondaryTeal)),
-                SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.paddingIconText),
                 Expanded(
                     child: _buildStatItem(
                         context,
-                        'Voti Scrutinati',
+                        AppStrings.scrutinisedVotes,
                         '$totalVotes/$totalVoters',
                         Icons.how_to_vote,
                         AppTheme.primaryBlue))
               ]),
-              SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.paddingIconText),
               if (leadingCandidate.isNotEmpty &&
-                  leadingCandidate != "Schede Bianche" &&
-                  leadingCandidate != "Schede Nulle")
+                  leadingCandidate != AppStrings.blankVotes &&
+                  leadingCandidate != AppStrings.nullVotes)
                 _buildLeadingCandidateCard(context)
             ])));
   }
@@ -1074,19 +1257,24 @@ class StatisticsPanel extends StatelessWidget {
   Widget _buildStatItem(BuildContext context, String label, String value,
       IconData icon, Color color) {
     return Container(
-        padding: EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppDimensions.statItemPadding),
         decoration: BoxDecoration(
             color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12)),
+            borderRadius:
+                BorderRadius.circular(AppDimensions.borderRadiusButton)),
         child: Column(children: [
-          Icon(icon, color: color, size: 24),
-          SizedBox(height: 8),
+          Icon(icon, color: color, size: AppDimensions.statIconSize),
+          const SizedBox(height: AppDimensions.statItemSpacing),
           Text(value,
-              style: TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.bold, color: color)),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold, color: color)),
           Text(label,
-              style:
-                  TextStyle(fontSize: 12, color: Theme.of(context).hintColor))
+              style: Theme.of(context)
+                  .textTheme
+                  .labelSmall
+                  ?.copyWith(color: Theme.of(context).hintColor))
         ]));
   }
 
@@ -1094,37 +1282,41 @@ class StatisticsPanel extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
         width: double.infinity,
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppDimensions.paddingAll),
         decoration: BoxDecoration(
             gradient: LinearGradient(colors: [
               AppTheme.accentOrange.withOpacity(0.1),
               AppTheme.accentOrange.withOpacity(0.05)
             ]),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius:
+                BorderRadius.circular(AppDimensions.borderRadiusButton),
             border: Border.all(color: AppTheme.accentOrange.withOpacity(0.3))),
         child: Row(children: [
           Container(
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.all(AppDimensions.paddingAppBarIcon),
               decoration: BoxDecoration(
                   color: AppTheme.accentOrange,
-                  borderRadius: BorderRadius.circular(8)),
-              child: Icon(Icons.emoji_events, color: Colors.white, size: 20)),
-          SizedBox(width: 12),
+                  borderRadius: BorderRadius.circular(
+                      AppDimensions.borderRadiusCircular)),
+              child: const Icon(Icons.emoji_events,
+                  color: Colors.white, size: AppDimensions.iconSizeAppBar)),
+          const SizedBox(width: AppDimensions.paddingIconText),
           Expanded(
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                Text('In Testa',
-                    style: TextStyle(fontSize: 12, color: theme.hintColor)),
+                Text(AppStrings.lead,
+                    style: Theme.of(context)
+                        .textTheme
+                        .labelSmall
+                        ?.copyWith(color: theme.hintColor)),
                 Text(leadingCandidate,
-                    style: TextStyle(
-                        fontSize: 16,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: theme.colorScheme.onSurface))
               ])),
-          Text('$leadingVotes voti',
-              style: TextStyle(
-                  fontSize: 14,
+          Text('$leadingVotes ${AppStrings.votes}',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: AppTheme.accentOrange))
         ]));
@@ -1134,51 +1326,57 @@ class StatisticsPanel extends StatelessWidget {
 class ComparisonChart extends StatelessWidget {
   final List<Map<String, dynamic>> candidates;
 
-  const ComparisonChart({Key? key, required this.candidates}) : super(key: key);
+  const ComparisonChart({super.key, required this.candidates});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final validCandidates = candidates
-        .where(
-            (c) => c['name'] != "Schede Bianche" && c['name'] != "Schede Nulle")
+        .where((c) =>
+            c['name'] != AppStrings.blankVotes &&
+            c['name'] != AppStrings.nullVotes)
         .toList();
 
-    if (validCandidates.length < 2) {
+    if (validCandidates.length < AppStrings.minParticipants) {
       return Card(
           child: Center(
               child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text('Confronto non disponibile (meno di 2 candidati)',
-                      style: TextStyle(color: theme.hintColor)))));
+                  padding: const EdgeInsets.all(AppDimensions.paddingAll),
+                  child: Text(AppStrings.comparisonNotAvailable,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(color: theme.hintColor)))));
     }
     final first = validCandidates[0];
     final second = validCandidates[1];
     final gap = first['votes'] - second['votes'];
 
     return Card(
-        margin: EdgeInsets.symmetric(vertical: 8),
+        margin: const EdgeInsets.symmetric(
+            vertical: AppDimensions.paddingAppBarIcon),
         child: Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.paddingAll),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('Confronto Diretto',
-                  style: TextStyle(
-                      fontSize: 16,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: theme.colorScheme.onSurface)),
-              SizedBox(height: 16),
-              _buildCandidateBar(context, first['name'], first['votes'],
-                  first['color'], 1.0, true),
-              SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.paddingAll),
+              _buildCandidateBar(context, first['name'] as String,
+                  first['votes'] as int, first['color'] as Color, 1.0, true),
+              const SizedBox(height: AppDimensions.paddingIconText),
               _buildCandidateBar(
                   context,
-                  second['name'],
-                  second['votes'],
-                  second['color'],
-                  (first['votes'] > 0 ? second['votes'] / first['votes'] : 0.0),
+                  second['name'] as String,
+                  second['votes'] as int,
+                  second['color'] as Color,
+                  (first['votes'] > 0
+                      ? (second['votes'] as int) / (first['votes'] as int)
+                      : 0.0),
                   false),
-              SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.paddingAll),
               _buildGapIndicator(gap)
             ])));
   }
@@ -1187,37 +1385,39 @@ class ComparisonChart extends StatelessWidget {
       Color color, double width, bool isLeading) {
     return Row(children: [
       SizedBox(
-          width: 80,
+          width: AppDimensions.comparisonNameWidth,
           child: Text(name,
-              style: TextStyle(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: isLeading ? FontWeight.bold : FontWeight.normal,
                   color: isLeading ? color : Theme.of(context).hintColor),
               overflow: TextOverflow.ellipsis)),
-      SizedBox(width: 12),
+      const SizedBox(width: AppDimensions.paddingIconText),
       Expanded(
           child: Container(
-              height: 24,
+              height: AppDimensions.comparisonBarHeight,
               decoration: BoxDecoration(
                   color: Theme.of(context).dividerColor.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(12)),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.borderRadiusButton)),
               child: FractionallySizedBox(
                   alignment: Alignment.centerLeft,
                   widthFactor: width,
                   child: Container(
                       decoration: BoxDecoration(
                           color: color,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(
+                              AppDimensions.borderRadiusButton),
                           boxShadow: isLeading
                               ? [
                                   BoxShadow(
                                       color: color.withOpacity(0.3),
                                       blurRadius: 4,
-                                      offset: Offset(0, 2))
+                                      offset: const Offset(0, 2))
                                 ]
                               : null),
                       child: Center(
                           child: Text('$votes',
-                              style: TextStyle(
+                              style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12)))))))
@@ -1228,15 +1428,19 @@ class ComparisonChart extends StatelessWidget {
     final isAdvantage = gap > 0;
     final color = isAdvantage ? AppTheme.secondaryTeal : AppTheme.accentOrange;
     return Container(
-        padding: EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppDimensions.paddingIconText),
         decoration: BoxDecoration(
             color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8)),
+            borderRadius:
+                BorderRadius.circular(AppDimensions.borderRadiusCircular)),
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           Icon(isAdvantage ? Icons.trending_up : Icons.balance,
               color: color, size: 16),
-          SizedBox(width: 8),
-          Text(gap != 0 ? 'Vantaggio: $gap voti' : 'Pareggio',
+          const SizedBox(width: AppDimensions.paddingAppBarIcon),
+          Text(
+              gap != 0
+                  ? '${AppStrings.advantage}: $gap ${AppStrings.votes}'
+                  : AppStrings.tie,
               style: TextStyle(fontWeight: FontWeight.w600, color: color))
         ]));
   }
@@ -1247,28 +1451,27 @@ class ExportPanel extends StatelessWidget {
   final Map<String, dynamic> statistics;
 
   const ExportPanel(
-      {Key? key, required this.candidates, required this.statistics})
-      : super(key: key);
+      {super.key, required this.candidates, required this.statistics});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-        margin: EdgeInsets.symmetric(vertical: 8),
+        margin: const EdgeInsets.symmetric(
+            vertical: AppDimensions.paddingAppBarIcon),
         child: Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.paddingAll),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Esportazione Dati',
-                  style: TextStyle(
-                      fontSize: 16,
+              Text(AppStrings.exportData,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Theme.of(context).colorScheme.onSurface)),
-              SizedBox(height: 16),
+              const SizedBox(height: AppDimensions.paddingAll),
               Row(children: [
                 Expanded(
                     child: _buildExportButton('CSV', Icons.table_chart,
                         () => _exportToCsv(context), AppTheme.secondaryTeal)),
-                SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.paddingIconText),
                 Expanded(
                     child: _buildExportButton('JSON', Icons.code,
                         () => _exportToJson(context), AppTheme.primaryBlue))
@@ -1285,17 +1488,19 @@ class ExportPanel extends StatelessWidget {
         style: ElevatedButton.styleFrom(
             backgroundColor: color,
             foregroundColor: Colors.white,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16)));
+            shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(AppDimensions.borderRadiusCircular)),
+            padding: const EdgeInsets.symmetric(
+                vertical: 12, horizontal: AppDimensions.paddingAll)));
   }
 
   void _exportToCsv(BuildContext context) {
     final buffer = StringBuffer()..writeln('Candidato,Voti,Percentuale');
-    final totalVotes = statistics['totalVotes'] ?? 0;
+    final totalVotes = statistics['totalVotes'] as int? ?? 0;
     for (final candidate in candidates) {
       final percentage = totalVotes > 0
-          ? (candidate['votes'] / totalVotes * 100).toStringAsFixed(2)
+          ? ((candidate['votes'] as int) / totalVotes * 100).toStringAsFixed(2)
           : '0.00';
       buffer.writeln('${candidate['name']},${candidate['votes']},$percentage%');
     }
@@ -1312,23 +1517,24 @@ class ExportPanel extends StatelessWidget {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
-                title: Text('Esporta in $format'),
+                title: Text('${AppStrings.exportTo} $format'),
                 content: SingleChildScrollView(
                     child: SelectableText(data,
-                        style: TextStyle(fontFamily: 'monospace'))),
+                        style: const TextStyle(fontFamily: 'monospace'))),
                 actions: [
                   TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: Text('Chiudi')),
+                      child: const Text(AppStrings.close)),
                   ElevatedButton(
                       onPressed: () {
                         Clipboard.setData(ClipboardData(text: data)).then((_) {
                           Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text('Dati copiati negli appunti!')));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text(AppStrings.dataCopied)));
                         });
                       },
-                      child: Text('Copia'))
+                      child: const Text(AppStrings.copy))
                 ]));
   }
 }
