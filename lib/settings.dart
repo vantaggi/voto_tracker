@@ -67,7 +67,7 @@ class _SettingsState extends State<SettingsPage> {
       body: ListView(
         shrinkWrap: true,
         children: [
-          // creaOpzioneNumPartecipanti(),
+          creaOpzioneNumPartecipanti(),
           creaOpzioneNumVotanti(),
         ],
       ),
