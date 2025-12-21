@@ -37,13 +37,15 @@ class HomePage extends StatelessWidget {
                   );
               } else {
                   // Mobile
-                  return const Column(
-                      children: [
-                          SizedBox(height: 350, child: ChartsSection()), 
-                          Divider(height: 1),
-                          Expanded(child: CandidatesSection()),
-                      ]
-                  );
+                          return const SingleChildScrollView(
+                              child: Column(
+                                  children: [
+                                      SizedBox(height: 350, child: ChartsSection()), 
+                                      Divider(height: 1),
+                                      CandidatesSection(isScrollable: false),
+                                  ]
+                              )
+                          );
               }
           }
       ),

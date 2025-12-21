@@ -191,37 +191,40 @@ class ScrutinyProvider extends ChangeNotifier {
   }
 
   void _calculateResults() {
-    // Sort logic: higher votes first
-    _candidates.sort((a, b) => b.votes.compareTo(a.votes));
+    // DO NOT sort _candidates in place to prevent UI jumping
+    // Create a shadow list for ranking logic
+    final sortedList = List<Candidate>.from(_candidates);
+    sortedList.sort((a, b) => b.votes.compareTo(a.votes));
+
+    // Assign ranks
+    for (int i = 0; i < sortedList.length; i++) {
+        sortedList[i].rank = i + 1;
+    }
 
     _totalVotesAssigned = _candidates.fold(0, (sum, c) => sum + c.votes);
     _remainingVotes = _settings.totalVoters - _totalVotesAssigned;
 
     _winner = null;
 
-    final validCandidates = _candidates
+    final validCandidates = sortedList
         .where((c) =>
             c.name != AppStrings.blankVotes && c.name != AppStrings.nullVotes)
         .toList();
 
     if (validCandidates.isEmpty) return;
 
-    // Mathematical Winner Limit
+    // Winner Calculation Logic (same as before)
     if (validCandidates.length >= 2) {
       final firstPlace = validCandidates[0];
       final secondPlace = validCandidates[1];
       final voteGap = firstPlace.votes - secondPlace.votes;
 
-      // Note: usage of remainingVotes. If overvoting, remainingVotes is negative.
-      // Logic still holds: if gap > remaining (where remaining is negative), gap > neg is true IF gap is positive enough.
-      // But standard logic implies remainingVotes >= 0.
       if (_remainingVotes >= 0 && voteGap > _remainingVotes) {
         _winner = firstPlace.name;
-        return;
+        // Don't return early, we need to ensure stats are consistent
       }
     }
 
-    // End of scrutiny
     if (_remainingVotes <= 0 && _totalVotesAssigned > 0) {
       if (validCandidates.length >= 2 &&
           validCandidates[0].votes == validCandidates[1].votes &&
@@ -231,6 +234,13 @@ class ScrutinyProvider extends ChangeNotifier {
         _winner = validCandidates.first.name;
       }
     }
+  }
+
+  // Getter for sorted candidates (for charts/export)
+  List<Candidate> get sortedCandidates {
+      final list = List<Candidate>.from(_candidates);
+      list.sort((a, b) => b.votes.compareTo(a.votes));
+      return list;
   }
 
   Map<int, Map<String, int>> get historyPoints {

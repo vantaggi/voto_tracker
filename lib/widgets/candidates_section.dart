@@ -8,18 +8,31 @@ import 'package:voto_tracker/utils/app_constants.dart';
 import 'package:voto_tracker/widgets/candidate_card.dart';
 
 class CandidatesSection extends StatelessWidget {
-  const CandidatesSection({super.key});
+  final bool isScrollable;
+  const CandidatesSection({super.key, this.isScrollable = true});
 
   @override
   Widget build(BuildContext context) {
+    // If not scrollable (e.g. inside SingleChildScrollView), we use shrinkWrap and physics NeverScrollable
     return Column(
       children: [
         const StatsHeader(),
-        Expanded(
-          child: Consumer<ScrutinyProvider>(
+        if (isScrollable) 
+            Expanded(child: _buildList())
+        else 
+            _buildList(),
+        const ControlButtons(),
+      ],
+    );
+  }
+
+  Widget _buildList() {
+      return Consumer<ScrutinyProvider>(
             builder: (context, provider, child) {
               return ListView.builder(
                 padding: const EdgeInsets.all(AppDimensions.paddingAll),
+                shrinkWrap: !isScrollable,
+                physics: isScrollable ? null : const NeverScrollableScrollPhysics(),
                 itemCount: provider.candidates.length,
                 itemBuilder: (context, index) {
                   return Padding(
@@ -32,11 +45,7 @@ class CandidatesSection extends StatelessWidget {
                 },
               );
             },
-          ),
-        ),
-        const ControlButtons(),
-      ],
-    );
+          );
   }
 }
 
@@ -116,15 +125,15 @@ class StatsHeader extends StatelessWidget {
               color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(AppDimensions.borderRadiusCard),
           ),
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+          child: Wrap(
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 12,
+              runSpacing: 8,
               children: [
                   Text("1° ${first.name}: ${first.votes}", style: const TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(width: 16),
                   Text("VS", style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
-                  const SizedBox(width: 16),
                   Text("2° ${second.name}: ${second.votes}", style: const TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(width: 16),
                   Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
@@ -163,7 +172,7 @@ class ControlButtons extends StatelessWidget {
                     ),
                     IconButton(
                         onPressed: () => _showExportOptions(context),
-                        icon: const Icon(Icons.copy),
+                        icon: const Icon(Icons.ios_share),
                         tooltip: AppStrings.exportData,
                     ),
                     IconButton(
@@ -208,7 +217,7 @@ class ControlButtons extends StatelessWidget {
                                 final provider = context.read<ScrutinyProvider>();
                                 try {
                                     await PdfExportService.exportToPdf(
-                                        candidates: provider.candidates,
+                                        candidates: provider.sortedCandidates,
                                         totalVotesAssigned: provider.totalVotesAssigned,
                                         totalVoters: provider.settings.totalVoters,
                                         remainingVotes: provider.remainingVotes,

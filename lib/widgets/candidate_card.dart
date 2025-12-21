@@ -30,6 +30,24 @@ class CandidateCard extends StatelessWidget {
                 Expanded(
                   child: Row(
                     children: [
+                      // Rank Badge
+                      if (candidate.rank > 0 && candidate.votes > 0)
+                      Container(
+                          margin: const EdgeInsets.only(right: 8),
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                              color: candidate.rank == 1 ? Colors.amber : Colors.grey.shade200,
+                              shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                              "${candidate.rank}",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                  color: candidate.rank == 1 ? Colors.white : Colors.black
+                              )
+                          )
+                      ),
                       Container(
                         width: 16,
                         height: 16,

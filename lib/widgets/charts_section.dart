@@ -59,7 +59,7 @@ class _CurrentResultsChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<ScrutinyProvider>(builder: (context, provider, child) {
-      final candidates = provider.candidates;
+      final candidates = provider.sortedCandidates;
       if (candidates.isEmpty) {
         return Center(
             child: Text(AppStrings.noDataAvailable,
@@ -273,7 +273,7 @@ class _PercentageChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<ScrutinyProvider>(builder: (context, provider, child) {
-      final candidates = provider.candidates;
+      final candidates = provider.sortedCandidates;
       final totalVotes = provider.totalVotesAssigned;
 
       if (candidates.isEmpty || totalVotes == 0) {
