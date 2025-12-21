@@ -57,27 +57,38 @@ class StatsHeader extends StatelessWidget {
     return Consumer<ScrutinyProvider>(builder: (context, provider, child) {
       final theme = Theme.of(context);
       
-      // Winner Banner
-      if (provider.winner != null) {
-          return Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              color: provider.winner == AppStrings.tie ? Colors.orange : Colors.amber,
-              child: Column(
-                  children: [
-                      Text(AppStrings.winner, 
-                          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: Colors.black)),
-                      Text(provider.winner!, 
-                          style: theme.textTheme.displayMedium?.copyWith(color: Colors.black)),
-                  ]
-              )
-          );
-      }
-      
       return Container(
         padding: const EdgeInsets.all(AppDimensions.paddingAll),
         child: Column(
           children: [
+            // Winner Banner (Stacked on top if present)
+            if (provider.winner != null)
+                Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                        color: provider.winner == AppStrings.tie ? Colors.orange : Colors.amber,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                            BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2)
+                            )
+                        ]
+                    ),
+                    child: Column(
+                        children: [
+                            Text(AppStrings.winner, 
+                                style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: Colors.black)),
+                            Text(provider.winner!, 
+                                style: theme.textTheme.displayMedium?.copyWith(color: Colors.black)),
+                        ]
+                    )
+                ),
+
+            // ALWAYS Show Stats
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -264,9 +275,29 @@ class ControlButtons extends StatelessWidget {
                             foregroundColor: Colors.white,
                             textStyle: const TextStyle(fontWeight: FontWeight.bold)),
                         onPressed: () {
-                             context.read<ScrutinyProvider>().reset();
-                             Navigator.pop(context);
-                        },
+                    showDialog(
+                        context: context,
+                        builder: (innerContext) => AlertDialog(
+                            title: const Text("Conferma Reset"),
+                            content: const Text("Sei sicuro di voler cancellare tutti i voti? Questa operazione non può essere annullata."),
+                            actions: [
+                                TextButton(
+                                    onPressed: () => Navigator.pop(innerContext),
+                                    child: const Text(AppStrings.cancel)
+                                ),
+                                ElevatedButton(
+                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                                    onPressed: () {
+                                        context.read<ScrutinyProvider>().reset();
+                                        Navigator.pop(innerContext); // Pop the inner dialog
+                                        Navigator.pop(context); // Pop the outer dialog
+                                    },
+                                    child: const Text("Reset")
+                                )
+                            ],
+                        )
+                    );
+                },
                         child: const Text(AppStrings.reset),
                     )
                 ]

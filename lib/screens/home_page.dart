@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
 import 'package:voto_tracker/widgets/charts_section.dart';
 import 'package:voto_tracker/widgets/candidates_section.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:voto_tracker/screens/settings_dialog.dart';
 
 class HomePage extends StatelessWidget {
@@ -9,6 +10,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    WakelockPlus.enable(); // Keep screen on while on this page
     return Scaffold(
       appBar: AppBar(
         title: const Text(AppStrings.appTitle),

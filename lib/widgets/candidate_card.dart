@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:voto_tracker/models/candidate.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
+import 'package:flutter/services.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
 
 class CandidateCard extends StatelessWidget {
@@ -20,87 +21,93 @@ class CandidateCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppDimensions.borderRadiusCard),
         side: BorderSide(color: candidate.color.withValues(alpha: 0.5), width: 1),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(AppDimensions.paddingAll),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      // Rank Badge
-                      if (candidate.rank > 0 && candidate.votes > 0)
-                      Container(
-                          margin: const EdgeInsets.only(right: 8),
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                              color: candidate.rank == 1 ? Colors.amber : Colors.grey.shade200,
-                              shape: BoxShape.circle,
-                          ),
-                          child: Text(
-                              "${candidate.rank}",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                  color: candidate.rank == 1 ? Colors.white : Colors.black
-                              )
-                          )
-                      ),
-                      Container(
-                        width: 16,
-                        height: 16,
-                        decoration: BoxDecoration(
-                            color: candidate.color, shape: BoxShape.circle),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          candidate.name,
-                          style: theme.textTheme.titleMedium,
-                          overflow: TextOverflow.ellipsis,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppDimensions.borderRadiusCard),
+        onLongPress: () => _showEditNameDialog(context),
+        child: Padding(
+            padding: const EdgeInsets.all(AppDimensions.paddingAll),
+            child: Column(
+            children: [
+                Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                    Expanded(
+                    child: Row(
+                        children: [
+                        // Rank Badge
+                        if (candidate.rank > 0 && candidate.votes > 0)
+                        Container(
+                            margin: const EdgeInsets.only(right: 8),
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                                color: candidate.rank == 1 ? Colors.amber : Colors.grey.shade200,
+                                shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                                "${candidate.rank}",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                    color: candidate.rank == 1 ? Colors.white : Colors.black
+                                )
+                            )
                         ),
-                      ),
-                    ],
-                  ),
+                        Container(
+                            width: 16,
+                            height: 16,
+                            decoration: BoxDecoration(
+                                color: candidate.color, shape: BoxShape.circle),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                            child: Text(
+                            candidate.name,
+                            style: theme.textTheme.titleMedium,
+                            overflow: TextOverflow.ellipsis,
+                            ),
+                        ),
+                        ],
+                    ),
+                    ),
+                    IconButton(
+                    icon: const Icon(Icons.edit, size: 20),
+                    onPressed: () => _showEditNameDialog(context),
+                    tooltip: AppStrings.editName,
+                    ),
+                ],
                 ),
-                IconButton(
-                  icon: const Icon(Icons.edit, size: 20),
-                  onPressed: () => _showEditNameDialog(context),
-                  tooltip: AppStrings.editName,
+                const SizedBox(height: 16),
+                Text(
+                '${candidate.votes}',
+                style: theme.textTheme.displayMedium
+                    ?.copyWith(color: candidate.color, fontWeight: FontWeight.bold),
                 ),
-              ],
+                Text(AppStrings.votes, style: theme.textTheme.bodyMedium),
+                const SizedBox(height: 16),
+                Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                    _buildVoteButton(
+                        context: context,
+                        icon: Icons.remove,
+                        onPressed: () {
+                            HapticFeedback.selectionClick();
+                            context.read<ScrutinyProvider>().vote(index, increment: false);
+                        },
+                        color: Colors.red.shade400),
+                    const SizedBox(width: 24),
+                    _buildVoteButton(
+                        context: context,
+                        icon: Icons.add,
+                        onPressed: () {
+                             HapticFeedback.selectionClick();
+                             context.read<ScrutinyProvider>().vote(index, increment: true);
+                        },
+                        color: Colors.green.shade600),
+                ],
+                ),
+            ],
             ),
-            const SizedBox(height: 16),
-            Text(
-              '${candidate.votes}',
-              style: theme.textTheme.displayMedium
-                  ?.copyWith(color: candidate.color, fontWeight: FontWeight.bold),
-            ),
-            Text(AppStrings.votes, style: theme.textTheme.bodyMedium),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildVoteButton(
-                    context: context,
-                    icon: Icons.remove,
-                    onPressed: () {
-                        context.read<ScrutinyProvider>().vote(index, increment: false);
-                    },
-                    color: Colors.red.shade400),
-                const SizedBox(width: 24),
-                _buildVoteButton(
-                    context: context,
-                    icon: Icons.add,
-                    onPressed: () {
-                         context.read<ScrutinyProvider>().vote(index, increment: true);
-                    },
-                    color: Colors.green.shade600),
-              ],
-            ),
-          ],
         ),
       ),
     );
@@ -134,6 +141,7 @@ class CandidateCard extends StatelessWidget {
         title: const Text(AppStrings.editName),
         content: TextField(
           controller: controller,
+          autofocus: true,
           decoration: const InputDecoration(
             labelText: AppStrings.candidateName,
             border: OutlineInputBorder(),

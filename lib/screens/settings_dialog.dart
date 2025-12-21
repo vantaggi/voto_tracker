@@ -44,6 +44,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
           children: [
             TextField(
               controller: _totalVotersController,
+              autofocus: true,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
                 labelText: AppStrings.totalVotersNumber,
