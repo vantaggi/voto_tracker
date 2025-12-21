@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
+import 'package:voto_tracker/services/pdf_export_service.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
 import 'package:voto_tracker/widgets/candidate_card.dart';
 
@@ -65,13 +67,19 @@ class StatsHeader extends StatelessWidget {
       
       return Container(
         padding: const EdgeInsets.all(AppDimensions.paddingAll),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+        child: Column(
           children: [
-            _buildStatItem(context, Icons.how_to_vote, AppStrings.scrutinisedVotes, 
-                '${provider.totalVotesAssigned} / ${provider.settings.totalVoters}'),
-            _buildStatItem(context, Icons.pending, "Rimanenti", 
-                '${provider.remainingVotes}'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildStatItem(context, Icons.how_to_vote, AppStrings.scrutinisedVotes, 
+                    '${provider.totalVotesAssigned} / ${provider.settings.totalVoters}'),
+                _buildStatItem(context, Icons.pending, "Rimanenti", 
+                    '${provider.remainingVotes}'),
+              ],
+            ),
+             const SizedBox(height: 16),
+             _buildComparison(context, provider),
           ],
         ),
       );
@@ -86,6 +94,47 @@ class StatsHeader extends StatelessWidget {
               Text(value, style: theme.textTheme.titleLarge),
               Text(label, style: theme.textTheme.bodySmall),
           ]
+      );
+  }
+
+  Widget _buildComparison(BuildContext context, ScrutinyProvider provider) {
+      final validCandidates = provider.candidates
+          .where((c) => c.name != AppStrings.blankVotes && c.name != AppStrings.nullVotes)
+          .toList();
+      
+      if (validCandidates.length < 2) {
+          return const Text(AppStrings.comparisonNotAvailable, style: TextStyle(color: Colors.grey));
+      }
+
+      final first = validCandidates[0];
+      final second = validCandidates[1];
+      final diff = first.votes - second.votes;
+
+      return Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(AppDimensions.borderRadiusCard),
+          ),
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                  Text("1° ${first.name}: ${first.votes}", style: const TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(width: 16),
+                  Text("VS", style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
+                  const SizedBox(width: 16),
+                  Text("2° ${second.name}: ${second.votes}", style: const TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(width: 16),
+                  Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(12)
+                      ),
+                      child: Text("${AppStrings.advantage}: +$diff", style: TextStyle(color: Theme.of(context).colorScheme.onPrimaryContainer, fontWeight: FontWeight.bold))
+                  )
+              ]
+          )
       );
   }
 }
@@ -113,7 +162,7 @@ class ControlButtons extends StatelessWidget {
                         tooltip: "Redo",
                     ),
                     IconButton(
-                        onPressed: () => _exportData(context),
+                        onPressed: () => _showExportOptions(context),
                         icon: const Icon(Icons.copy),
                         tooltip: AppStrings.exportData,
                     ),
@@ -128,9 +177,64 @@ class ControlButtons extends StatelessWidget {
         );
     }
     
-    void _exportData(BuildContext context) {
-        final csv = context.read<ScrutinyProvider>().exportToCsv();
-        Clipboard.setData(ClipboardData(text: csv));
+    void _showExportOptions(BuildContext context) {
+        showModalBottomSheet(
+            context: context,
+            builder: (context) => SafeArea(
+                child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                        ListTile(
+                            leading: const Icon(Icons.table_chart),
+                            title: const Text("Copia CSV"),
+                            onTap: () {
+                                Navigator.pop(context);
+                                _exportData(context, isCsv: true);
+                            },
+                        ),
+                        ListTile(
+                            leading: const Icon(Icons.code),
+                            title: const Text("Copia JSON"),
+                            onTap: () {
+                                Navigator.pop(context);
+                                _exportData(context, isCsv: false);
+                            },
+                        ),
+                        ListTile(
+                            leading: const Icon(Icons.picture_as_pdf),
+                            title: const Text("Export PDF Report"),
+                            onTap: () async {
+                                Navigator.pop(context);
+                                final provider = context.read<ScrutinyProvider>();
+                                try {
+                                    await PdfExportService.exportToPdf(
+                                        candidates: provider.candidates,
+                                        totalVotesAssigned: provider.totalVotesAssigned,
+                                        totalVoters: provider.settings.totalVoters,
+                                        remainingVotes: provider.remainingVotes,
+                                        historyPoints: provider.historyPoints,
+                                        winner: provider.winner,
+                                    );
+                                } catch (e) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                            content: Text("Error: ${e.toString()} - Try restarting the app fully."),
+                                            backgroundColor: Colors.red,
+                                        )
+                                    );
+                                }
+                            },
+                        ),
+                    ]
+                )
+            )
+        );
+    }
+
+    void _exportData(BuildContext context, {required bool isCsv}) {
+        final provider = context.read<ScrutinyProvider>();
+        final String data = isCsv ? provider.exportToCsv() : jsonEncode(provider.exportToJson());
+        Clipboard.setData(ClipboardData(text: data));
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text(AppStrings.dataCopied))
         );
@@ -143,9 +247,13 @@ class ControlButtons extends StatelessWidget {
                 title: const Text(AppStrings.confirmReset),
                 content: const Text(AppStrings.resetConfirmation),
                 actions: [
-                    TextButton(onPressed: () => Navigator.pop(context), child: const Text(AppStrings.cancel)),
+                    TextButton(onPressed: () => Navigator.pop(context), 
+                        child: Text(AppStrings.cancel, style: Theme.of(context).textTheme.labelLarge)),
                     ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red, 
+                            foregroundColor: Colors.white,
+                            textStyle: const TextStyle(fontWeight: FontWeight.bold)),
                         onPressed: () {
                              context.read<ScrutinyProvider>().reset();
                              Navigator.pop(context);

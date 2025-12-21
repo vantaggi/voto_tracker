@@ -24,6 +24,8 @@ dependencies:
   fl_chart: ^0.66.0
   provider: ^6.1.1
   shared_preferences: ^2.2.2
+  pdf: ^3.10.4
+  printing: ^5.11.1
 
 dev_dependencies:
   flutter_test:

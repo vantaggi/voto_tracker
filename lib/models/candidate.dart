@@ -14,8 +14,7 @@ class Candidate {
   Map<String, dynamic> toJson() => {
     'name': name,
     'votes': votes,
-    'color': color.value, // Ignoring deprecation for clean int serialization compatibility as toARGB32 might be version specific or behave differently.
-    // 'color': color.toARGB32(), // Recommended replacement if available
+    'color': color.toARGB32(),
   };
 
   factory Candidate.fromJson(Map<String, dynamic> json) {

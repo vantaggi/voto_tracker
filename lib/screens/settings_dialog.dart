@@ -84,9 +84,11 @@ class _SettingsDialogState extends State<SettingsDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text(AppStrings.cancel),
+          child: Text(AppStrings.cancel, style: Theme.of(context).textTheme.labelLarge),
         ),
         ElevatedButton(
+          style: ElevatedButton.styleFrom(
+              textStyle: const TextStyle(fontWeight: FontWeight.bold)),
           onPressed: () {
             final int voters = int.tryParse(_totalVotersController.text) ?? 100;
             final newSettings = Settings(
@@ -96,8 +98,23 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 showNullVotes: _showNullVotes,
             );
             
-            context.read<ScrutinyProvider>().updateSettings(newSettings);
+            // Capture provider before context potentially becomes invalid
+            final provider = context.read<ScrutinyProvider>();
+            
+            // 1. Unfocus any text fields causing the keyboard to close
+            FocusScope.of(context).unfocus();
+            
+            // 2. Close dialog immediately
             Navigator.pop(context);
+
+            // 3. Perform the update after a short delay to ensure the dialog barrier is gone
+            Future.delayed(const Duration(milliseconds: 150), () {
+                try {
+                   provider.updateSettings(newSettings);
+                } catch(e) {
+                   debugPrint("Error saving settings: $e");
+                }
+            });
           },
           child: const Text(AppStrings.save),
         ),

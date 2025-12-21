@@ -16,11 +16,11 @@ class ChartsSection extends StatelessWidget {
         child: Column(children: [
           _buildTabBar(context),
           const SizedBox(height: 16),
-          Expanded(
+          const Expanded(
               child: TabBarView(children: [
-            const _CurrentResultsChart(),
-            const _HistoryChart(),
-            const _PercentageChart()
+            _CurrentResultsChart(),
+            _HistoryChart(),
+            _PercentageChart()
           ])),
         ]),
       ),
@@ -174,12 +174,25 @@ class _HistoryChart extends StatelessWidget {
       final sortedHistory = historyPoints.entries.toList()
         ..sort((a, b) => a.key.compareTo(b.key));
 
+      // Calculate dynamic Y-axis range
+      double maxY = 0;
+      for (var c in candidates) {
+          if (c.votes > maxY) maxY = c.votes.toDouble();
+      }
+      maxY = (maxY * 1.1).ceilToDouble(); // Add 10% buffering
+      if (maxY < 10) maxY = 10;
+      
+      // Calculate max X (history length matches votes assigned usually)
+      double maxX = sortedHistory.isNotEmpty ? sortedHistory.last.key.toDouble() : 10;
+      
       return Card(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(AppDimensions.paddingAll,
               AppDimensions.paddingAll, AppDimensions.paddingAll, 8),
           child: LineChart(
             LineChartData(
+              maxY: maxY,
+              maxX: maxX,
               lineBarsData: candidates
                   .where((c) =>
                       c.name != AppStrings.blankVotes &&
@@ -208,7 +221,7 @@ class _HistoryChart extends StatelessWidget {
                             ?.copyWith(color: theme.hintColor)),
                     sideTitles: SideTitles(
                         showTitles: true,
-                        reservedSize: 24,
+                        interval: (maxX / 5).ceilToDouble(), // Dynamic interval
                         getTitlesWidget: (value, meta) => Text(
                             value.toInt().toString(),
                             style: Theme.of(context)
@@ -225,6 +238,7 @@ class _HistoryChart extends StatelessWidget {
                     sideTitles: SideTitles(
                         showTitles: true,
                         reservedSize: 32,
+                        interval: (maxY / 5).ceilToDouble(), // Dynamic interval
                         getTitlesWidget: (value, meta) => Text(
                             value.toInt().toString(),
                             style: Theme.of(context)
@@ -240,8 +254,8 @@ class _HistoryChart extends StatelessWidget {
               gridData: FlGridData(
                   show: true,
                   drawVerticalLine: true,
-                  verticalInterval: 10,
-                  horizontalInterval: 5),
+                  verticalInterval: (maxX / 5).ceilToDouble(),
+                  horizontalInterval: (maxY / 5).ceilToDouble()),
               borderData: FlBorderData(
                   show: true, border: Border.all(color: theme.dividerColor)),
               clipData: const FlClipData.all(),
@@ -272,22 +286,42 @@ class _PercentageChart extends StatelessWidget {
       return Card(
           child: Padding(
               padding: const EdgeInsets.all(AppDimensions.paddingAll),
-              child: PieChart(PieChartData(
-                  sections:
-                      candidates.where((c) => c.votes > 0).map((candidate) {
-                    final percentage = candidate.getPercentage(totalVotes);
-                    return PieChartSectionData(
-                        color: candidate.color,
-                        value: candidate.votes.toDouble(),
-                        title: '${percentage.toStringAsFixed(1)}%',
-                        radius: AppDimensions.chartPieRadius,
-                        titleStyle: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white));
-                  }).toList(),
-                  centerSpaceRadius: AppDimensions.chartPieCenterSpaceRadius,
-                  sectionsSpace: AppDimensions.chartPieSpace))));
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                   PieChart(PieChartData(
+                      sections:
+                          candidates.where((c) => c.votes > 0).map((candidate) {
+                        final percentage = candidate.getPercentage(totalVotes);
+                        return PieChartSectionData(
+                            color: candidate.color,
+                            value: candidate.votes.toDouble(),
+                            title: '${percentage.toStringAsFixed(1)}%',
+                            radius: 50, // Slightly thinner donut ring
+                            titleStyle: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white));
+                      }).toList(),
+                      centerSpaceRadius: 60, // Larger center for text
+                      sectionsSpace: AppDimensions.chartPieSpace)),
+                   Column(
+                     mainAxisSize: MainAxisSize.min,
+                     children: [
+                       Text(
+                         totalVotes.toString(),
+                         style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                           fontWeight: FontWeight.bold,
+                         ),
+                       ),
+                       Text(
+                         "totale",
+                         style: Theme.of(context).textTheme.bodySmall,
+                       )
+                     ],
+                   )
+                ],
+              )));
     });
   }
 }

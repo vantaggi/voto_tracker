@@ -125,9 +125,11 @@ class CandidateCard extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(AppStrings.cancel),
+            child: Text(AppStrings.cancel, style: Theme.of(context).textTheme.labelLarge),
           ),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                textStyle: const TextStyle(fontWeight: FontWeight.bold)),
             onPressed: () {
               if (controller.text.isNotEmpty) {
                 context.read<ScrutinyProvider>().renameCandidate(index, controller.text);

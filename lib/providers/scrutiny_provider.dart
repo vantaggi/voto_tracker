@@ -34,11 +34,19 @@ class ScrutinyProvider extends ChangeNotifier {
   void _initializeCandidates() {
     _candidates = List.generate(
       _settings.participantsCount,
-      (index) => Candidate(
-        name: '${AppStrings.candidatePrefix} ${index + 1}',
-        votes: 0,
-        color: Colors.primaries[index % Colors.primaries.length],
-      ),
+      (index) {
+          final List<Color> distinctColors = [
+              Colors.red, Colors.blue, Colors.green, Colors.orange, 
+              Colors.purple, Colors.teal, Colors.pink, Colors.brown,
+              Colors.lime, Colors.indigo, Colors.cyan, Colors.deepOrange,
+              Colors.lightGreen, Colors.blueGrey, Colors.amberAccent
+          ];
+          return Candidate(
+            name: '${AppStrings.candidatePrefix} ${index + 1}',
+            votes: 0,
+            color: distinctColors[index % distinctColors.length],
+          );
+      },
     );
     if (_settings.showBlankVotes) {
       _candidates.add(Candidate(
@@ -110,6 +118,7 @@ class ScrutinyProvider extends ChangeNotifier {
     if (!increment && _candidates[index].votes <= 0) return;
 
     if (increment) {
+      if (_remainingVotes <= 0) return; // Prevent overvoting
       _candidates[index].votes++;
     } else {
       _candidates[index].votes--;
