@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="voto_tracker"
+        android:label="Voto Tracker"
         android:name="${applicationName}"
         android:enableOnBackInvokedCallback="true"
         android:icon="@drawable/ic_vototracker">

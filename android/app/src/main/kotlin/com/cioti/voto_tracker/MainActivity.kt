@@ -1,4 +1,4 @@
-package com.example.voto_tracker
+package com.cioti.voto_tracker
 
 import io.flutter.embedding.android.FlutterActivity
 
