@@ -182,11 +182,6 @@ class ControlButtons extends StatelessWidget {
                         tooltip: "Redo",
                     ),
                     IconButton(
-                        onPressed: () => _showExportOptions(context),
-                        icon: const Icon(Icons.ios_share),
-                        tooltip: AppStrings.exportData,
-                    ),
-                    IconButton(
                          icon: const Icon(Icons.refresh),
                          color: Colors.red,
                          tooltip: AppStrings.reset,
@@ -194,69 +189,6 @@ class ControlButtons extends StatelessWidget {
                     )
                 ]
             )
-        );
-    }
-    
-    void _showExportOptions(BuildContext context) {
-        showModalBottomSheet(
-            context: context,
-            builder: (context) => SafeArea(
-                child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                        ListTile(
-                            leading: const Icon(Icons.table_chart),
-                            title: const Text("Copia CSV"),
-                            onTap: () {
-                                Navigator.pop(context);
-                                _exportData(context, isCsv: true);
-                            },
-                        ),
-                        ListTile(
-                            leading: const Icon(Icons.code),
-                            title: const Text("Copia JSON"),
-                            onTap: () {
-                                Navigator.pop(context);
-                                _exportData(context, isCsv: false);
-                            },
-                        ),
-                        ListTile(
-                            leading: const Icon(Icons.picture_as_pdf),
-                            title: const Text("Export PDF Report"),
-                            onTap: () async {
-                                Navigator.pop(context);
-                                final provider = context.read<ScrutinyProvider>();
-                                try {
-                                    await PdfExportService.exportToPdf(
-                                        candidates: provider.sortedCandidates,
-                                        totalVotesAssigned: provider.totalVotesAssigned,
-                                        totalVoters: provider.settings.totalVoters,
-                                        remainingVotes: provider.remainingVotes,
-                                        historyPoints: provider.historyPoints,
-                                        winner: provider.winner,
-                                    );
-                                } catch (e) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                            content: Text("Error: ${e.toString()} - Try restarting the app fully."),
-                                            backgroundColor: Colors.red,
-                                        )
-                                    );
-                                }
-                            },
-                        ),
-                    ]
-                )
-            )
-        );
-    }
-
-    void _exportData(BuildContext context, {required bool isCsv}) {
-        final provider = context.read<ScrutinyProvider>();
-        final String data = isCsv ? provider.exportToCsv() : jsonEncode(provider.exportToJson());
-        Clipboard.setData(ClipboardData(text: data));
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text(AppStrings.dataCopied))
         );
     }
     

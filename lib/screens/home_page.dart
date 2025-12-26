@@ -94,6 +94,8 @@ class HomePage extends StatelessWidget {
                               await SocialShareService.shareResults(
                                   candidates: provider.sortedCandidates, 
                                   totalVotes: provider.totalVotesAssigned,
+                                  totalVoters: provider.settings.totalVoters,
+                                  remainingVotes: provider.remainingVotes,
                                   winner: provider.winner,
                                   winnerLabel: label
                               );

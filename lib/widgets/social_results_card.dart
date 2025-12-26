@@ -5,6 +5,8 @@ import 'package:voto_tracker/utils/app_constants.dart';
 class SocialResultsCard extends StatelessWidget {
   final List<Candidate> candidates;
   final int totalVotes;
+  final int totalVoters;
+  final int remainingVotes;
   final String? winner;
   final String? winnerLabel;
 
@@ -12,6 +14,8 @@ class SocialResultsCard extends StatelessWidget {
     super.key,
     required this.candidates,
     required this.totalVotes,
+    required this.totalVoters,
+    required this.remainingVotes,
     this.winner,
     this.winnerLabel,
   });
@@ -30,8 +34,8 @@ class SocialResultsCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Colors.indigo.shade900,
-            Colors.purple.shade900,
+            Color(0xFF1A1F2C), // Deep professional blue-grey
+            Color(0xFF2D3748), // Lighter slate
             Colors.black,
           ],
         ),
@@ -46,8 +50,14 @@ class SocialResultsCard extends StatelessWidget {
                Column(
                  crossAxisAlignment: CrossAxisAlignment.start,
                  children: [
-                    Text("AGGIORNAMENTO", style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12, letterSpacing: 2)),
+                    Text("AGGIORNAMENTO ${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')}", 
+                        style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12, letterSpacing: 2)),
                     const Text("SCRUTINIO LIVE", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900)),
+                     const SizedBox(height: 4),
+                     Text(
+                        "Scrutinate: $totalVotes / $totalVoters (${(totalVotes / (totalVoters == 0 ? 1 : totalVoters) * 100).toStringAsFixed(1)}%)\nRimanenti: $remainingVotes",
+                        style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.4)
+                     ),
                  ]
                ),
                Icon(Icons.how_to_vote, color: Colors.white.withOpacity(0.2), size: 48)
