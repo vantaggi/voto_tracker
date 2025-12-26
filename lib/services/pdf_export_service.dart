@@ -13,6 +13,7 @@ class PdfExportService {
     required int remainingVotes,
     required Map<int, Map<String, int>> historyPoints,
     String? winner,
+    String? winnerLabel,
   }) async {
     final doc = pw.Document();
     final font = await PdfGoogleFonts.robotoRegular();
@@ -31,7 +32,7 @@ class PdfExportService {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.stretch,
             children: [
-              _buildModernHeader(winner),
+              _buildModernHeader(winner, winnerLabel),
               pw.SizedBox(height: 15),
               _buildStatsStrip(totalVotesAssigned, totalVoters, remainingVotes),
               pw.SizedBox(height: 20),
@@ -76,7 +77,7 @@ class PdfExportService {
         bytes: await doc.save(), filename: 'scrutinio_report.pdf');
   }
 
-  static pw.Widget _buildModernHeader(String? winner) {
+  static pw.Widget _buildModernHeader(String? winner, String? winnerLabel) {
       return pw.Row(
           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
           crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -97,7 +98,7 @@ class PdfExportService {
                       color: PdfColors.amber,
                       borderRadius: pw.BorderRadius.circular(20),
                   ),
-                  child: pw.Text("VINCITORE: $winner", 
+                  child: pw.Text("${winnerLabel ?? 'VINCITORE'}: $winner", 
                       style: pw.TextStyle(color: PdfColors.white, fontWeight: pw.FontWeight.bold))
               ),
               pw.Text(

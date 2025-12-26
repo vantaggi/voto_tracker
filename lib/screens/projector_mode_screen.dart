@@ -130,19 +130,27 @@ class ProjectorModeScreen extends StatelessWidget {
   Widget _buildHeader(ScrutinyProvider provider) {
       final winner = provider.winner;
       if (winner != null) {
+          final isFinal = provider.remainingVotes <= 0;
+          final label = isFinal ? "ELETTO" : "MAGGIORANZA RAGGIUNTA";
+          
           return Container(
               padding: const EdgeInsets.symmetric(vertical: 16),
               width: double.infinity,
               color: Colors.amber,
               alignment: Alignment.center,
-              child: Text(
-                  "VINCITORE: ${winner.toUpperCase()}",
-                  style: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 48,
-                      letterSpacing: 4
-                  ),
+              child: Column(
+                children: [
+                    Text(label, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 24)),
+                    Text(
+                        winner.toUpperCase(),
+                        style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 48,
+                            letterSpacing: 4
+                        ),
+                    ),
+                ],
               )
           );
       }

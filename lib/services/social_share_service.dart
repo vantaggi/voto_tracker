@@ -11,7 +11,8 @@ class SocialShareService {
     static Future<void> shareResults({
         required List<Candidate> candidates, 
         required int totalVotes,
-        String? winner
+        String? winner,
+        String? winnerLabel
     }) async {
         final controller = ScreenshotController();
         
@@ -19,7 +20,7 @@ class SocialShareService {
             final double pixelRatio = 3.0; // High res
             
             final Uint8List image = await controller.captureFromWidget(
-                SocialResultsCard(candidates: candidates, totalVotes: totalVotes, winner: winner),
+                SocialResultsCard(candidates: candidates, totalVotes: totalVotes, winner: winner, winnerLabel: winnerLabel),
                 delay: const Duration(milliseconds: 10),
                 pixelRatio: pixelRatio
             );

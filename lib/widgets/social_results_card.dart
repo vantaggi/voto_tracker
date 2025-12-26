@@ -6,12 +6,14 @@ class SocialResultsCard extends StatelessWidget {
   final List<Candidate> candidates;
   final int totalVotes;
   final String? winner;
+  final String? winnerLabel;
 
   const SocialResultsCard({
     super.key,
     required this.candidates,
     required this.totalVotes,
     this.winner,
+    this.winnerLabel,
   });
 
   @override
@@ -65,7 +67,7 @@ class SocialResultsCard extends StatelessWidget {
             ),
             child: Column(
                 children: [
-                    const Text("VINCITORE", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12)),
+                    Text(winnerLabel ?? "VINCITORE", style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12)),
                     Text(winner!.toUpperCase(), style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 28), textAlign: TextAlign.center),
                 ]
             )

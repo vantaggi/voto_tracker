@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/screens/projector_mode_screen.dart';
 import 'package:voto_tracker/services/social_share_service.dart';
+import 'package:voto_tracker/services/pdf_export_service.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -20,16 +21,9 @@ class HomePage extends StatelessWidget {
         title: const Text(AppStrings.appTitle),
         actions: [
             IconButton(
-                icon: const Icon(Icons.share),
-                tooltip: "Condividi Risultati",
-                onPressed: () {
-                    final provider = context.read<ScrutinyProvider>();
-                    SocialShareService.shareResults(
-                        candidates: provider.sortedCandidates, 
-                        totalVotes: provider.totalVotesAssigned,
-                        winner: provider.winner
-                    );
-                },
+                icon: const Icon(Icons.ios_share),
+                tooltip: "Esporta / Condividi",
+                onPressed: () => _showExportOptions(context),
             ),
             IconButton(
                 icon: const Icon(Icons.tv),
@@ -76,5 +70,62 @@ class HomePage extends StatelessWidget {
           }
       ),
     );
+  }
+  void _showExportOptions(BuildContext context) {
+      showModalBottomSheet(
+          context: context,
+          builder: (context) => SafeArea(
+              child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                      ListTile(
+                          leading: const Icon(Icons.image),
+                          title: const Text("Condividi immagine social"),
+                          subtitle: const Text("Ottimizzata per Instagram/WhatsApp"),
+                          onTap: () async {
+                              Navigator.pop(context);
+                              final provider = context.read<ScrutinyProvider>();
+                              
+                              String? label;
+                              if (provider.winner != null) {
+                                  label = provider.remainingVotes <= 0 ? "ELETTO" : "MAGGIORANZA RAGGIUNTA";
+                              }
+
+                              await SocialShareService.shareResults(
+                                  candidates: provider.sortedCandidates, 
+                                  totalVotes: provider.totalVotesAssigned,
+                                  winner: provider.winner,
+                                  winnerLabel: label
+                              );
+                          },
+                      ),
+                      ListTile(
+                          leading: const Icon(Icons.picture_as_pdf),
+                          title: const Text("Esporta Report PDF"),
+                          subtitle: const Text("Documento ufficiale con grafici"),
+                          onTap: () async {
+                               Navigator.pop(context);
+                               final provider = context.read<ScrutinyProvider>();
+                               
+                               String? label;
+                               if (provider.winner != null) {
+                                   label = provider.remainingVotes <= 0 ? "ELETTO" : "MAGGIORANZA RAGGIUNTA";
+                               }
+
+                               await PdfExportService.exportToPdf(
+                                   candidates: provider.candidates, 
+                                   totalVotesAssigned: provider.totalVotesAssigned,
+                                   totalVoters: provider.settings.totalVoters,
+                                   remainingVotes: provider.remainingVotes,
+                                   historyPoints: provider.historyPoints,
+                                   winner: provider.winner,
+                                   winnerLabel: label
+                               );
+                          },
+                      ),
+                  ],
+              )
+          )
+      );
   }
 }
