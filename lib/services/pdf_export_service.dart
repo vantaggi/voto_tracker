@@ -138,7 +138,7 @@ class PdfExportService {
   static pw.Widget _buildBarChart(List<Candidate> candidates, int totalVotes) {
     if (candidates.isEmpty) return pw.Container();
     final maxVotes = candidates.isEmpty ? 10 : candidates.map((c) => c.votes).reduce((a, b) => a > b ? a : b);
-    final scale = maxVotes > 0 ? 150.0 / maxVotes : 0.0; // Reduced width for 2-col layout
+    final scale = maxVotes > 0 ? 100.0 / maxVotes : 0.0; // Reduced width to fit in column
 
     return pw.Container(
         decoration: pw.BoxDecoration(

@@ -30,19 +30,30 @@ class ChartsSection extends StatelessWidget {
   Widget _buildTabBar(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
+      height: 45,
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: theme.cardTheme.color,
-        borderRadius: BorderRadius.circular(AppDimensions.borderRadiusToggle),
-        border: Border.all(color: theme.dividerColor),
+        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(25),
       ),
       child: TabBar(
         indicator: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppDimensions.borderRadiusToggle),
-          color: theme.colorScheme.primary,
+          borderRadius: BorderRadius.circular(21),
+          color: theme.colorScheme.surface,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-        labelColor: theme.colorScheme.onPrimary,
-        unselectedLabelColor: theme.colorScheme.onSurface,
-        labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+        labelColor: theme.colorScheme.primary,
+        unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
+        labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
         tabs: const [
           Tab(text: AppStrings.current),
           Tab(text: AppStrings.history),
