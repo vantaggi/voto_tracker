@@ -161,6 +161,32 @@ class ScrutinyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void loadConfiguration(List<Candidate> newCandidates) {
+      _candidates = newCandidates;
+      // Ensure votes are 0 if it's just a config load
+      for (var c in _candidates) {
+          c.votes = 0;
+      }
+      
+      // Update settings participant count if needed
+      final validCount = _candidates.where((c) => c.name != AppStrings.blankVotes && c.name != AppStrings.nullVotes).length;
+      if (validCount != _settings.participantsCount) {
+          _settings = Settings(
+              totalVoters: _settings.totalVoters, 
+              participantsCount: validCount,
+              showBlankVotes: _candidates.any((c) => c.name == AppStrings.blankVotes),
+              showNullVotes: _candidates.any((c) => c.name == AppStrings.nullVotes)
+          );
+      }
+
+      _history.clear();
+      _historyIndex = -1;
+      _calculateResults();
+      _saveHistory();
+      _persistState();
+      notifyListeners();
+  }
+
   void updateSettings(Settings newSettings) {
     _settings = newSettings;
     // When settings change (e.g. number of candidates), we usually reset.
@@ -184,7 +210,16 @@ class ScrutinyProvider extends ChangeNotifier {
   void renameCandidate(int index, String newName) {
     if (index >= 0 && index < _candidates.length) {
       _candidates[index].name = newName;
-      _saveHistory(); // Save name change to history? Maybe not strict requirement but good QoL
+      _saveHistory(); 
+      _persistState();
+      notifyListeners();
+    }
+  }
+
+  void setCandidatePreviousPercentage(int index, double? value) {
+    if (index >= 0 && index < _candidates.length) {
+      _candidates[index].previousPercentage = value;
+      _saveHistory();
       _persistState();
       notifyListeners();
     }

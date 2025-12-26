@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:voto_tracker/models/settings.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
+import 'package:voto_tracker/services/configuration_service.dart';
 
 class SettingsDialog extends StatefulWidget {
   const SettingsDialog({super.key});
@@ -78,6 +79,32 @@ class _SettingsDialogState extends State<SettingsDialog> {
               title: const Text(AppStrings.nullVotes),
               value: _showNullVotes,
               onChanged: (value) => setState(() => _showNullVotes = value),
+            ),
+            const SizedBox(height: 16),
+            const Text("Gestione Dati"),
+             ListTile(
+              leading: const Icon(Icons.upload_file),
+              title: const Text("Esporta Configurazione"),
+              subtitle: const Text("Salva lista candidati"),
+              onTap: () async {
+                 final provider = context.read<ScrutinyProvider>();
+                 await ConfigurationService.exportConfiguration(provider.candidates);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.download),
+              title: const Text("Importa Configurazione"),
+              subtitle: const Text("Carica lista candidati"),
+              onTap: () async {
+                 final candidates = await ConfigurationService.importConfiguration();
+                 if (candidates != null && context.mounted) {
+                     Navigator.pop(context); // Close dialog
+                     context.read<ScrutinyProvider>().loadConfiguration(candidates);
+                     ScaffoldMessenger.of(context).showSnackBar(
+                         const SnackBar(content: Text("Configurazione caricata con successo"))
+                     );
+                 }
+              },
             ),
           ],
         ),

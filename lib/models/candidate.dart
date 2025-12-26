@@ -5,12 +5,14 @@ class Candidate {
   int votes;
   Color color;
   int rank = 0; // Transient property for display, initialized to 0
+  double? previousPercentage; // For Swing Analysis
 
   Candidate({
     required this.name, 
     required this.votes, 
     required this.color,
-    this.rank = 0
+    this.rank = 0,
+    this.previousPercentage,
   });
 
   double getPercentage(int totalVotes) {
@@ -21,6 +23,7 @@ class Candidate {
     'name': name,
     'votes': votes,
     'color': color.toARGB32(),
+    'previousPercentage': previousPercentage,
   };
 
   factory Candidate.fromJson(Map<String, dynamic> json) {
@@ -28,7 +31,8 @@ class Candidate {
       name: json['name'],
       votes: json['votes'],
       color: Color(json['color']),
-      rank: json['rank'] ?? 0, // Ensure rank is loaded or defaults to 0
+      rank: json['rank'] ?? 0, 
+      previousPercentage: json['previousPercentage'] != null ? (json['previousPercentage'] as num).toDouble() : null,
     );
   }
 }

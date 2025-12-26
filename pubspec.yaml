@@ -28,6 +28,10 @@ dependencies:
   pdf: ^3.11.0
   printing: ^5.13.0
   wakelock_plus: ^1.2.9
+  share_plus: ^10.1.4
+  path_provider: ^2.1.5
+  file_picker: ^8.1.7
+  screenshot: ^3.0.0
 
 dev_dependencies:
   flutter_test:

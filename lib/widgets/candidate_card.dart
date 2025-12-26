@@ -15,6 +15,15 @@ class CandidateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final provider = context.watch<ScrutinyProvider>();
+    final totalVotes = provider.totalVotesAssigned;
+    final currentPercentage = candidate.getPercentage(totalVotes);
+    final previousPercentage = candidate.previousPercentage;
+    double? delta;
+    if (previousPercentage != null) {
+      delta = currentPercentage - previousPercentage;
+    }
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -76,14 +85,51 @@ class CandidateCard extends StatelessWidget {
                     ),
                 ],
                 ),
-                const SizedBox(height: 16),
-                Text(
-                '${candidate.votes}',
-                style: theme.textTheme.displayMedium
-                    ?.copyWith(color: candidate.color, fontWeight: FontWeight.bold),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                     Text(
+                        '${candidate.votes}',
+                        style: theme.textTheme.displayMedium
+                            ?.copyWith(color: candidate.color, fontWeight: FontWeight.bold),
+                     ),
+                     const SizedBox(width: 4),
+                     Text(AppStrings.votes, style: theme.textTheme.bodyMedium),
+                  ]
                 ),
-                Text(AppStrings.votes, style: theme.textTheme.bodyMedium),
-                const SizedBox(height: 16),
+                 // Swing Analysis Display
+                if (delta != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        delta >= 0 ? Icons.arrow_upward : Icons.arrow_downward,
+                        size: 14,
+                        color: delta >= 0 ? Colors.green : Colors.red,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${delta >= 0 ? "+" : ""}${delta.toStringAsFixed(1)}%',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: delta >= 0 ? Colors.green : Colors.red,
+                          fontWeight: FontWeight.bold
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                         '(vs ${previousPercentage!.toStringAsFixed(1)}%)',
+                         style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor, fontSize: 10),
+                      )
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 8),
                 Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -134,19 +180,37 @@ class CandidateCard extends StatelessWidget {
   }
 
   void _showEditNameDialog(BuildContext context) {
-    final controller = TextEditingController(text: candidate.name);
+    final nameController = TextEditingController(text: candidate.name);
+    final prevController = TextEditingController(text: candidate.previousPercentage?.toString() ?? "");
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text(AppStrings.editName),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: const InputDecoration(
-            labelText: AppStrings.candidateName,
-            border: OutlineInputBorder(),
-          ),
-          textCapitalization: TextCapitalization.words,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+              TextField(
+                controller: nameController,
+                autofocus: true,
+                decoration: const InputDecoration(
+                    labelText: AppStrings.candidateName,
+                    border: OutlineInputBorder(),
+                ),
+                textCapitalization: TextCapitalization.words,
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: prevController,
+                decoration: const InputDecoration(
+                    labelText: "Risultato Precedente (%)",
+                    suffixText: "%",
+                    border: OutlineInputBorder(),
+                    hintText: "Es. 25.5"
+                ),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              ),
+          ]
         ),
         actions: [
           TextButton(
@@ -157,8 +221,17 @@ class CandidateCard extends StatelessWidget {
             style: ElevatedButton.styleFrom(
                 textStyle: const TextStyle(fontWeight: FontWeight.bold)),
             onPressed: () {
-              if (controller.text.isNotEmpty) {
-                context.read<ScrutinyProvider>().renameCandidate(index, controller.text);
+              if (nameController.text.isNotEmpty) {
+                final provider = context.read<ScrutinyProvider>();
+                provider.renameCandidate(index, nameController.text);
+                
+                if (prevController.text.isNotEmpty) {
+                    final val = double.tryParse(prevController.text.replaceAll(',', '.'));
+                    provider.setCandidatePreviousPercentage(index, val);
+                } else {
+                    provider.setCandidatePreviousPercentage(index, null);
+                }
+                
                 Navigator.pop(context);
               }
             },

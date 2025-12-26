@@ -4,6 +4,10 @@ import 'package:voto_tracker/widgets/charts_section.dart';
 import 'package:voto_tracker/widgets/candidates_section.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:voto_tracker/screens/settings_dialog.dart';
+import 'package:provider/provider.dart';
+import 'package:voto_tracker/providers/scrutiny_provider.dart';
+import 'package:voto_tracker/screens/projector_mode_screen.dart';
+import 'package:voto_tracker/services/social_share_service.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -15,6 +19,26 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text(AppStrings.appTitle),
         actions: [
+            IconButton(
+                icon: const Icon(Icons.share),
+                tooltip: "Condividi Risultati",
+                onPressed: () {
+                    final provider = context.read<ScrutinyProvider>();
+                    SocialShareService.shareResults(
+                        candidates: provider.sortedCandidates, 
+                        totalVotes: provider.totalVotesAssigned,
+                        winner: provider.winner
+                    );
+                },
+            ),
+            IconButton(
+                icon: const Icon(Icons.tv),
+                tooltip: "Modalità Proiettore",
+                onPressed: () => Navigator.push(
+                    context, 
+                    MaterialPageRoute(builder: (context) => const ProjectorModeScreen())
+                ),
+            ),
             IconButton(
                 icon: const Icon(Icons.settings),
                 tooltip: AppStrings.settingsButtonTooltip,
