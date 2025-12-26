@@ -29,6 +29,7 @@ class AppStrings {
   static const String close = 'Chiudi';
   static const String copy = 'Copia';
   static const String dataCopied = 'Dati copiati negli appunti!';
+  static const String resetDone = 'Reset effettuato!';
   static const String comparisonNotAvailable =
       'Confronto non disponibile (meno di 2 candidati)';
   static const String lead = 'In Testa';

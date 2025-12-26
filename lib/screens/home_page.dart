@@ -88,7 +88,11 @@ class HomePage extends StatelessWidget {
                               
                               String? label;
                               if (provider.winner != null) {
-                                  label = provider.remainingVotes <= 0 ? "ELETTO" : "MAGGIORANZA RAGGIUNTA";
+                                  if (provider.winner == AppStrings.tie) {
+                                      label = "RISULTATO FINALE";
+                                  } else {
+                                      label = provider.remainingVotes <= 0 ? "ELETTO" : "MAGGIORANZA RAGGIUNTA";
+                                  }
                               }
 
                               await SocialShareService.shareResults(
@@ -111,7 +115,11 @@ class HomePage extends StatelessWidget {
                                
                                String? label;
                                if (provider.winner != null) {
-                                   label = provider.remainingVotes <= 0 ? "ELETTO" : "MAGGIORANZA RAGGIUNTA";
+                                   if (provider.winner == AppStrings.tie) {
+                                       label = "RISULTATO FINALE";
+                                   } else {
+                                       label = provider.remainingVotes <= 0 ? "ELETTO" : "MAGGIORANZA RAGGIUNTA";
+                                   }
                                }
 
                                await PdfExportService.exportToPdf(

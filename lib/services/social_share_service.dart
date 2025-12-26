@@ -42,7 +42,7 @@ class SocialShareService {
             await Share.shareXFiles(
                 [XFile(file.path)], 
                 text: winner != null 
-                    ? '🏆 VITTORIA! ${winner} ha vinto lo scrutinio!'
+                    ? '🏆 ${winnerLabel ?? "VINCITORE"}: $winner!'
                     : '📊 Aggiornamento scrutinio in tempo reale - Voto Tracker'
             );
             

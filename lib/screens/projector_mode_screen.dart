@@ -131,7 +131,7 @@ class ProjectorModeScreen extends StatelessWidget {
       final winner = provider.winner;
       if (winner != null) {
           final isFinal = provider.remainingVotes <= 0;
-          final label = isFinal ? "ELETTO" : "MAGGIORANZA RAGGIUNTA";
+          final label = winner == AppStrings.tie ? "RISULTATO FINALE" : (isFinal ? "ELETTO" : "MAGGIORANZA RAGGIUNTA");
           
           return Container(
               padding: const EdgeInsets.symmetric(vertical: 16),

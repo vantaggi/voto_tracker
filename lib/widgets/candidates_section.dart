@@ -80,8 +80,12 @@ class StatsHeader extends StatelessWidget {
                     ),
                     child: Column(
                         children: [
-                            Text(AppStrings.winner, 
-                                style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: Colors.black)),
+                            Text(
+                                (provider.winner == AppStrings.tie 
+                                    ? "RISULTATO FINALE" 
+                                    : (provider.remainingVotes <= 0 ? "ELETTO" : "MAGGIORANZA RAGGIUNTA")), 
+                                style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: Colors.black)
+                            ),
                             Text(provider.winner!, 
                                 style: theme.textTheme.displayMedium?.copyWith(color: Colors.black)),
                         ]
@@ -197,43 +201,107 @@ class ControlButtons extends StatelessWidget {
             context: context,
             builder: (context) => AlertDialog(
                 title: const Text(AppStrings.confirmReset),
-                content: const Text(AppStrings.resetConfirmation),
+                content: const Text("Tutti i dati verranno cancellati in modo permanente.\n\nPer confermare, tieni premuto il pulsante rosso."),
                 actions: [
-                    TextButton(onPressed: () => Navigator.pop(context), 
-                        child: Text(AppStrings.cancel, style: Theme.of(context).textTheme.labelLarge)),
-                    ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red, 
-                            foregroundColor: Colors.white,
-                            textStyle: const TextStyle(fontWeight: FontWeight.bold)),
-                        onPressed: () {
-                    showDialog(
-                        context: context,
-                        builder: (innerContext) => AlertDialog(
-                            title: const Text("Conferma Reset"),
-                            content: const Text("Sei sicuro di voler cancellare tutti i voti? Questa operazione non può essere annullata."),
-                            actions: [
-                                TextButton(
-                                    onPressed: () => Navigator.pop(innerContext),
-                                    child: const Text(AppStrings.cancel)
-                                ),
-                                ElevatedButton(
-                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                                    onPressed: () {
-                                        context.read<ScrutinyProvider>().reset();
-                                        Navigator.pop(innerContext); // Pop the inner dialog
-                                        Navigator.pop(context); // Pop the outer dialog
-                                    },
-                                    child: const Text("Reset")
-                                )
-                            ],
-                        )
-                    );
-                },
-                        child: const Text(AppStrings.reset),
-                    )
+                    TextButton(
+                        onPressed: () => Navigator.pop(context), 
+                        child: const Text(AppStrings.cancel)
+                    ),
+                    _HoldToResetButton(
+                        onReset: () {
+                            context.read<ScrutinyProvider>().reset();
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text(AppStrings.resetDone))
+                            );
+                        }
+                    ),
                 ]
             )
         );
     }
+}
+
+class _HoldToResetButton extends StatefulWidget {
+    final VoidCallback onReset;
+    const _HoldToResetButton({required this.onReset});
+
+    @override
+    State<_HoldToResetButton> createState() => _HoldToResetButtonState();
+}
+
+class _HoldToResetButtonState extends State<_HoldToResetButton> with SingleTickerProviderStateMixin {
+    late AnimationController _controller;
+
+    @override
+    void initState() {
+        super.initState();
+        _controller = AnimationController(vsync: this, duration: const Duration(seconds: 2));
+        _controller.addStatusListener((status) {
+            if (status == AnimationStatus.completed) {
+                HapticFeedback.heavyImpact();
+                widget.onReset();
+            }
+        });
+    }
+
+    @override
+    void dispose() {
+        _controller.dispose();
+        super.dispose();
+    }
+
+    @override
+    Widget build(BuildContext context) {
+        return GestureDetector(
+            onTapDown: (_) => _controller.forward(),
+            onTapUp: (_) {
+                if (_controller.status != AnimationStatus.completed) {
+                    _controller.reverse();
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text("Tieni premuto fino al completamento per resettare"),
+                            duration: Duration(milliseconds: 1000),
+                        )
+                    );
+                }
+            },
+            onTapCancel: () => _controller.reverse(),
+            child: AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                    return Container(
+                        height: 48,
+                        width: 200, // Fixed width for dialog
+                        decoration: BoxDecoration(
+                            color: Colors.red.shade100,
+                            borderRadius: BorderRadius.circular(24),
+                        ),
+                        clipBehavior: Clip.hardEdge,
+                        alignment: Alignment.centerLeft,
+                        child: Stack(
+                            children: [
+                                Container(
+                                    width: 200 * _controller.value,
+                                    height: 48,
+                                    color: Colors.red,
+                                ),
+                                Center(
+                                    child: Text(
+                                        "TIENI PREMUTO",
+                                        style: TextStyle(
+                                            color: _controller.value > 0.5 ? Colors.white : Colors.red,
+                                            fontWeight: FontWeight.bold
+                                        ),
+                                    )
+                                )
+                            ],
+                        )
+                    );
+                }
+            ),
+        );
+    }
+
 }
