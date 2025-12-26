@@ -45,7 +45,8 @@ class HomePage extends StatelessWidget {
       ),
       body: LayoutBuilder(
           builder: (context, constraints) {
-              if (constraints.maxWidth > 800) {
+              // Only switch to side-by-side if we have enough width AND height
+              if (constraints.maxWidth > 800 && constraints.maxHeight > 500) {
                   // Desktop / Tablet Landscape
                   return const Row(
                       crossAxisAlignment: CrossAxisAlignment.start,

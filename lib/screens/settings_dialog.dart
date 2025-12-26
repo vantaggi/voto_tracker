@@ -37,6 +37,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      scrollable: true,
       title: const Text(AppStrings.scrutinyConfiguration),
       content: SingleChildScrollView(
         child: Column(
