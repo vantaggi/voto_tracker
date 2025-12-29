@@ -102,22 +102,26 @@ class _CurrentResultsChart extends StatelessWidget {
               bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                       showTitles: true,
+                      reservedSize: 60,
                       getTitlesWidget: (value, meta) {
                         if (value.toInt() < candidates.length &&
                             value.toInt() >= 0) {
                           final name = candidates[value.toInt()].name;
                           return Padding(
                               padding: const EdgeInsets.only(
-                                  top: AppDimensions.paddingAppBarIcon),
-                              child: Text(
-                                  name.length > 8
-                                      ? '${name.substring(0, 8)}...'
-                                      : name,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .labelSmall
-                                      ?.copyWith(
-                                          color: theme.colorScheme.onSurface)));
+                                  top: 8),
+                              child: Transform.rotate(
+                                angle: -0.4,
+                                child: Text(
+                                    name.length > 12
+                                        ? '${name.substring(0, 12)}...'
+                                        : name,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall
+                                        ?.copyWith(
+                                            color: theme.colorScheme.onSurface)),
+                              ));
                         }
                         return const Text('');
                       })),
