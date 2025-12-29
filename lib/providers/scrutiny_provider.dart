@@ -109,6 +109,7 @@ class ScrutinyProvider extends ChangeNotifier {
         // Let's treat current votes as Base Votes so they appear in counts but maybe as a starting flat line
     }
 
+    _calculateResults();
     _persistState();
     notifyListeners();
   }
