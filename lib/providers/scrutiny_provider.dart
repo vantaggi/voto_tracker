@@ -28,6 +28,27 @@ class ScrutinyProvider extends ChangeNotifier {
   int get totalVotesAssigned => _totalVotesAssigned;
   int get remainingVotes => _remainingVotes;
   String? get winner => _winner;
+  
+  // Fix: Magic Number calculation (Votes needed to guarantee win vs 2nd place)
+  int? get votesUntilMajority {
+      if (_candidates.isEmpty) return null;
+      
+      // Use sorted copy to find actual leader and runner-up
+      final sorted = sortedCandidates;
+      if (sorted.length < 2) {
+           final majorityThreshold = (_settings.totalVoters / 2).floor() + 1;
+           if (sorted[0].votes >= majorityThreshold) return 0;
+           return majorityThreshold - sorted[0].votes;
+      }
+      
+      final leader = sorted[0];
+      final second = sorted[1];
+      
+      double val = (second.votes + _remainingVotes - leader.votes) / 2;
+      int needed = val.floor() + 1;
+      
+      return needed < 0 ? 0 : needed;
+  }
 
   ScrutinyProvider() {
     _loadState();

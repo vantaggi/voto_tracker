@@ -1,10 +1,12 @@
 import 'dart:io';
+
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:voto_tracker/models/candidate.dart';
+import 'package:voto_tracker/theme/app_theme.dart';
 import 'package:voto_tracker/widgets/social_results_card.dart';
 
 class SocialShareService {
@@ -19,16 +21,19 @@ class SocialShareService {
         final controller = ScreenshotController();
         
         try {
-            final double pixelRatio = 3.0; // High res
+            const double pixelRatio = 3.0; // High res
             
             final Uint8List image = await controller.captureFromWidget(
-                SocialResultsCard(
-                    candidates: candidates, 
-                    totalVotes: totalVotes, 
-                    totalVoters: totalVoters,
-                    remainingVotes: remainingVotes,
-                    winner: winner, 
-                    winnerLabel: winnerLabel
+                Theme(
+                    data: AppTheme.darkTheme, // Force Dark Theme for consistent share image
+                    child: SocialResultsCard(
+                        candidates: candidates, 
+                        totalVotes: totalVotes, 
+                        totalVoters: totalVoters,
+                        remainingVotes: remainingVotes,
+                        winner: winner, 
+                        winnerLabel: winnerLabel
+                    ),
                 ),
                 delay: const Duration(milliseconds: 10),
                 pixelRatio: pixelRatio

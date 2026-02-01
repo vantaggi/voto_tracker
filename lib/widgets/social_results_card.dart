@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:voto_tracker/models/candidate.dart';
-import 'package:voto_tracker/utils/app_constants.dart';
 
 class SocialResultsCard extends StatelessWidget {
   final List<Candidate> candidates;
@@ -24,19 +23,24 @@ class SocialResultsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     // Top 5 candidates only
     final topCandidates = candidates.take(5).toList();
-
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    // Explicitly using a dark background for social share images regardless of light/dark theme context
+    // But since we are passing AppTheme.darkTheme, we can use theme colors directly.
     return Container(
       width: 1080 / 2, // Scaled down for display, will be captured at higher pixel ratio
       height: 1350 / 2, // 4:5 Aspect Ratio (Instagram Portrait)
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
+        color: colorScheme.surface, 
+        // Subtle gradient overlay for extra polish
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFF1A1F2C), // Deep professional blue-grey
-            Color(0xFF2D3748), // Lighter slate
-            Colors.black,
+            colorScheme.surface,
+            colorScheme.surfaceContainer,
           ],
         ),
       ),
@@ -51,68 +55,136 @@ class SocialResultsCard extends StatelessWidget {
                  crossAxisAlignment: CrossAxisAlignment.start,
                  children: [
                     Text("AGGIORNAMENTO ${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')}", 
-                        style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12, letterSpacing: 2)),
-                    const Text("SCRUTINIO LIVE", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900)),
-                     const SizedBox(height: 4),
+                        style: theme.textTheme.labelMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant, letterSpacing: 2
+                        )),
+                    const SizedBox(height: 4),
+                    Text("SCRUTINIO LIVE", 
+                        style: theme.textTheme.headlineLarge?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -1,
+                            color: colorScheme.onSurface
+                        )
+                    ),
+                     const SizedBox(height: 8),
                      Text(
                         "Scrutinate: $totalVotes / $totalVoters (${(totalVotes / (totalVoters == 0 ? 1 : totalVoters) * 100).toStringAsFixed(1)}%)\nRimanenti: $remainingVotes",
-                        style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.4)
+                        style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant)
                      ),
                  ]
                ),
-               Icon(Icons.how_to_vote, color: Colors.white.withOpacity(0.2), size: 48)
+               Icon(Icons.how_to_vote_outlined, color: colorScheme.primary.withOpacity(0.5), size: 64)
             ],
           ),
           const SizedBox(height: 32),
           
-          // Winner Badge
+          // Winner Badge (if present)
           if (winner != null)
           Container(
-            padding: const EdgeInsets.all(16),
-            margin: const EdgeInsets.only(bottom: 24),
+            padding: const EdgeInsets.all(24),
+            margin: const EdgeInsets.only(bottom: 32),
             decoration: BoxDecoration(
-                color: Colors.amber,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [BoxShadow(color: Colors.amber.withOpacity(0.4), blurRadius: 20)]
+                color: colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(24), // M3 Medium/Large shape
+                boxShadow: [
+                  BoxShadow(
+                    color: colorScheme.shadow.withOpacity(0.2), 
+                    blurRadius: 16,
+                    offset: const Offset(0, 4)
+                  )
+                ]
             ),
             child: Column(
                 children: [
-                    Text(winnerLabel ?? "VINCITORE", style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12)),
-                    Text(winner!.toUpperCase(), style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 28), textAlign: TextAlign.center),
+                    Text(winnerLabel ?? "VINCITORE", 
+                        style: theme.textTheme.titleSmall?.copyWith(
+                            color: colorScheme.onPrimaryContainer, 
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.5
+                        )
+                    ),
+                    const SizedBox(height: 4),
+                    Text(winner!.toUpperCase(), 
+                        style: theme.textTheme.displaySmall?.copyWith(
+                            color: colorScheme.onPrimaryContainer, 
+                            fontWeight: FontWeight.w900
+                        ), 
+                        textAlign: TextAlign.center
+                    ),
                 ]
             )
           ),
 
-          // List
+          // List Header
           if (winner == null)
-            const Text("CLASSIFICA PARZIALE", style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.bold)),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Text("CLASSIFICA PARZIALE", 
+                  style: theme.textTheme.labelLarge?.copyWith(
+                      color: colorScheme.primary, 
+                      fontWeight: FontWeight.bold
+                  )
+              ),
+            ),
           
-          const SizedBox(height: 16),
-          
+          // Candidates List
           Expanded(
             child: Column(
               children: topCandidates.asMap().entries.map((entry) {
                 final index = entry.key;
                 final c = entry.value;
                 final p = c.getPercentage(totalVotes);
+                final bool isFirst = index == 0;
+                
                 return Container(
                     margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                     decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8)
+                        color: isFirst 
+                             ? colorScheme.surfaceContainerHighest 
+                             : colorScheme.surfaceContainerLow,
+                        borderRadius: BorderRadius.circular(16),
+                        border: isFirst 
+                             ? Border.all(color: colorScheme.primary.withOpacity(0.5)) 
+                             : null
                     ),
                     child: Row(
                         children: [
-                            Text("${index + 1}.", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                            const SizedBox(width: 12),
-                            Expanded(child: Text(c.name, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500))),
-                            Text("${p.toStringAsFixed(1)}%", style: const TextStyle(color: Colors.white70, fontSize: 14)),
-                            const SizedBox(width: 12),
                             Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(color: c.color, borderRadius: BorderRadius.circular(4)),
-                                child: Text("${c.votes}", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))
+                                width: 28, 
+                                alignment: Alignment.center,
+                                child: Text("${index + 1}.", 
+                                    style: theme.textTheme.titleMedium?.copyWith(
+                                        color: isFirst ? colorScheme.primary : colorScheme.onSurfaceVariant, 
+                                        fontWeight: FontWeight.bold
+                                    )
+                                )
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(child: Text(c.name, 
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: isFirst ? FontWeight.bold : FontWeight.w500
+                                )
+                            )),
+                            Text("${p.toStringAsFixed(1)}%", 
+                                style: theme.textTheme.bodyLarge?.copyWith(
+                                    color: colorScheme.onSurfaceVariant
+                                )
+                            ),
+                            const SizedBox(width: 16),
+                            Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                    color: c.color.withOpacity(0.2), 
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: c.color.withOpacity(0.5))
+                                ),
+                                child: Text("${c.votes}", 
+                                    style: theme.textTheme.titleMedium?.copyWith(
+                                        color: c.color == Colors.black ? colorScheme.onSurface : c.color, 
+                                        fontWeight: FontWeight.bold
+                                    )
+                                )
                             )
                         ]
                     )
@@ -121,10 +193,22 @@ class SocialResultsCard extends StatelessWidget {
             ),
           ),
           
-          const Divider(color: Colors.white24),
+          const Divider(),
           const SizedBox(height: 16),
           Center(
-              child: Text("Generato con Voto Tracker", style: TextStyle(color: Colors.white.withOpacity(0.5), fontStyle: FontStyle.italic))
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.bar_chart, size: 16, color: colorScheme.onSurfaceVariant),
+                  const SizedBox(width: 8),
+                  Text("Generato con Voto Tracker", 
+                      style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant, 
+                          fontStyle: FontStyle.italic
+                      )
+                  ),
+                ],
+              )
           )
         ],
       ),

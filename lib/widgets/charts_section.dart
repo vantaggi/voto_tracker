@@ -29,31 +29,35 @@ class ChartsSection extends StatelessWidget {
 
   Widget _buildTabBar(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Container(
-      height: 45,
+      height: 48,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(25),
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.5)),
       ),
       child: TabBar(
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
         indicator: BoxDecoration(
-          borderRadius: BorderRadius.circular(21),
-          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(20),
+          color: colorScheme.primary,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+              color: colorScheme.shadow.withOpacity(0.15),
+              blurRadius: 3,
+              offset: const Offset(0, 1),
             ),
           ],
         ),
-        labelColor: theme.colorScheme.primary,
-        unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
-        labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
-        indicatorSize: TabBarIndicatorSize.tab,
-        dividerColor: Colors.transparent,
+        labelColor: colorScheme.onPrimary,
+        unselectedLabelColor: colorScheme.onSurfaceVariant,
+        labelStyle: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
+        unselectedLabelStyle: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w500),
+        overlayColor: WidgetStateProperty.all(Colors.transparent),
         tabs: const [
           Tab(text: AppStrings.current),
           Tab(text: AppStrings.history),
@@ -73,68 +77,107 @@ class _CurrentResultsChart extends StatelessWidget {
       final candidates = provider.sortedCandidates;
       if (candidates.isEmpty) {
         return Center(
-            child: Text(AppStrings.noDataAvailable,
-                style: Theme.of(context).textTheme.bodyMedium));
+            child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.bar_chart, size: 48, color: Theme.of(context).colorScheme.outline),
+            const SizedBox(height: 16),
+            Text(AppStrings.noDataAvailable,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    )),
+          ],
+        ));
       }
 
       final theme = Theme.of(context);
+      final colorScheme = theme.colorScheme;
+      
       final double maxY = candidates.isEmpty
           ? 10
           : (candidates.map((e) => e.votes).reduce((a, b) => a > b ? a : b) + 5)
               .toDouble();
 
       return Card(
+        elevation: 0,
+        color: colorScheme.surfaceContainerLow,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide(color: colorScheme.outlineVariant),
+        ),
         child: Padding(
-          padding: const EdgeInsets.all(AppDimensions.paddingAll),
+          padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
           child: BarChart(BarChartData(
             alignment: BarChartAlignment.spaceAround,
             maxY: maxY,
+            gridData: FlGridData(
+              show: true,
+              drawVerticalLine: false,
+              horizontalInterval: 5,
+              getDrawingHorizontalLine: (value) => FlLine(
+                color: colorScheme.outlineVariant.withOpacity(0.5),
+                strokeWidth: 1,
+                dashArray: [4, 4],
+              ),
+            ),
             barTouchData: BarTouchData(
                 touchTooltipData: BarTouchTooltipData(
+                    getTooltipColor: (_) => colorScheme.inverseSurface,
+                    tooltipPadding: const EdgeInsets.all(8),
+                    tooltipMargin: 8,
                     getTooltipItem: (group, groupIndex, rod, rodIndex) =>
                         BarTooltipItem(
-                            '${candidates[groupIndex].name}\n${candidates[groupIndex].votes} ${AppStrings.votes}',
-                            const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold)))),
+                            '${candidates[groupIndex].name}\n',
+                            TextStyle(
+                                color: colorScheme.onInverseSurface,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: '${candidates[groupIndex].votes} ${AppStrings.votes}',
+                                style: TextStyle(
+                                  color: colorScheme.onInverseSurface.withOpacity(0.8),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal
+                                )
+                              )
+                            ]
+                        ))),
             titlesData: FlTitlesData(
               show: true,
               bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 60,
+                      reservedSize: 80, // Increased space for labels
                       getTitlesWidget: (value, meta) {
                         if (value.toInt() < candidates.length &&
                             value.toInt() >= 0) {
                           final name = candidates[value.toInt()].name;
                           return Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 8),
+                              padding: const EdgeInsets.only(top: 8),
                               child: Transform.rotate(
-                                angle: -0.4,
+                                angle: -0.5, // Rotated for better fit
                                 child: Text(
-                                    name.length > 12
-                                        ? '${name.substring(0, 12)}...'
+                                    name.length > 15
+                                        ? '${name.substring(0, 15)}...'
                                         : name,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelSmall
+                                    style: theme.textTheme.labelMedium
                                         ?.copyWith(
-                                            color: theme.colorScheme.onSurface)),
+                                            color: colorScheme.onSurfaceVariant,
+                                            fontWeight: FontWeight.w600)),
                               ));
                         }
-                        return const Text('');
+                        return const SizedBox.shrink();
                       })),
               leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 32,
+                      reservedSize: 30,
                       getTitlesWidget: (value, meta) => Text(
                           value.toInt().toString(),
-                          style: Theme.of(context)
-                              .textTheme
-                              .labelSmall
-                              ?.copyWith(color: theme.colorScheme.onSurface)))),
+                          style: theme.textTheme.labelSmall
+                              ?.copyWith(color: colorScheme.onSurfaceVariant)))),
               topTitles:
                   const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               rightTitles:
@@ -148,9 +191,14 @@ class _CurrentResultsChart extends StatelessWidget {
                       BarChartRodData(
                           toY: entry.value.votes.toDouble(),
                           color: entry.value.color,
-                          width: AppDimensions.chartBarWidth,
-                          borderRadius: BorderRadius.circular(
-                              AppDimensions.chartBarRadius))
+                          width: 24, // Thicker bars
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                          backDrawRodData: BackgroundBarChartRodData(
+                             show: true,
+                             toY: maxY,
+                             color: colorScheme.surfaceContainerHighest.withOpacity(0.5)
+                          )
+                      )
                     ]))
                 .toList(),
           )),
@@ -169,20 +217,25 @@ class _HistoryChart extends StatelessWidget {
       final historyPoints = provider.historyPoints;
       final candidates = provider.candidates;
       final theme = Theme.of(context);
+      final colorScheme = theme.colorScheme;
 
       if (historyPoints.isEmpty || historyPoints.length <= 1) {
         return Card(
+            elevation: 0,
+            color: colorScheme.surfaceContainerLow,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+              side: BorderSide(color: colorScheme.outlineVariant),
+            ),
             child: Center(
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-              Icon(Icons.timeline, size: 48, color: theme.hintColor),
-              const SizedBox(height: AppDimensions.paddingAll),
+              Icon(Icons.show_chart, size: 48, color: colorScheme.outline),
+              const SizedBox(height: 16),
               Text(AppStrings.noHistoryAvailable,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.copyWith(color: theme.hintColor))
+                  style: theme.textTheme.bodyLarge
+                      ?.copyWith(color: colorScheme.onSurfaceVariant))
             ])));
       }
 
@@ -194,25 +247,29 @@ class _HistoryChart extends StatelessWidget {
       for (var c in candidates) {
           if (c.votes > maxY) maxY = c.votes.toDouble();
       }
-      maxY = (maxY * 1.1).ceilToDouble(); // Add 10% buffering
+      maxY = (maxY * 1.1).ceilToDouble(); 
       if (maxY < 10) maxY = 10;
       
-      // Calculate max X (history length matches votes assigned usually)
       double maxX = sortedHistory.isNotEmpty ? sortedHistory.last.key.toDouble() : 10;
       
       return Card(
+        elevation: 0,
+        color: colorScheme.surfaceContainerLow,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide(color: colorScheme.outlineVariant),
+        ),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(AppDimensions.paddingAll,
-              AppDimensions.paddingAll, AppDimensions.paddingAll, 8),
+          padding: const EdgeInsets.fromLTRB(16, 24, 24, 16),
           child: LineChart(
             LineChartData(
               maxY: maxY,
               maxX: maxX,
               lineBarsData: candidates
-                  .where((c) =>
-                      c.name != AppStrings.blankVotes &&
-                      c.name != AppStrings.nullVotes)
+                  // Removed filter to show all candidates including Blank/Null
                   .map((candidate) {
+                final isTechnical = candidate.name == AppStrings.blankVotes || candidate.name == AppStrings.nullVotes;
+                
                 return LineChartBarData(
                   spots: sortedHistory.map((entry) {
                     final x = entry.key.toDouble();
@@ -220,47 +277,45 @@ class _HistoryChart extends StatelessWidget {
                     return FlSpot(x, y);
                   }).toList(),
                   isCurved: true,
+                  curveSmoothness: 0.2,
+                  preventCurveOverShooting: true,
                   color: candidate.color,
-                  barWidth: AppDimensions.chartLineBarWidth,
+                  barWidth: isTechnical ? 2 : 3, // Thinner for technical votes
+                  isStrokeCapRound: true,
+                  dashArray: isTechnical ? [5, 5] : null, // Dashed for technical votes
                   dotData: const FlDotData(show: false),
                   belowBarData: BarAreaData(
-                      show: true, color: candidate.color.withValues(alpha: 0.1)),
+                      show: !isTechnical, // Only fill area for real candidates to reduce noise
+                      color: candidate.color.withOpacity(0.05) 
+                  ),
                 );
               }).toList(),
               titlesData: FlTitlesData(
                 bottomTitles: AxisTitles(
                     axisNameWidget: Text(AppStrings.scrutinisedVotes,
-                        style: Theme.of(context)
-                            .textTheme
-                            .labelSmall
-                            ?.copyWith(color: theme.hintColor)),
+                        style: theme.textTheme.labelSmall
+                            ?.copyWith(color: colorScheme.onSurfaceVariant)),
                     sideTitles: SideTitles(
                         showTitles: true,
-                        interval: (maxX / 5).ceilToDouble(), // Dynamic interval
+                        interval: (maxX / 5).ceilToDouble(),
                         getTitlesWidget: (value, meta) => Text(
                             value.toInt().toString(),
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelSmall
+                            style: theme.textTheme.labelSmall
                                 ?.copyWith(
-                                    color: theme.colorScheme.onSurface)))),
+                                    color: colorScheme.onSurfaceVariant)))),
                 leftTitles: AxisTitles(
                     axisNameWidget: Text(AppStrings.votesShort,
-                        style: Theme.of(context)
-                            .textTheme
-                            .labelSmall
-                            ?.copyWith(color: theme.hintColor)),
+                        style: theme.textTheme.labelSmall
+                            ?.copyWith(color: colorScheme.onSurfaceVariant)),
                     sideTitles: SideTitles(
                         showTitles: true,
-                        reservedSize: 32,
-                        interval: (maxY / 5).ceilToDouble(), // Dynamic interval
+                        reservedSize: 30,
+                        interval: (maxY / 5).ceilToDouble(),
                         getTitlesWidget: (value, meta) => Text(
                             value.toInt().toString(),
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelSmall
+                            style: theme.textTheme.labelSmall
                                 ?.copyWith(
-                                    color: theme.colorScheme.onSurface)))),
+                                    color: colorScheme.onSurfaceVariant)))),
                 topTitles:
                     const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 rightTitles:
@@ -269,11 +324,34 @@ class _HistoryChart extends StatelessWidget {
               gridData: FlGridData(
                   show: true,
                   drawVerticalLine: true,
+                  getDrawingHorizontalLine: (value) => FlLine(
+                     color: colorScheme.outlineVariant.withOpacity(0.5), strokeWidth: 1, dashArray: [4, 4]
+                  ),
+                  getDrawingVerticalLine: (value) => FlLine(
+                     color: colorScheme.outlineVariant.withOpacity(0.5), strokeWidth: 1, dashArray: [4, 4]
+                  ),
                   verticalInterval: (maxX / 5).ceilToDouble(),
                   horizontalInterval: (maxY / 5).ceilToDouble()),
               borderData: FlBorderData(
-                  show: true, border: Border.all(color: theme.dividerColor)),
-              clipData: const FlClipData.all(),
+                  show: true, 
+                  border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.5))
+              ),
+              lineTouchData: LineTouchData(
+                touchTooltipData: LineTouchTooltipData(
+                  getTooltipColor: (_) => colorScheme.inverseSurface,
+                  getTooltipItems: (touchedSpots) {
+                    return touchedSpots.map((LineBarSpot touchedSpot) {
+                      return LineTooltipItem(
+                        '${touchedSpot.y.toInt()}',
+                         TextStyle(
+                            color: touchedSpot.bar.color ?? colorScheme.onInverseSurface,
+                            fontWeight: FontWeight.bold,
+                         ),
+                      );
+                    }).toList();
+                  },
+                ),
+              ),
             ),
           ),
         ),
@@ -290,17 +368,40 @@ class _PercentageChart extends StatelessWidget {
     return Consumer<ScrutinyProvider>(builder: (context, provider, child) {
       final candidates = provider.sortedCandidates;
       final totalVotes = provider.totalVotesAssigned;
+      final theme = Theme.of(context);
+      final colorScheme = theme.colorScheme;
 
       if (candidates.isEmpty || totalVotes == 0) {
         return Card(
+            elevation: 0,
+            color: colorScheme.surfaceContainerLow,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+              side: BorderSide(color: colorScheme.outlineVariant),
+            ),
             child: Center(
-                child: Text(AppStrings.noVotesRecorded,
-                    style: Theme.of(context).textTheme.bodyMedium)));
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.pie_chart_outline, size: 48, color: colorScheme.outline),
+                    const SizedBox(height: 16),
+                    Text(AppStrings.noVotesRecorded,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: colorScheme.onSurfaceVariant
+                        )),
+                  ],
+                )));
       }
 
       return Card(
+          elevation: 0,
+          color: colorScheme.surfaceContainerLow,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+              side: BorderSide(color: colorScheme.outlineVariant),
+          ),
           child: Padding(
-              padding: const EdgeInsets.all(AppDimensions.paddingAll),
+              padding: const EdgeInsets.all(24),
               child: Stack(
                 alignment: Alignment.center,
                 children: [
@@ -312,31 +413,73 @@ class _PercentageChart extends StatelessWidget {
                             color: candidate.color,
                             value: candidate.votes.toDouble(),
                             title: '${percentage.toStringAsFixed(1)}%',
-                            radius: 50, // Slightly thinner donut ring
-                            titleStyle: const TextStyle(
-                                fontSize: 12,
+                            radius: 70, // Thicker ring
+                            titleStyle: TextStyle(
+                                fontSize: 13,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white));
+                                color: _getContrastColor(candidate.color),
+                            ),
+                            badgeWidget: _buildBadge(context, candidate.name, candidate.color),
+                            badgePositionPercentageOffset: 1.25,
+                            borderSide: BorderSide(color: colorScheme.surfaceContainerLow, width: 2)
+                        );
                       }).toList(),
-                      centerSpaceRadius: 60, // Larger center for text
-                      sectionsSpace: AppDimensions.chartPieSpace)),
+                      centerSpaceRadius: 60,
+                      sectionsSpace: 2, // Small gap
+                   )),
                    Column(
                      mainAxisSize: MainAxisSize.min,
                      children: [
                        Text(
                          totalVotes.toString(),
-                         style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                           fontWeight: FontWeight.bold,
+                         style: theme.textTheme.displayMedium?.copyWith(
+                           fontWeight: FontWeight.w800,
+                           color: colorScheme.onSurface,
+                           height: 1.0
                          ),
                        ),
                        Text(
-                         "totale",
-                         style: Theme.of(context).textTheme.bodySmall,
+                         "VOTI TOTALI",
+                         style: theme.textTheme.labelMedium?.copyWith(
+                             color: colorScheme.onSurfaceVariant,
+                             letterSpacing: 1.5,
+                             fontWeight: FontWeight.bold
+                         ),
                        )
                      ],
                    )
                 ],
               )));
     });
+  }
+
+  Widget _buildBadge(BuildContext context, String text, Color color) {
+      final colorScheme = Theme.of(context).colorScheme;
+      return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: color.withOpacity(0.5)),
+              boxShadow: [
+                  BoxShadow(
+                      color: colorScheme.shadow.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2)
+                  )
+              ]
+          ),
+          child: Text(text, style: TextStyle(
+              fontSize: 11, 
+              color: colorScheme.onSurfaceVariant, 
+              fontWeight: FontWeight.w600
+          ))
+      );
+  }
+
+  Color _getContrastColor(Color color) {
+    return ThemeData.estimateBrightnessForColor(color) == Brightness.dark
+        ? Colors.white
+        : Colors.black;
   }
 }

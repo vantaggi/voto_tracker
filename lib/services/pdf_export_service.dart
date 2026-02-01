@@ -21,25 +21,22 @@ class PdfExportService {
 
     // Organize data for single page layout
     final validCandidates = candidates.where((c) => c.votes > 0).toList();
-
+    
     doc.addPage(
       pw.Page( // Single Page constraint (MultiPage would paginate)
         pageTheme: pw.PageTheme(
           theme: pw.ThemeData.withFont(base: font, bold: fontBold),
-          margin: const pw.EdgeInsets.all(24),
+          margin: const pw.EdgeInsets.all(32),
         ),
         build: (pw.Context context) {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.stretch,
             children: [
               _buildModernHeader(winner, winnerLabel),
-              pw.SizedBox(height: 15),
+              pw.SizedBox(height: 24),
               _buildStatsStrip(totalVotesAssigned, totalVoters, remainingVotes),
-              pw.SizedBox(height: 20),
+              pw.SizedBox(height: 24),
               
-              // Row: Left (Bar Chart + Pie), Right (History) ??? 
-              // Better: Row -> Left (Current Standings + Pie), Right (Chart)
-              // Let's split 50/50
               pw.Row(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
@@ -48,12 +45,12 @@ class PdfExportService {
                        child: pw.Column(
                            children: [
                                _buildBarChart(candidates, totalVotesAssigned),
-                               pw.SizedBox(height: 20),
-                               _buildDonutChart(candidates, totalVotesAssigned),
+                               pw.SizedBox(height: 24),
+                               _buildDonutChart(candidates, totalVotesAssigned, totalVoters),
                            ]
                        )
                    ),
-                   pw.SizedBox(width: 20),
+                   pw.SizedBox(width: 24),
                    pw.Expanded(
                        flex: 6,
                        child: _buildHistoryChart(historyPoints, candidates)
@@ -65,7 +62,7 @@ class PdfExportService {
               
               _buildCompactTable(candidates, totalVotesAssigned),
               
-              pw.SizedBox(height: 10),
+              pw.SizedBox(height: 16),
               _buildFooter(),
             ],
           );
@@ -86,9 +83,9 @@ class PdfExportService {
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
                       pw.Text(AppStrings.appTitlePro.toUpperCase(), 
-                          style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold, color: PdfColors.blueGrey800)
+                          style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold, color: PdfColors.indigo900, letterSpacing: 1.2)
                       ),
-                      pw.Text('Report Ufficiale', style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey500)),
+                      pw.Text('REPORT UFFICIALE SCRUTINIO', style: const pw.TextStyle(fontSize: 10, color: PdfColors.indigo500, letterSpacing: 2)),
                   ]
               ),
               if (winner != null)
@@ -96,14 +93,23 @@ class PdfExportService {
                   padding: const pw.EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: pw.BoxDecoration(
                       color: PdfColors.amber,
-                      borderRadius: pw.BorderRadius.circular(20),
+                      borderRadius: pw.BorderRadius.circular(16), // M3 Medium Shape
                   ),
                   child: pw.Text("${winnerLabel ?? 'VINCITORE'}: $winner", 
-                      style: pw.TextStyle(color: PdfColors.white, fontWeight: pw.FontWeight.bold))
+                      style: pw.TextStyle(color: PdfColors.black, fontWeight: pw.FontWeight.bold))
               ),
-              pw.Text(
-                  DateTime.now().toString().substring(0, 16),
-                  style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey)
+              pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.end,
+                children: [
+                  pw.Text(
+                      DateTime.now().toString().substring(0, 10),
+                      style: pw.TextStyle(fontSize: 12, color: PdfColors.grey700)
+                  ),
+                   pw.Text(
+                      DateTime.now().toString().substring(11, 16),
+                      style: pw.TextStyle(fontSize: 12, color: PdfColors.grey700, fontWeight: pw.FontWeight.bold)
+                  ),
+                ]
               )
           ]
       );
@@ -111,17 +117,19 @@ class PdfExportService {
 
   static pw.Widget _buildStatsStrip(int totalVotesAssigned, int totalVoters, int remainingVotes) {
       return pw.Container(
-          padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          padding: const pw.EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           decoration: pw.BoxDecoration(
-              color: PdfColors.blueGrey50,
-              borderRadius: pw.BorderRadius.circular(8)
+              color: PdfColors.indigo50, // Surface Container High equivalent
+              borderRadius: pw.BorderRadius.circular(16) // M3 Medium Shape
           ),
           child: pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
-                  _buildCompactStat("Voti Scrutinati", "$totalVotesAssigned / $totalVoters"),
-                  _buildCompactStat("Rimanenti", "$remainingVotes"),
-                  _buildCompactStat("Completamento", "${(totalVoters > 0 ? (totalVotesAssigned / totalVoters * 100) : 0).toStringAsFixed(1)}%"),
+                  _buildCompactStat("VOTI SCRUTINATI", "$totalVotesAssigned / $totalVoters"),
+                  pw.Container(width: 1, height: 24, color: PdfColors.indigo100),
+                  _buildCompactStat("RIMANENTI", "$remainingVotes"),
+                  pw.Container(width: 1, height: 24, color: PdfColors.indigo100),
+                  _buildCompactStat("COMPLETAMENTO", "${(totalVoters > 0 ? (totalVotesAssigned / totalVoters * 100) : 0).toStringAsFixed(1)}%"),
               ]
           )
       );
@@ -130,8 +138,9 @@ class PdfExportService {
   static pw.Widget _buildCompactStat(String label, String value) {
       return pw.Column(
           children: [
-              pw.Text(value, style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: PdfColors.blueGrey900)),
-              pw.Text(label, style: const pw.TextStyle(fontSize: 8, color: PdfColors.blueGrey500)),
+              pw.Text(value, style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.indigo900)),
+              pw.SizedBox(height: 2),
+              pw.Text(label, style: const pw.TextStyle(fontSize: 8, color: PdfColors.indigo400, letterSpacing: 1)),
           ]
       );
   }
@@ -139,44 +148,43 @@ class PdfExportService {
   static pw.Widget _buildBarChart(List<Candidate> candidates, int totalVotes) {
     if (candidates.isEmpty) return pw.Container();
     final maxVotes = candidates.isEmpty ? 10 : candidates.map((c) => c.votes).reduce((a, b) => a > b ? a : b);
-    final scale = maxVotes > 0 ? 100.0 / maxVotes : 0.0; // Reduced width to fit in column
+    final scale = maxVotes > 0 ? 100.0 / maxVotes : 0.0; 
 
     return pw.Container(
         decoration: pw.BoxDecoration(
             border: pw.Border.all(color: PdfColors.grey200),
-            borderRadius: pw.BorderRadius.circular(8)
+            borderRadius: pw.BorderRadius.circular(16)
         ),
-        padding: const pw.EdgeInsets.all(10),
+        padding: const pw.EdgeInsets.all(16),
         child: pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text('Classifica', style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, color: PdfColors.grey700)),
-            pw.Divider(thickness: 0.5, color: PdfColors.grey200),
-            pw.SizedBox(height: 5),
+            pw.Text('CLASSIFICA', style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: PdfColors.grey600)),
+            pw.SizedBox(height: 12),
             ...candidates.map((c) {
               final barWidth = c.votes * scale;
               return pw.Padding(
-                padding: const pw.EdgeInsets.only(bottom: 6),
+                padding: const pw.EdgeInsets.only(bottom: 8),
                 child: pw.Row(
                   children: [
                     pw.Expanded(
-                      flex: 3,
-                      child: pw.Text(c.name, style: const pw.TextStyle(fontSize: 9), maxLines: 1, overflow: pw.TextOverflow.clip),
+                      flex: 4,
+                      child: pw.Text(c.name, style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey800), maxLines: 2, overflow: pw.TextOverflow.clip),
                     ),
                     pw.Expanded(
-                        flex: 7,
+                        flex: 6,
                         child: pw.Row(
                             children: [
                                 pw.Container(
                                   width: barWidth > 0 ? barWidth : 1, 
-                                  height: 8,
+                                  height: 10, // Thicker bars
                                   decoration: pw.BoxDecoration(
                                     color: PdfColor.fromInt(c.color.toARGB32()),
-                                    borderRadius: pw.BorderRadius.circular(2)
+                                    borderRadius: pw.BorderRadius.circular(4)
                                   ),
                                 ),
-                                pw.SizedBox(width: 4),
-                                pw.Text('${c.votes}', style: const pw.TextStyle(fontSize: 8)),
+                                pw.SizedBox(width: 6),
+                                pw.Text('${c.votes}', style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: PdfColors.grey800)),
                             ]
                         )
                     )
@@ -191,7 +199,7 @@ class PdfExportService {
 
   static pw.Widget _buildHistoryChart(
       Map<int, Map<String, int>> historyPoints, List<Candidate> candidates) {
-    if (historyPoints.length < 2) return pw.Container(height: 200, child: pw.Center(child: pw.Text("Dati non sufficienti per il grafico")));
+    if (historyPoints.length < 2) return pw.Container(height: 200, child: pw.Center(child: pw.Text("Dati insufficenti")));
 
     final sortedKeys = historyPoints.keys.toList()..sort();
     
@@ -207,9 +215,9 @@ class PdfExportService {
          datasets.add(pw.LineDataSet(
              data: data,
              color: PdfColor.fromInt(c.color.toARGB32()),
-             pointSize: 1,
+             pointSize: 0, // No dots for cleaner look
              isCurved: true, 
-             lineWidth: 1.5,
+             lineWidth: 2,
          ));
     }
     
@@ -236,20 +244,20 @@ class PdfExportService {
     return pw.Container(
         decoration: pw.BoxDecoration(
             border: pw.Border.all(color: PdfColors.grey200),
-            borderRadius: pw.BorderRadius.circular(8)
+            borderRadius: pw.BorderRadius.circular(16)
         ),
-        padding: const pw.EdgeInsets.all(12),
-        height: 250, // Fixed height for alignment
+        padding: const pw.EdgeInsets.all(16),
+        height: 280, 
         child: pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-                pw.Text('Andamento Voti', style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, color: PdfColors.grey700)),
-                pw.SizedBox(height: 10),
+                pw.Text('ANDAMENTO VOTI', style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: PdfColors.grey600)),
+                pw.SizedBox(height: 12),
                 pw.Expanded(
                     child: pw.Chart(
                         grid: pw.CartesianGrid(
-                            xAxis: pw.FixedAxis(xAxisLabels, textStyle: const pw.TextStyle(fontSize: 8)),
-                            yAxis: pw.FixedAxis(yAxisSteps, textStyle: const pw.TextStyle(fontSize: 8)),
+                            xAxis: pw.FixedAxis(xAxisLabels, textStyle: const pw.TextStyle(fontSize: 8, color: PdfColors.grey600)),
+                            yAxis: pw.FixedAxis(yAxisSteps, textStyle: const pw.TextStyle(fontSize: 8, color: PdfColors.grey600)),
                         ),
                         datasets: datasets,
                     )
@@ -259,12 +267,11 @@ class PdfExportService {
     );
   }
   
-  static pw.Widget _buildDonutChart(List<Candidate> candidates, int totalVotes) {
+  static pw.Widget _buildDonutChart(List<Candidate> candidates, int totalVotes, int totalVoters) {
        if (totalVotes == 0) return pw.Container();
        final validCandidates = candidates.where((c) => c.votes > 0).toList();
        
        return pw.Container(
-           height: 120,
            child: pw.Row(
                children: [
                    pw.Expanded(
@@ -277,7 +284,7 @@ class PdfExportService {
                                        return pw.PieDataSet(
                                            value: c.votes.toDouble(),
                                            color: PdfColor.fromInt(c.color.toARGB32()),
-                                           innerRadius: 25, // DONUT EFFECT
+                                           innerRadius: 30, // DONUT EFFECT
                                            legend: null 
                                        );
                                    }).toList()
@@ -285,8 +292,8 @@ class PdfExportService {
                                pw.Column(
                                    mainAxisSize: pw.MainAxisSize.min,
                                    children: [
-                                       pw.Text("$totalVotes", style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
-                                       pw.Text("voti", style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey))
+                                       pw.Text("${(totalVotes / (totalVoters > 0 ? totalVoters : 1) * 100).toInt()}%", style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: PdfColors.indigo900)),
+                                       pw.Text("COMPLET.", style: const pw.TextStyle(fontSize: 6, color: PdfColors.indigo300))
                                    ]
                                )
                            ]
@@ -301,9 +308,9 @@ class PdfExportService {
                                padding: const pw.EdgeInsets.only(bottom: 2),
                                child: pw.Row(
                                    children: [
-                                       pw.Container(width: 8, height: 8, color: PdfColor.fromInt(c.color.toARGB32())),
+                                       pw.Container(width: 8, height: 8, decoration: pw.BoxDecoration(color: PdfColor.fromInt(c.color.toARGB32()), borderRadius: pw.BorderRadius.circular(2))),
                                        pw.SizedBox(width: 4),
-                                       pw.Text("${c.getPercentage(totalVotes).toStringAsFixed(1)}%", style: const pw.TextStyle(fontSize: 8))
+                                       pw.Text("${c.getPercentage(totalVotes).toStringAsFixed(1)}%", style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700))
                                    ]
                                )
                            )
@@ -315,31 +322,41 @@ class PdfExportService {
   }
 
   static pw.Widget _buildCompactTable(List<Candidate> candidates, int totalVotes) {
-    return pw.TableHelper.fromTextArray(
-      headers: ['POS', 'CANDIDATO', 'VOTI', '%', 'STATUS'],
-      data: candidates.asMap().entries.map((entry) {
-        final c = entry.value;
-        final index = entry.key + 1;
-        return [
-          '$index',
-          c.name,
-          '${c.votes}',
-          '${c.getPercentage(totalVotes).toStringAsFixed(1)}%',
-          (index == 1) ? 'LEADER' : '' 
-        ];
-      }).toList(),
-      headerStyle: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold, color: PdfColors.white),
-      headerDecoration: const pw.BoxDecoration(color: PdfColors.blueGrey700),
-      cellStyle: const pw.TextStyle(fontSize: 9),
-      cellHeight: 20,
-      cellAlignments: {
-        0: pw.Alignment.centerLeft,
-        1: pw.Alignment.centerLeft,
-        2: pw.Alignment.centerRight,
-        3: pw.Alignment.centerRight,
-        4: pw.Alignment.center,
-      },
-      oddRowDecoration: const pw.BoxDecoration(color: PdfColors.grey100),
+    return pw.Container(
+      decoration: pw.BoxDecoration(
+        border: pw.Border.all(color: PdfColors.grey300),
+        borderRadius: pw.BorderRadius.circular(12)
+      ),
+      child: pw.ClipRRect(
+        verticalRadius: 12,
+        horizontalRadius: 12,
+        child: pw.TableHelper.fromTextArray(
+          headers: ['POS', 'CANDIDATO', 'VOTI', '%', 'STATUS'],
+          data: candidates.asMap().entries.map((entry) {
+            final c = entry.value;
+            final index = entry.key + 1;
+            return [
+              '$index',
+              c.name,
+              '${c.votes}',
+              '${c.getPercentage(totalVotes).toStringAsFixed(1)}%',
+              (index == 1) ? 'LEADER' : '' 
+            ];
+          }).toList(),
+          headerStyle: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: PdfColors.white),
+          headerDecoration: const pw.BoxDecoration(color: PdfColors.indigo600), // Matching app Primary
+          cellStyle: const pw.TextStyle(fontSize: 9),
+          cellHeight: 24,
+          cellAlignments: {
+            0: pw.Alignment.centerLeft,
+            1: pw.Alignment.centerLeft,
+            2: pw.Alignment.centerRight,
+            3: pw.Alignment.centerRight,
+            4: pw.Alignment.center,
+          },
+          oddRowDecoration: const pw.BoxDecoration(color: PdfColors.indigo50), // Subtle stripe
+        )
+      )
     );
   }
 
@@ -347,7 +364,7 @@ class PdfExportService {
     return pw.Container(
         padding: const pw.EdgeInsets.only(top: 10),
         decoration: const pw.BoxDecoration(
-            border: pw.Border(top: pw.BorderSide(color: PdfColors.grey300))
+            border: pw.Border(top: pw.BorderSide(color: PdfColors.grey200))
         ),
         child: pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,

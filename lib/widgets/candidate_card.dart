@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:voto_tracker/models/candidate.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
-import 'package:flutter/services.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
 
 class CandidateCard extends StatelessWidget {
@@ -15,6 +15,8 @@ class CandidateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     final provider = context.watch<ScrutinyProvider>();
     final totalVotes = provider.totalVotesAssigned;
     final currentPercentage = candidate.getPercentage(totalVotes);
@@ -25,13 +27,8 @@ class CandidateCard extends StatelessWidget {
     }
 
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.borderRadiusCard),
-        side: BorderSide(color: candidate.color.withValues(alpha: 0.5), width: 1),
-      ),
+      clipBehavior: Clip.hardEdge, // Ensure ripple respects rounded corners
       child: InkWell(
-        borderRadius: BorderRadius.circular(AppDimensions.borderRadiusCard),
         onLongPress: () => _showEditNameDialog(context),
         child: Padding(
             padding: const EdgeInsets.all(AppDimensions.paddingAll),
@@ -46,32 +43,38 @@ class CandidateCard extends StatelessWidget {
                         // Rank Badge
                         if (candidate.rank > 0 && candidate.votes > 0)
                         Container(
-                            margin: const EdgeInsets.only(right: 8),
-                            padding: const EdgeInsets.all(6),
+                            margin: const EdgeInsets.only(right: 12),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                             decoration: BoxDecoration(
-                                color: candidate.rank == 1 ? Colors.amber : Colors.grey.shade200,
-                                shape: BoxShape.circle,
+                                color: candidate.rank == 1 
+                                  ? colorScheme.primaryContainer 
+                                  : colorScheme.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(12), // Pill shape
                             ),
                             child: Text(
-                                "${candidate.rank}",
-                                style: TextStyle(
+                                "#${candidate.rank}",
+                                style: theme.textTheme.labelLarge?.copyWith(
+                                    color: candidate.rank == 1 
+                                      ? colorScheme.onPrimaryContainer 
+                                      : colorScheme.onSurfaceVariant,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 12,
-                                    color: candidate.rank == 1 ? Colors.white : Colors.black
                                 )
                             )
                         ),
                         Container(
-                            width: 16,
-                            height: 16,
+                            width: 12,
+                            height: 12,
                             decoration: BoxDecoration(
-                                color: candidate.color, shape: BoxShape.circle),
+                                color: candidate.color, 
+                                shape: BoxShape.circle,
+                                border: Border.all(color: colorScheme.outlineVariant, width: 1)
+                            ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 12),
                         Expanded(
                             child: Text(
                             candidate.name,
-                            style: theme.textTheme.titleMedium,
+                            style: theme.textTheme.titleLarge,
                             overflow: TextOverflow.ellipsis,
                             ),
                         ),
@@ -79,13 +82,16 @@ class CandidateCard extends StatelessWidget {
                     ),
                     ),
                     IconButton(
-                    icon: const Icon(Icons.edit, size: 20),
-                    onPressed: () => _showEditNameDialog(context),
-                    tooltip: AppStrings.editName,
+                      icon: const Icon(Icons.edit_outlined),
+                      onPressed: () => _showEditNameDialog(context),
+                      tooltip: AppStrings.editName,
+                      style: IconButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                      ),
                     ),
                 ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -93,88 +99,104 @@ class CandidateCard extends StatelessWidget {
                   children: [
                      Text(
                         '${candidate.votes}',
-                        style: theme.textTheme.displayMedium
-                            ?.copyWith(color: candidate.color, fontWeight: FontWeight.bold),
+                        style: theme.textTheme.displayMedium?.copyWith(
+                           color: colorScheme.onSurface,
+                           fontWeight: FontWeight.w800
+                        ),
                      ),
-                     const SizedBox(width: 4),
-                     Text(AppStrings.votes, style: theme.textTheme.bodyMedium),
+                     const SizedBox(width: 8),
+                     Text(
+                       AppStrings.votes, 
+                       style: theme.textTheme.bodyLarge?.copyWith(
+                         color: colorScheme.onSurfaceVariant
+                       )
+                     ),
                   ]
                 ),
                  // Swing Analysis Display
                 if (delta != null)
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        delta >= 0 ? Icons.arrow_upward : Icons.arrow_downward,
-                        size: 14,
-                        color: delta >= 0 ? Colors.green : Colors.red,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${delta >= 0 ? "+" : ""}${delta.toStringAsFixed(1)}%',
-                        style: theme.textTheme.bodySmall?.copyWith(
+                  padding: const EdgeInsets.only(bottom: 8, top: 4),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: (delta >= 0 ? Colors.green : Colors.red).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          delta >= 0 ? Icons.trending_up : Icons.trending_down,
+                          size: 16,
                           color: delta >= 0 ? Colors.green : Colors.red,
-                          fontWeight: FontWeight.bold
                         ),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                         '(vs ${previousPercentage!.toStringAsFixed(1)}%)',
-                         style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor, fontSize: 10),
-                      )
-                    ],
+                        const SizedBox(width: 4),
+                        Text(
+                          '${delta >= 0 ? "+" : ""}${delta.toStringAsFixed(1)}%',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: delta >= 0 ? Colors.green : Colors.red,
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                           '(vs ${previousPercentage!.toStringAsFixed(1)}%)',
+                           style: theme.textTheme.labelMedium?.copyWith(
+                             color: colorScheme.onSurfaceVariant.withOpacity(0.8)
+                           ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(height: 16),
+                // Action Buttons - Using M3 styles
                 Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                    _buildVoteButton(
-                        context: context,
-                        icon: Icons.remove,
-                        onPressed: () {
-                            HapticFeedback.selectionClick();
-                            context.read<ScrutinyProvider>().vote(index, increment: false);
-                        },
-                        color: Colors.red.shade400),
-                    const SizedBox(width: 24),
-                    _buildVoteButton(
-                        context: context,
-                        icon: Icons.add,
-                        onPressed: () {
-                             HapticFeedback.selectionClick();
-                             context.read<ScrutinyProvider>().vote(index, increment: true);
-                        },
-                        color: Colors.green.shade600),
+                    // Decrease Button - Tonal (less emphasis)
+                    // Using reddish tint via style override if we want semantic "danger",
+                    // or just neutral tonal. User had red previously.
+                    FilledButton.tonal(
+                      onPressed: () {
+                         HapticFeedback.selectionClick();
+                         context.read<ScrutinyProvider>().vote(index, increment: false);
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: colorScheme.errorContainer,
+                        foregroundColor: colorScheme.onErrorContainer,
+                        minimumSize: const Size(56, 56), // Larger touch target
+                        padding: EdgeInsets.zero,
+                        shape: const CircleBorder(), // Circular buttons for +/-
+                      ),
+                      child: const Icon(Icons.remove, size: 28),
+                    ),
+                    
+                    const SizedBox(width: 32),
+                    
+                    // Increase Button - Filled (High emphasis)
+                    FilledButton(
+                      onPressed: () {
+                          HapticFeedback.selectionClick();
+                          context.read<ScrutinyProvider>().vote(index, increment: true);
+                      },
+                       style: FilledButton.styleFrom(
+                        backgroundColor: colorScheme.primary, // Or custom green
+                        foregroundColor: colorScheme.onPrimary,
+                        minimumSize: const Size(72, 72), // Prominent Main Action
+                        padding: EdgeInsets.zero,
+                        elevation: 2,
+                        shape: const CircleBorder(), // Circular buttons for +/-
+                      ),
+                      child: const Icon(Icons.add, size: 36),
+                    ),
                 ],
                 ),
             ],
             ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildVoteButton(
-      {required BuildContext context,
-      required IconData icon,
-      required VoidCallback onPressed,
-      required Color color}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        shape: BoxShape.circle,
-      ),
-      child: IconButton(
-        icon: Icon(icon),
-        color: color,
-        iconSize: 32,
-        onPressed: onPressed,
-        splashRadius: 28,
       ),
     );
   }
@@ -196,6 +218,7 @@ class CandidateCard extends StatelessWidget {
                 decoration: const InputDecoration(
                     labelText: AppStrings.candidateName,
                     border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.person),
                 ),
                 textCapitalization: TextCapitalization.words,
               ),
@@ -206,6 +229,7 @@ class CandidateCard extends StatelessWidget {
                     labelText: "Risultato Precedente (%)",
                     suffixText: "%",
                     border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.percent),
                     hintText: "Es. 25.5"
                 ),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -217,9 +241,7 @@ class CandidateCard extends StatelessWidget {
             onPressed: () => Navigator.pop(context),
             child: Text(AppStrings.cancel, style: Theme.of(context).textTheme.labelLarge),
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                textStyle: const TextStyle(fontWeight: FontWeight.bold)),
+          FilledButton(
             onPressed: () {
               if (nameController.text.isNotEmpty) {
                 final provider = context.read<ScrutinyProvider>();
