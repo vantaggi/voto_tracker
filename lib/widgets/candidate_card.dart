@@ -156,9 +156,7 @@ class CandidateCard extends StatelessWidget {
                 Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                    // Decrease Button - Tonal (less emphasis)
-                    // Using reddish tint via style override if we want semantic "danger",
-                    // or just neutral tonal. User had red previously.
+                    // Decrease Button
                     FilledButton.tonal(
                       onPressed: () {
                          HapticFeedback.selectionClick();

@@ -20,7 +20,6 @@ class CandidatesSection extends StatelessWidget {
             const StatsHeader(),
 
             // List
-            // List
             if (isScrollable)
               Expanded(
                 child: ListView.builder(

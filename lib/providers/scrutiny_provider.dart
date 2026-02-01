@@ -29,7 +29,7 @@ class ScrutinyProvider extends ChangeNotifier {
   int get remainingVotes => _remainingVotes;
   String? get winner => _winner;
   
-  // Fix: Magic Number calculation (Votes needed to guarantee win vs 2nd place)
+  // Magic Number calculation (Votes needed to guarantee win vs 2nd place)
   int? get votesUntilMajority {
       if (_candidates.isEmpty) return null;
       

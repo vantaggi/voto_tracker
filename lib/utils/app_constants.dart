@@ -41,7 +41,7 @@ class AppStrings {
   static const String scrutinisedVotes = 'Voti Scrutinati';
   static const String votesShort = 'Voti';
 
-  // Fix: Added missing strings
+
   static const String undoTooltip = 'Annulla ultima azione';
   static const String redoTooltip = 'Ripristina azione';
   static const String resetButton = 'TIENI PREMUTO PER RESETTARE';
