@@ -124,7 +124,7 @@ class StatsHeader extends StatelessWidget {
                   _buildStatItem(context, Icons.how_to_vote_outlined, AppStrings.scrutinisedVotes, 
                       '${provider.totalVotesAssigned} / ${provider.settings.totalVoters}'),
                   Container(height: 48, width: 1, color: colorScheme.outlineVariant),
-                  _buildStatItem(context, Icons.pending_outlined, "Rimanenti", 
+                  _buildStatItem(context, Icons.pending_outlined, AppStrings.remaining,
                       '${provider.remainingVotes}'),
                 ],
               ),
@@ -169,7 +169,7 @@ class StatsHeader extends StatelessWidget {
                   Icon(Icons.info_outline, size: 16, color: colorScheme.primary),
                   const SizedBox(width: 8),
                   Text(
-                      "Mancano ${provider.votesUntilMajority} voti per la vittoria",
+                      AppStrings.votesToWin(provider.votesUntilMajority ?? 0),
                       style: TextStyle(color: colorScheme.onSurfaceVariant, fontWeight: FontWeight.w500)
                   )
               ],

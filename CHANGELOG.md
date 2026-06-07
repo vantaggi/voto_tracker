@@ -21,6 +21,11 @@ Le sezioni sono generate dai commit convenzionali (vedi
 - Aggiunti test unitari su `ScrutinyProvider` e `Settings` (vote-log, vincitore,
   undo, clamp, export): 14 test, tutti verdi.
 
+### 🛠️ Refactoring
+- Centralizzate in `AppStrings` le stringhe UI residue di schermate e widget
+  (menu export, impostazioni, proiettore, card, grafici): niente più testi
+  hardcoded nell'interfaccia interattiva.
+
 ## [1.1.2] - 2026-06-07
 
 ### 🐞 Bug Fix

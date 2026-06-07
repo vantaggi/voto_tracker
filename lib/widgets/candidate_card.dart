@@ -224,11 +224,11 @@ class CandidateCard extends StatelessWidget {
               TextField(
                 controller: prevController,
                 decoration: const InputDecoration(
-                    labelText: "Risultato Precedente (%)",
+                    labelText: AppStrings.previousResultLabel,
                     suffixText: "%",
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.percent),
-                    hintText: "Es. 25.5"
+                    hintText: AppStrings.previousResultHint
                 ),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
               ),

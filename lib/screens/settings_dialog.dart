@@ -60,7 +60,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
               decoration: const InputDecoration(
                 labelText: AppStrings.totalVotersNumber,
                 prefixIcon: Icon(Icons.people_outline),
-                hintText: "Es. 100",
+                hintText: AppStrings.votersHint,
               ),
             ),
             const SizedBox(height: 32),
@@ -92,7 +92,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
             ),
             
             const SizedBox(height: 24),
-            Text("Opzioni di Voto", style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text(AppStrings.votingOptions, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Card(
               elevation: 0,
@@ -117,7 +117,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
             ),
 
             const SizedBox(height: 24),
-            Text("Gestione Dati", style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text(AppStrings.dataManagement, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             
             // Using OutlinedButtons for secondary actions
@@ -126,7 +126,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 Expanded(
                   child: OutlinedButton.icon(
                     icon: const Icon(Icons.upload_file),
-                    label: const Text("Esporta"),
+                    label: const Text(AppStrings.exportLabel),
                     onPressed: () async {
                        final provider = context.read<ScrutinyProvider>();
                        await ConfigurationService.exportConfiguration(provider.candidates);
@@ -137,14 +137,14 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 Expanded(
                   child: OutlinedButton.icon(
                     icon: const Icon(Icons.download),
-                    label: const Text("Importa"),
+                    label: const Text(AppStrings.importLabel),
                     onPressed: () async {
                        final candidates = await ConfigurationService.importConfiguration();
                        if (candidates != null && context.mounted) {
                            Navigator.pop(context); // Close dialog
                            context.read<ScrutinyProvider>().loadConfiguration(candidates);
                            ScaffoldMessenger.of(context).showSnackBar(
-                               const SnackBar(content: Text("Configurazione caricata con successo"))
+                               const SnackBar(content: Text(AppStrings.configLoaded))
                            );
                        }
                     },

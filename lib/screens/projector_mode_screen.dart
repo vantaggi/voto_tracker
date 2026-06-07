@@ -21,7 +21,7 @@ class ProjectorModeScreen extends StatelessWidget {
           return Scaffold(
             backgroundColor: colorScheme.surface, 
             appBar: AppBar(
-              title: const Text("Modalità Proiettore"),
+              title: const Text(AppStrings.projectorMode),
               backgroundColor: Colors.transparent,
               foregroundColor: colorScheme.onSurfaceVariant,
               elevation: 0,
@@ -34,7 +34,7 @@ class ProjectorModeScreen extends StatelessWidget {
                 if (candidates.isEmpty) {
                     return Center(
                         child: Text(
-                            "In attesa di dati...", 
+                            AppStrings.waitingForData,
                             style: Theme.of(context).textTheme.displaySmall?.copyWith(color: colorScheme.onSurfaceVariant)
                         )
                     );
@@ -185,7 +185,7 @@ class ProjectorModeScreen extends StatelessWidget {
                    Icon(Icons.how_to_vote_outlined, color: colorScheme.onSurfaceVariant, size: 32),
                    const SizedBox(width: 16),
                    Text(
-                       "VOTI TOTALI: ${provider.totalVotesAssigned} / ${provider.settings.totalVoters}",
+                       "${AppStrings.votesTotal}: ${provider.totalVotesAssigned} / ${provider.settings.totalVoters}",
                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: colorScheme.onSurfaceVariant)
                    )
               ]

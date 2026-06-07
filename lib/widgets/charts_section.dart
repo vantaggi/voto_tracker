@@ -439,7 +439,7 @@ class _PercentageChart extends StatelessWidget {
                          ),
                        ),
                        Text(
-                         "VOTI TOTALI",
+                         AppStrings.votesTotal,
                          style: theme.textTheme.labelMedium?.copyWith(
                              color: colorScheme.onSurfaceVariant,
                              letterSpacing: 1.5,

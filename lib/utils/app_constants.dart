@@ -54,6 +54,34 @@ class AppStrings {
   static const String redoTooltip = 'Ripristina azione';
   static const String resetButton = 'TIENI PREMUTO PER RESETTARE';
 
+  // AppBar / azioni
+  static const String exportShareTooltip = 'Esporta / Condividi';
+  static const String projectorMode = 'Modalità Proiettore';
+
+  // Menu di esportazione
+  static const String shareImageTitle = 'Condividi immagine social';
+  static const String shareImageSubtitle = 'Ottimizzata per Instagram/WhatsApp';
+  static const String exportPdfTitle = 'Esporta Report PDF';
+  static const String exportPdfSubtitle = 'Documento ufficiale con grafici';
+
+  // Statistiche / proiettore
+  static const String remaining = 'Rimanenti';
+  static const String votesTotal = 'VOTI TOTALI';
+  static const String waitingForData = 'In attesa di dati...';
+  static String votesToWin(int n) => 'Mancano $n voti per la vittoria';
+
+  // Impostazioni
+  static const String votersHint = 'Es. 100';
+  static const String votingOptions = 'Opzioni di Voto';
+  static const String dataManagement = 'Gestione Dati';
+  static const String exportLabel = 'Esporta';
+  static const String importLabel = 'Importa';
+  static const String configLoaded = 'Configurazione caricata con successo';
+
+  // Modifica candidato (swing)
+  static const String previousResultLabel = 'Risultato Precedente (%)';
+  static const String previousResultHint = 'Es. 25.5';
+
   // Numbers
   static const int minParticipants = 2;
   static const int maxParticipants = 8;

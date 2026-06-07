@@ -23,12 +23,12 @@ class HomePage extends StatelessWidget {
         actions: [
             IconButton(
                 icon: const Icon(Icons.ios_share),
-                tooltip: "Esporta / Condividi",
+                tooltip: AppStrings.exportShareTooltip,
                 onPressed: () => _showExportOptions(context),
             ),
             IconButton(
                 icon: const Icon(Icons.tv),
-                tooltip: "Modalità Proiettore",
+                tooltip: AppStrings.projectorMode,
                 onPressed: () => Navigator.push(
                     context, 
                     MaterialPageRoute(builder: (context) => const ProjectorModeScreen())
@@ -82,8 +82,8 @@ class HomePage extends StatelessWidget {
                   children: [
                       ListTile(
                           leading: const Icon(Icons.image),
-                          title: const Text("Condividi immagine social"),
-                          subtitle: const Text("Ottimizzata per Instagram/WhatsApp"),
+                          title: const Text(AppStrings.shareImageTitle),
+                          subtitle: const Text(AppStrings.shareImageSubtitle),
                           onTap: () async {
                               Navigator.pop(context);
                               final provider = context.read<ScrutinyProvider>();
@@ -100,8 +100,8 @@ class HomePage extends StatelessWidget {
                       ),
                       ListTile(
                           leading: const Icon(Icons.picture_as_pdf),
-                          title: const Text("Esporta Report PDF"),
-                          subtitle: const Text("Documento ufficiale con grafici"),
+                          title: const Text(AppStrings.exportPdfTitle),
+                          subtitle: const Text(AppStrings.exportPdfSubtitle),
                           onTap: () async {
                                Navigator.pop(context);
                                final provider = context.read<ScrutinyProvider>();
