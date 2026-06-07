@@ -1,0 +1,45 @@
+name: Auto-Versioning & Changelog
+
+# Ad ogni push su master, bumpa la patch version in pubspec.yaml e rigenera la
+# sezione del CHANGELOG dai commit convenzionali. Vedi docs/CONVENTIONAL_COMMITS.md.
+#
+# ⚠️ Caveat "ghost version": questo job committa su master stesso. Ogni release
+# può quindi generare una patch "vuota": al release manuale successivo salta quel
+# numero e annota il salto nel CHANGELOG.
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  version_bump:
+    runs-on: ubuntu-latest
+    # evita loop infiniti sul commit di bump
+    if: "!contains(github.event.head_commit.message, 'chore: version bump')"
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # serve la storia completa + i tag per il changelog
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Estrai e bumpa la patch version
+        run: |
+          VERSION=$(grep -oP '^version:\s*\K\d+\.\d+\.\d+' pubspec.yaml)
+          IFS='.' read -r MA MI PA <<< "$VERSION"
+          echo "NEW_VERSION=$MA.$MI.$((PA+1))" >> "$GITHUB_ENV"
+
+      - name: Esegui lo script di bump
+        run: python scripts/bump_version.py "${{ env.NEW_VERSION }}"
+
+      - name: Commit & push
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+          git add pubspec.yaml CHANGELOG.md
+          git diff --staged --quiet || git commit -m "chore: version bump to ${{ env.NEW_VERSION }} [skip ci]"
+          git push
