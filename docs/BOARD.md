@@ -19,7 +19,8 @@ documentale e di automazione (AI Workflow Kit) sopra al codice esistente.
 | DOC-002 | **docs/STRUCTURE, PROJECT_GUIDE, DESIGN_SYSTEM, CONVENTIONAL_COMMITS** | ✅ Fatto | 🔴 Alta | 🟢 Basso | - | 2026-06-07 |
 | DOC-003 | **CHANGELOG.md** (Keep a Changelog + semver) | ✅ Fatto | 🟡 Media | 🟢 Basso | - | 2026-06-07 |
 | INFRA-001 | **Flotta subagent** in `.claude/agents/` | ✅ Fatto | 🟡 Media | 🟢 Basso | - | 2026-06-07 |
-| INFRA-002 | **Auto-versioning workflow** (`bump_version.py` + CI su master) | ✅ Fatto | 🟡 Media | 🟡 Medio | - | 2026-06-07 |
+| INFRA-002 | **Script di versioning manuale** (`scripts/bump_version.py`) | ✅ Fatto | 🟡 Media | 🟢 Basso | - | 2026-06-07 |
+| INFRA-003 | **Rimosso il workflow CI `auto-version.yml`** (ghost version su ogni push) | ✅ Fatto | 🟡 Media | 🟢 Basso | - | 2026-06-07 |
 
 ## 🐞 Wave 1.1 — Audit & Bugfix (giugno 2026)
 

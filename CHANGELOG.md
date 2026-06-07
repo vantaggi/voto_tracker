@@ -21,8 +21,10 @@ Le sezioni sono generate dai commit convenzionali (vedi
 ### ⚙️ Manutenzione
 - Azzerati tutti gli avvisi dell'analyzer (`withValues`, rimozione di codice
   morto, lint minori): da 31 a 0 issue.
-- Flotta di subagent in `.claude/agents/` e auto-versioning CI
-  (`scripts/bump_version.py` + `.github/workflows/auto-version.yml`).
+- Flotta di subagent in `.claude/agents/` e script di versioning manuale
+  (`scripts/bump_version.py`).
+- Rimosso il workflow CI `auto-version.yml`: bumpava ad ogni push su `master`
+  generando commit di versione "ghost". Il bump ora è manuale, alla release.
 
 ### 📝 Documentazione
 - Adottato l'AI Workflow Kit: README come Master Brain Index, `docs/` (STRUCTURE,

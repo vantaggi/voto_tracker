@@ -32,8 +32,8 @@ python scripts/bump_version.py X.Y.Z     # bump pubspec + CHANGELOG
 2. Bumpa **insieme** versione semver in `pubspec.yaml` e voce CHANGELOG; il build
    number cresce monotòno.
 3. Allinea i testi store (`PLAY_STORE_LISTING.md`) alle feature reali.
-4. Caveat "ghost version": se il CI ha creato una patch vuota su `master`, salta
-   quel numero nella release manuale e annota il salto nel CHANGELOG.
+4. Versioning manuale: `python scripts/bump_version.py X.Y.Z` bumpa `pubspec.yaml`
+   e rigenera il CHANGELOG dai commit (non c'è una CI che bumpa automaticamente).
 
 ## Anti-pattern
 - Pubblicare con `analyze`/`test` rossi.

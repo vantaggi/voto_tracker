@@ -74,8 +74,6 @@ docs/
 ├── documentation.md            # Sync README/BOARD/CHANGELOG/STRUCTURE
 └── release-android.md          # Build release, versioning, scheda Play Store
 
-.github/workflows/
-└── auto-version.yml            # Bump patch + changelog su push a master
 scripts/
-└── bump_version.py             # Bump pubspec.yaml + rigenera CHANGELOG
+└── bump_version.py             # Bump MANUALE di pubspec.yaml + rigenera CHANGELOG (alla release)
 ```

@@ -28,10 +28,10 @@ git tag -a vX.Y.Z -m "release vX.Y.Z — <sintesi>"
 git push origin vX.Y.Z
 gh release create vX.Y.Z --title "vX.Y.Z — <tema>" --notes "<changelog>"
 ```
-La versione canonica è in `pubspec.yaml` (`version: X.Y.Z+build`). Vedi il caveat
-"ghost version" del workflow kit: il bump CI su `master` può creare una patch
-"vuota"; al release manuale successivo salta il numero ghost e annotalo nel
-CHANGELOG.
+La versione canonica è in `pubspec.yaml` (`version: X.Y.Z+build`). Il versioning è
+**manuale**: alla release esegui `python scripts/bump_version.py X.Y.Z` per bumpare
+`pubspec.yaml` e rigenerare la sezione del CHANGELOG dai commit convenzionali
+(non c'è più una CI che bumpa ad ogni push).
 
 ## Anti-pattern
 - Refactor opportunistici mescolati a un commit di fix.
