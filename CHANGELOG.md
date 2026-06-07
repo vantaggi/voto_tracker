@@ -9,13 +9,24 @@ Le sezioni sono generate dai commit convenzionali (vedi
 
 ## [Unreleased]
 
+### 🐞 Bug Fix
+- Export PDF: la classifica e la tabella ora mostrano i candidati ordinati per
+  voti (prima usavano l'ordine originale, marcando come leader la prima riga).
+- Corretto un memory leak nel dialog di rinomina (controller non disposti).
+- Le impostazioni ora validano il numero di votanti/candidati (clamp a valori
+  minimi) impedendo conteggi negativi.
+- Etichetta del vincitore resa accurata ("Vittoria matematica" per vantaggio
+  incolmabile) e centralizzata, eliminando le diciture duplicate.
+
+### ⚙️ Manutenzione
+- Azzerati tutti gli avvisi dell'analyzer (`withValues`, rimozione di codice
+  morto, lint minori): da 31 a 0 issue.
+- Flotta di subagent in `.claude/agents/` e auto-versioning CI
+  (`scripts/bump_version.py` + `.github/workflows/auto-version.yml`).
+
 ### 📝 Documentazione
 - Adottato l'AI Workflow Kit: README come Master Brain Index, `docs/` (STRUCTURE,
   BOARD, PROJECT_GUIDE, CONVENTIONAL_COMMITS, DESIGN_SYSTEM), CHANGELOG.
-
-### ⚙️ Manutenzione
-- Flotta di subagent in `.claude/agents/` e auto-versioning CI
-  (`scripts/bump_version.py` + `.github/workflows/auto-version.yml`).
 
 ## [1.1.1] - 2026-06-07
 
