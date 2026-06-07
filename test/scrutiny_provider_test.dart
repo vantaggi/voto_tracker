@@ -112,6 +112,44 @@ void main() {
       p.reset();
       expect(p.totalVotesAssigned, 0);
       expect(p.canUndo, isFalse);
+      expect(p.canRedo, isFalse);
+    });
+  });
+
+  group('ScrutinyProvider — redo', () {
+    test('canRedo è falso finché non si annulla', () async {
+      final p = await _providerWith(candidates: 2, voters: 10);
+      p.vote(0);
+      expect(p.canRedo, isFalse);
+    });
+
+    test('redo riapplica l\'azione annullata', () async {
+      final p = await _providerWith(candidates: 2, voters: 10);
+      p.vote(0);
+      p.vote(1);
+      p.undo();
+      expect(p.canRedo, isTrue);
+      expect(p.candidates[1].votes, 0);
+      p.redo();
+      expect(p.candidates[1].votes, 1);
+      expect(p.totalVotesAssigned, 2);
+      expect(p.canRedo, isFalse);
+    });
+
+    test('una nuova azione invalida il redo', () async {
+      final p = await _providerWith(candidates: 2, voters: 10);
+      p.vote(0);
+      p.undo();
+      expect(p.canRedo, isTrue);
+      p.vote(1); // nuova azione
+      expect(p.canRedo, isFalse);
+    });
+
+    test('redo è no-op senza azioni annullate', () async {
+      final p = await _providerWith(candidates: 2, voters: 10);
+      p.vote(0);
+      p.redo();
+      expect(p.totalVotesAssigned, 1);
     });
   });
 

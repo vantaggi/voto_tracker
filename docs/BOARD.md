@@ -43,7 +43,7 @@ Esito dell'audit del codice + `dart analyze` (31 issue → 0).
 | REFACTOR-001 | **Centralizzare le stringhe UI** di screen e widget in `AppStrings` | ✅ Fatto | 🟢 Bassa | 🟢 Basso | - | home_page, settings, proiettore, card, charts |
 | REFACTOR-002 | **Centralizzare le stringhe di export** (PDF, social card, share text) | 📅 Pianificato | 🟢 Bassa | 🟢 Basso | 1h | Molte interpolate; superficie separata |
 | TEST-001 | **Test unitari su `ScrutinyProvider`** (vote-log, vincitore, undo) | ✅ Fatto | 🔴 Alta | 🟢 Basso | - | 14 test in `test/`, tutti verdi |
-| FEAT-002 | **Redo** (oggi disabilitato nel modello a log sequenziale) | 📅 Pianificato | 🟢 Bassa | 🟡 Medio | 3h | Richiede redo-stack separato |
+| FEAT-002 | **Redo** | ✅ Fatto | 🟢 Bassa | 🟢 Basso | - | Redo-stack nel provider; il pulsante UI esistente ora funziona |
 | PERF-001 | **Audit replay vote-log** su scrutini molto grandi | 📅 Pianificato | 🟢 Bassa | 🟢 Basso | 2h | `_recalculateState` rigioca tutto il log |
 
 ## Convenzioni ID

@@ -16,6 +16,8 @@ Le sezioni sono generate dai commit convenzionali (vedi
 ### 🚀 Nuove Funzionalità
 - Export dei risultati in **CSV** e **JSON** dal menu di condivisione (i dati
   erano già calcolati ma non raggiungibili dall'interfaccia).
+- **Redo** ora funzionante: il pulsante di ripristino riapplica l'ultima azione
+  annullata (prima era inerte).
 
 ### 🧪 Test
 - Aggiunti test unitari su `ScrutinyProvider` e `Settings` (vote-log, vincitore,

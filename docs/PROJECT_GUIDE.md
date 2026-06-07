@@ -45,8 +45,9 @@ Implicazioni da rispettare:
 - Non scrivere `candidate.votes` direttamente fuori dal replay del log.
 - Aggiungere un voto = `_voteLog.add(index)`; togliere un voto = rimuovere
   l'**ultima** occorrenza di quell'indice (`lastIndexOf`).
-- L'**undo** rimuove l'ultima azione assoluta (`_voteLog.removeLast()`); il
-  **redo** è disabilitato (modello a log distruttivo, vedi FEAT-002 nel BOARD).
+- L'**undo** sposta l'ultima azione (`_voteLog.removeLast()`) su un `_redoStack`
+  in memoria; il **redo** la riapplica. Ogni nuova azione svuota il redo-stack
+  (invalidazione standard). Il redo-stack è transiente: non persiste fra riavvii.
 - Il **rename** non riscrive il log (la storia è ancorata all'indice), quindi è
   un'operazione sicura ed economica.
 

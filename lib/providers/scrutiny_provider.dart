@@ -11,10 +11,12 @@ class ScrutinyProvider extends ChangeNotifier {
 
   // Vote Log History (Replacing Snapshot History)
   final List<int> _voteLog = [];
+  // Stack delle azioni annullate (LIFO), per il redo. Transiente: non persiste
+  // fra i riavvii e viene svuotato a ogni nuova azione.
+  final List<int> _redoStack = [];
 
-  // History accessors for UI consistency (simulated)
   bool get canUndo => _voteLog.isNotEmpty;
-  bool get canRedo => false; // Redo is complex with this destructive rewrite model, disabling for now or could implement a 'redo log' but user didn't ask.
+  bool get canRedo => _redoStack.isNotEmpty;
 
   // Calculated values - RESTORED
   int _totalVotesAssigned = 0;
@@ -188,6 +190,7 @@ class ScrutinyProvider extends ChangeNotifier {
         }
     }
 
+    _redoStack.clear(); // una nuova azione invalida il redo
     _recalculateState();
     _persistState();
     notifyListeners();
@@ -195,7 +198,7 @@ class ScrutinyProvider extends ChangeNotifier {
 
   void undo() {
     if (_voteLog.isNotEmpty) {
-        _voteLog.removeLast(); // Standard undo is just popping the last action
+        _redoStack.add(_voteLog.removeLast()); // sposta l'ultima azione sul redo-stack
         _recalculateState();
         _persistState();
         notifyListeners();
@@ -203,12 +206,18 @@ class ScrutinyProvider extends ChangeNotifier {
   }
 
   void redo() {
-    // Not implemented in this sequential log model without a separate redo-stack
+    if (_redoStack.isNotEmpty) {
+        _voteLog.add(_redoStack.removeLast()); // riapplica l'ultima azione annullata
+        _recalculateState();
+        _persistState();
+        notifyListeners();
+    }
   }
 
   void reset() {
     _initializeCandidates();
     _voteLog.clear();
+    _redoStack.clear();
     _recalculateState();
     _persistState();
     notifyListeners();
@@ -233,6 +242,7 @@ class ScrutinyProvider extends ChangeNotifier {
       }
 
       _voteLog.clear();
+      _redoStack.clear();
       _recalculateState();
       _persistState();
       notifyListeners();
