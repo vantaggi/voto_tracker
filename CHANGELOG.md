@@ -23,6 +23,11 @@ Le sezioni sono generate dai commit convenzionali (vedi
 - Aggiunti test unitari su `ScrutinyProvider` e `Settings` (vote-log, vincitore,
   undo, clamp, export): 14 test, tutti verdi.
 
+### ⚡ Prestazioni
+- I voti aggiornano i conteggi in modo incrementale invece di rigiocare l'intero
+  storico a ogni tap: da O(voti) a O(candidati) per operazione (il replay
+  completo resta solo al caricamento e ai reset).
+
 ### 🛠️ Refactoring
 - Centralizzate in `AppStrings` le stringhe UI residue di schermate e widget
   (menu export, impostazioni, proiettore, card, grafici): niente più testi

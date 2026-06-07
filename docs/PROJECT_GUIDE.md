@@ -91,9 +91,12 @@ lo stato iniziale; ogni voto aggiunge uno snapshot. Consumato da
 
 - **`provider` invece di Bloc/Riverpod:** dominio piccolo, un solo aggregato di
   stato. Cambiarlo richiede una nota qui prima dell'implementazione.
-- **Vote-log invece di snapshot:** undo e grafico storico derivano gratis da
-  un'unica struttura; il costo è un replay O(n) a ogni mutazione (accettabile
-  alle dimensioni reali di uno scrutinio — vedi PERF-001).
+- **Vote-log invece di snapshot:** undo/redo e grafico storico derivano da
+  un'unica struttura. Le mutazioni di voto (increment/decrement/undo/redo)
+  aggiornano i conteggi in modo **incrementale** (O(candidati)); il replay
+  completo del log (`_recalculateState`, O(voti)) serve solo al caricamento da
+  `shared_preferences` e ai reset strutturali (PERF-001). `historyPoints` resta
+  O(voti) ma è ricostruito solo quando il grafico storico è visibile.
 - **App locale, niente backend:** nessun segreto da iniettare, nessuna
   cache-busting CDN, nessun deploy server. La "release" è una build store
   (`release-android` agent). Per questo gli strati Supabase/Vercel/cache-bust

@@ -179,39 +179,45 @@ class ScrutinyProvider extends ChangeNotifier {
     if (increment) {
         if (_remainingVotes <= 0) return;
         _voteLog.add(index);
+        _candidates[index].votes++;
     } else {
-        // Rewriting History: Remove the LAST occurrences of this candidate index
+        // Rimuove l'ultima occorrenza di questo candidato dal log
         int lastIndex = _voteLog.lastIndexOf(index);
-        if (lastIndex != -1) {
-            _voteLog.removeAt(lastIndex);
-        } else {
-            // No history to remove, safe to ignore or handle base votes if implemented
-            return;
-        }
+        if (lastIndex == -1) return; // niente da rimuovere
+        _voteLog.removeAt(lastIndex);
+        _candidates[index].votes--;
     }
 
     _redoStack.clear(); // una nuova azione invalida il redo
-    _recalculateState();
+    // Aggiornamento incrementale: ogni voto cambia un solo candidato di ±1,
+    // quindi non serve rigiocare l'intero log (vedi PERF-001).
+    _calculateResults();
     _persistState();
     notifyListeners();
   }
 
   void undo() {
-    if (_voteLog.isNotEmpty) {
-        _redoStack.add(_voteLog.removeLast()); // sposta l'ultima azione sul redo-stack
-        _recalculateState();
-        _persistState();
-        notifyListeners();
+    if (_voteLog.isEmpty) return;
+    final removed = _voteLog.removeLast(); // sposta l'ultima azione sul redo-stack
+    _redoStack.add(removed);
+    if (removed >= 0 && removed < _candidates.length) {
+      _candidates[removed].votes--;
     }
+    _calculateResults();
+    _persistState();
+    notifyListeners();
   }
 
   void redo() {
-    if (_redoStack.isNotEmpty) {
-        _voteLog.add(_redoStack.removeLast()); // riapplica l'ultima azione annullata
-        _recalculateState();
-        _persistState();
-        notifyListeners();
+    if (_redoStack.isEmpty) return;
+    final restored = _redoStack.removeLast(); // riapplica l'ultima azione annullata
+    _voteLog.add(restored);
+    if (restored >= 0 && restored < _candidates.length) {
+      _candidates[restored].votes++;
     }
+    _calculateResults();
+    _persistState();
+    notifyListeners();
   }
 
   void reset() {
