@@ -268,7 +268,7 @@ class _HistoryChart extends StatelessWidget {
               lineBarsData: candidates
                   // Removed filter to show all candidates including Blank/Null
                   .map((candidate) {
-                final isTechnical = candidate.name == AppStrings.blankVotes || candidate.name == AppStrings.nullVotes;
+                final isTechnical = candidate.isTechnical;
                 
                 return LineChartBarData(
                   spots: sortedHistory.map((entry) {

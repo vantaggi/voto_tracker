@@ -199,7 +199,7 @@ class PdfExportService {
 
     final sortedKeys = historyPoints.keys.toList()..sort();
     
-    final validCandidates = candidates.where((c) => c.name != AppStrings.blankVotes && c.name != AppStrings.nullVotes);
+    final validCandidates = candidates.where((c) => !c.isTechnical);
     
     final datasets = <pw.Dataset>[];
     for(var c in validCandidates) {

@@ -38,7 +38,7 @@ Esito dell'audit del codice + `dart analyze` (31 issue → 0).
 
 | ID | Task | Status | Priorità | Rischio | Stima | Note |
 |:--|:--|:--:|:--:|:--:|:--:|:--|
-| FEAT-001 | **Internazionalizzazione reale IT/EN** (`flutter_localizations` + ARB) | 📅 Pianificato | 🟡 Media | 🟡 Medio | 6h | Oggi solo IT in `AppStrings` |
+| FEAT-001 | **Internazionalizzazione reale IT/EN** (`flutter_localizations` + ARB) | 🏗️ In corso | 🟡 Media | 🟡 Medio | 6h | Fase A (enum identità) fatta; manca ARB + delegati + toggle |
 | FEAT-003 | **Esporre export CSV/JSON in UI** | ✅ Fatto | 🟡 Media | 🟢 Basso | - | `DataExportService` + voci nel menu di export |
 | REFACTOR-001 | **Centralizzare le stringhe UI** di screen e widget in `AppStrings` | ✅ Fatto | 🟢 Bassa | 🟢 Basso | - | home_page, settings, proiettore, card, charts |
 | REFACTOR-002 | **Centralizzare le stringhe di export** (PDF, social card, share text) | 📅 Pianificato | 🟢 Bassa | 🟢 Basso | 1h | Molte interpolate; superficie separata |

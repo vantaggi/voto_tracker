@@ -152,7 +152,7 @@ class ProjectorModeScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 24),
               width: double.infinity,
               decoration: BoxDecoration(
-                  color: winner == AppStrings.tie ? colorScheme.tertiaryContainer : colorScheme.primaryContainer,
+                  color: provider.isTie ? colorScheme.tertiaryContainer : colorScheme.primaryContainer,
                   borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32))
               ),
               alignment: Alignment.center,
@@ -161,14 +161,14 @@ class ProjectorModeScreen extends StatelessWidget {
                     Text(
                         label, 
                         style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            color: winner == AppStrings.tie ? colorScheme.onTertiaryContainer : colorScheme.onPrimaryContainer,
+                            color: provider.isTie ? colorScheme.onTertiaryContainer : colorScheme.onPrimaryContainer,
                             fontWeight: FontWeight.bold
                         )
                     ),
                     Text(
                         winner.toUpperCase(),
                         style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                            color: winner == AppStrings.tie ? colorScheme.onTertiaryContainer : colorScheme.onPrimaryContainer,
+                            color: provider.isTie ? colorScheme.onTertiaryContainer : colorScheme.onPrimaryContainer,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 2
                         ),

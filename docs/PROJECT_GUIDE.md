@@ -40,6 +40,12 @@ Il `_voteLog` (`List<int>`, ogni elemento = indice di un candidato) è la **font
 di verità** dei voti. I conteggi `Candidate.votes` sono **derivati**: vengono
 azzerati e ricostruiti rieseguendo il log in `_recalculateState()`.
 
+**Identità via enum, mai stringhe.** Schede bianche/nulle si riconoscono da
+`Candidate.type` (`CandidateType.normal/blank/spoiled`), non dal nome; lo stato
+del vincitore è `WinnerStatus` (`none/mathematical/elected/tie`), non il
+confronto con una stringa. Questo rende i nomi liberamente localizzabili/
+rinominabili senza rompere la logica (prerequisito per la i18n, FEAT-001).
+
 Implicazioni da rispettare:
 
 - Non scrivere `candidate.votes` direttamente fuori dal replay del log.

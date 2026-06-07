@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:voto_tracker/models/candidate.dart';
 import 'package:voto_tracker/models/settings.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
@@ -184,6 +185,40 @@ void main() {
       expect(p.remainingVotes, 0);
       expect(p.winner, '${AppStrings.candidatePrefix} 1');
       expect(p.winnerLabel, AppStrings.winnerElected);
+    });
+
+    test('winnerStatus e isTie riflettono lo stato (enum, non stringhe)',
+        () async {
+      final p = await _providerWith(candidates: 2, voters: 10);
+      expect(p.winnerStatus, WinnerStatus.none);
+      for (var i = 0; i < 6; i++) {
+        p.vote(0);
+      }
+      p.vote(1);
+      expect(p.winnerStatus, WinnerStatus.mathematical);
+      expect(p.hasWinner, isTrue);
+      expect(p.isTie, isFalse);
+      expect(p.winnerName, '${AppStrings.candidatePrefix} 1');
+    });
+  });
+
+  group('ScrutinyProvider — tipi candidato', () {
+    test('default: 4 normali + 1 bianca + 1 nulla', () async {
+      final p = await _freshProvider();
+      expect(
+          p.candidates.where((c) => c.type == CandidateType.normal).length, 4);
+      expect(p.candidates.any((c) => c.type == CandidateType.blank), isTrue);
+      expect(p.candidates.any((c) => c.type == CandidateType.spoiled), isTrue);
+    });
+
+    test('fromJson deduce il tipo dai dati legacy (senza campo type)', () {
+      final blank = Candidate.fromJson({
+        'name': AppStrings.blankVotes,
+        'votes': 0,
+        'color': 0xFF000000,
+      });
+      expect(blank.type, CandidateType.blank);
+      expect(blank.isTechnical, isTrue);
     });
   });
 

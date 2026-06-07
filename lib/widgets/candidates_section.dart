@@ -71,7 +71,7 @@ class StatsHeader extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
               decoration: BoxDecoration(
-                color: provider.winner == AppStrings.tie 
+                color: provider.isTie
                     ? colorScheme.tertiaryContainer 
                     : colorScheme.primaryContainer,
                 borderRadius: BorderRadius.circular(24),
@@ -88,7 +88,7 @@ class StatsHeader extends StatelessWidget {
                    Text(
                       provider.winnerLabel!,
                       style: TextStyle(
-                          color: provider.winner == AppStrings.tie 
+                          color: provider.isTie
                               ? colorScheme.onTertiaryContainer 
                               : colorScheme.onPrimaryContainer,
                           fontWeight: FontWeight.bold,
@@ -102,7 +102,7 @@ class StatsHeader extends StatelessWidget {
                       style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.w900,
-                          color: provider.winner == AppStrings.tie 
+                          color: provider.isTie
                               ? colorScheme.onTertiaryContainer 
                               : colorScheme.onPrimaryContainer,
                           height: 1.1

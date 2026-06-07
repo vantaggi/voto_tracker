@@ -5,6 +5,11 @@ import 'package:voto_tracker/models/candidate.dart';
 import 'package:voto_tracker/models/settings.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
 
+/// Stato del vincitore. Identità stabile (non basata su stringhe):
+/// `mathematical` = vantaggio incolmabile a scrutinio aperto,
+/// `elected` = primo a scrutinio chiuso, `tie` = pareggio finale.
+enum WinnerStatus { none, mathematical, elected, tie }
+
 class ScrutinyProvider extends ChangeNotifier {
   List<Candidate> _candidates = [];
   Settings _settings = Settings();
@@ -21,24 +26,50 @@ class ScrutinyProvider extends ChangeNotifier {
   // Calculated values - RESTORED
   int _totalVotesAssigned = 0;
   int _remainingVotes = 0;
-  String? _winner;
+  // Stato del vincitore tramite enum (identità stabile, non basata su stringhe).
+  String? _winnerName; // nome del candidato vincente (null su pareggio/nessuno)
+  WinnerStatus _winnerStatus = WinnerStatus.none;
 
   // Getters - RESTORED
   List<Candidate> get candidates => _candidates;
   Settings get settings => _settings;
   int get totalVotesAssigned => _totalVotesAssigned;
   int get remainingVotes => _remainingVotes;
-  String? get winner => _winner;
+
+  // Stato del vincitore
+  WinnerStatus get winnerStatus => _winnerStatus;
+  bool get hasWinner => _winnerStatus != WinnerStatus.none;
+  bool get isTie => _winnerStatus == WinnerStatus.tie;
+  String? get winnerName => _winnerName;
+
+  // Stringa di visualizzazione retro-compatibile: nome del vincitore, oppure
+  // l'etichetta di pareggio in caso di parità.
+  String? get winner {
+    switch (_winnerStatus) {
+      case WinnerStatus.none:
+        return null;
+      case WinnerStatus.tie:
+        return AppStrings.tie;
+      case WinnerStatus.elected:
+      case WinnerStatus.mathematical:
+        return _winnerName;
+    }
+  }
 
   // Etichetta coerente dello stato del vincitore (usata da UI, PDF e share).
   // Il vincitore è dichiarato per vantaggio matematicamente incolmabile, non per
   // maggioranza assoluta: l'etichetta riflette questa distinzione.
   String? get winnerLabel {
-    if (_winner == null) return null;
-    if (_winner == AppStrings.tie) return AppStrings.finalResult;
-    return _remainingVotes <= 0
-        ? AppStrings.winnerElected
-        : AppStrings.winnerMathematical;
+    switch (_winnerStatus) {
+      case WinnerStatus.none:
+        return null;
+      case WinnerStatus.tie:
+        return AppStrings.finalResult;
+      case WinnerStatus.elected:
+        return AppStrings.winnerElected;
+      case WinnerStatus.mathematical:
+        return AppStrings.winnerMathematical;
+    }
   }
 
   // Magic Number calculation (Votes needed to guarantee win vs 2nd place)
@@ -86,11 +117,17 @@ class ScrutinyProvider extends ChangeNotifier {
     );
     if (_settings.showBlankVotes) {
       _candidates.add(Candidate(
-          name: AppStrings.blankVotes, votes: 0, color: Colors.grey));
+          name: AppStrings.blankVotes,
+          votes: 0,
+          color: Colors.grey,
+          type: CandidateType.blank));
     }
     if (_settings.showNullVotes) {
       _candidates.add(Candidate(
-          name: AppStrings.nullVotes, votes: 0, color: Colors.black));
+          name: AppStrings.nullVotes,
+          votes: 0,
+          color: Colors.black,
+          type: CandidateType.spoiled));
     }
   }
 
@@ -237,13 +274,13 @@ class ScrutinyProvider extends ChangeNotifier {
       }
       
       // Update settings participant count if needed
-      final validCount = _candidates.where((c) => c.name != AppStrings.blankVotes && c.name != AppStrings.nullVotes).length;
+      final validCount = _candidates.where((c) => c.type == CandidateType.normal).length;
       if (validCount != _settings.participantsCount) {
           _settings = Settings(
-              totalVoters: _settings.totalVoters, 
+              totalVoters: _settings.totalVoters,
               participantsCount: validCount,
-              showBlankVotes: _candidates.any((c) => c.name == AppStrings.blankVotes),
-              showNullVotes: _candidates.any((c) => c.name == AppStrings.nullVotes)
+              showBlankVotes: _candidates.any((c) => c.type == CandidateType.blank),
+              showNullVotes: _candidates.any((c) => c.type == CandidateType.spoiled)
           );
       }
 
@@ -305,12 +342,11 @@ class ScrutinyProvider extends ChangeNotifier {
     _totalVotesAssigned = _candidates.fold(0, (sum, c) => sum + c.votes);
     _remainingVotes = _settings.totalVoters - _totalVotesAssigned;
 
-    _winner = null;
+    _winnerName = null;
+    _winnerStatus = WinnerStatus.none;
 
-    final validCandidates = sortedList
-        .where((c) =>
-            c.name != AppStrings.blankVotes && c.name != AppStrings.nullVotes)
-        .toList();
+    final validCandidates =
+        sortedList.where((c) => c.type == CandidateType.normal).toList();
 
     if (validCandidates.isEmpty) return;
 
@@ -321,7 +357,8 @@ class ScrutinyProvider extends ChangeNotifier {
       final voteGap = firstPlace.votes - secondPlace.votes;
 
       if (_remainingVotes >= 0 && voteGap > _remainingVotes) {
-        _winner = firstPlace.name;
+        _winnerName = firstPlace.name;
+        _winnerStatus = WinnerStatus.mathematical;
         // Don't return early, we need to ensure stats are consistent
       }
     }
@@ -330,9 +367,11 @@ class ScrutinyProvider extends ChangeNotifier {
       if (validCandidates.length >= 2 &&
           validCandidates[0].votes == validCandidates[1].votes &&
           validCandidates[0].votes > 0) {
-        _winner = AppStrings.tie;
+        _winnerName = null;
+        _winnerStatus = WinnerStatus.tie;
       } else {
-        _winner = validCandidates.first.name;
+        _winnerName = validCandidates.first.name;
+        _winnerStatus = WinnerStatus.elected;
       }
     }
   }
@@ -387,7 +426,8 @@ class ScrutinyProvider extends ChangeNotifier {
           'stats': {
               'totalVotes': _totalVotesAssigned,
               'totalVoters': _settings.totalVoters,
-              'winner': _winner
+              'winner': winner,
+              'winnerStatus': _winnerStatus.name
           }
       };
   }
