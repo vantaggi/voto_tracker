@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart' hide Widget, StatelessWidget, StatefulWidget;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -19,9 +18,6 @@ class PdfExportService {
     final font = await PdfGoogleFonts.robotoRegular();
     final fontBold = await PdfGoogleFonts.robotoBold();
 
-    // Organize data for single page layout
-    final validCandidates = candidates.where((c) => c.votes > 0).toList();
-    
     doc.addPage(
       pw.Page( // Single Page constraint (MultiPage would paginate)
         pageTheme: pw.PageTheme(
@@ -103,7 +99,7 @@ class PdfExportService {
                 children: [
                   pw.Text(
                       DateTime.now().toString().substring(0, 10),
-                      style: pw.TextStyle(fontSize: 12, color: PdfColors.grey700)
+                      style: const pw.TextStyle(fontSize: 12, color: PdfColors.grey700)
                   ),
                    pw.Text(
                       DateTime.now().toString().substring(11, 16),

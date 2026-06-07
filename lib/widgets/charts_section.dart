@@ -37,7 +37,7 @@ class ChartsSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.5)),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
       ),
       child: TabBar(
         indicatorSize: TabBarIndicatorSize.tab,
@@ -47,7 +47,7 @@ class ChartsSection extends StatelessWidget {
           color: colorScheme.primary,
           boxShadow: [
             BoxShadow(
-              color: colorScheme.shadow.withOpacity(0.15),
+              color: colorScheme.shadow.withValues(alpha: 0.15),
               blurRadius: 3,
               offset: const Offset(0, 1),
             ),
@@ -115,7 +115,7 @@ class _CurrentResultsChart extends StatelessWidget {
               drawVerticalLine: false,
               horizontalInterval: 5,
               getDrawingHorizontalLine: (value) => FlLine(
-                color: colorScheme.outlineVariant.withOpacity(0.5),
+                color: colorScheme.outlineVariant.withValues(alpha: 0.5),
                 strokeWidth: 1,
                 dashArray: [4, 4],
               ),
@@ -137,7 +137,7 @@ class _CurrentResultsChart extends StatelessWidget {
                               TextSpan(
                                 text: '${candidates[groupIndex].votes} ${AppStrings.votes}',
                                 style: TextStyle(
-                                  color: colorScheme.onInverseSurface.withOpacity(0.8),
+                                  color: colorScheme.onInverseSurface.withValues(alpha: 0.8),
                                   fontSize: 12,
                                   fontWeight: FontWeight.normal
                                 )
@@ -196,7 +196,7 @@ class _CurrentResultsChart extends StatelessWidget {
                           backDrawRodData: BackgroundBarChartRodData(
                              show: true,
                              toY: maxY,
-                             color: colorScheme.surfaceContainerHighest.withOpacity(0.5)
+                             color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
                           )
                       )
                     ]))
@@ -286,7 +286,7 @@ class _HistoryChart extends StatelessWidget {
                   dotData: const FlDotData(show: false),
                   belowBarData: BarAreaData(
                       show: !isTechnical, // Only fill area for real candidates to reduce noise
-                      color: candidate.color.withOpacity(0.05) 
+                      color: candidate.color.withValues(alpha: 0.05) 
                   ),
                 );
               }).toList(),
@@ -325,16 +325,16 @@ class _HistoryChart extends StatelessWidget {
                   show: true,
                   drawVerticalLine: true,
                   getDrawingHorizontalLine: (value) => FlLine(
-                     color: colorScheme.outlineVariant.withOpacity(0.5), strokeWidth: 1, dashArray: [4, 4]
+                     color: colorScheme.outlineVariant.withValues(alpha: 0.5), strokeWidth: 1, dashArray: [4, 4]
                   ),
                   getDrawingVerticalLine: (value) => FlLine(
-                     color: colorScheme.outlineVariant.withOpacity(0.5), strokeWidth: 1, dashArray: [4, 4]
+                     color: colorScheme.outlineVariant.withValues(alpha: 0.5), strokeWidth: 1, dashArray: [4, 4]
                   ),
                   verticalInterval: (maxX / 5).ceilToDouble(),
                   horizontalInterval: (maxY / 5).ceilToDouble()),
               borderData: FlBorderData(
                   show: true, 
-                  border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.5))
+                  border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.5))
               ),
               lineTouchData: LineTouchData(
                 touchTooltipData: LineTouchTooltipData(
@@ -460,10 +460,10 @@ class _PercentageChart extends StatelessWidget {
           decoration: BoxDecoration(
               color: colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: color.withOpacity(0.5)),
+              border: Border.all(color: color.withValues(alpha: 0.5)),
               boxShadow: [
                   BoxShadow(
-                      color: colorScheme.shadow.withOpacity(0.1),
+                      color: colorScheme.shadow.withValues(alpha: 0.1),
                       blurRadius: 4,
                       offset: const Offset(0, 2)
                   )

@@ -12,8 +12,8 @@ class Settings {
     int participantsCount = 4,
     bool showBlankVotes = true,
     bool showNullVotes = true,
-  })  : _totalVoters = totalVoters,
-        _participantsCount = participantsCount,
+  })  : _totalVoters = math.max(1, totalVoters),
+        _participantsCount = math.max(AppStrings.minParticipants, participantsCount),
         _showBlankVotes = showBlankVotes,
         _showNullVotes = showNullVotes;
 

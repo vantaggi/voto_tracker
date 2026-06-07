@@ -73,7 +73,7 @@ class SocialResultsCard extends StatelessWidget {
                      ),
                  ]
                ),
-               Icon(Icons.how_to_vote_outlined, color: colorScheme.primary.withOpacity(0.5), size: 64)
+               Icon(Icons.how_to_vote_outlined, color: colorScheme.primary.withValues(alpha: 0.5), size: 64)
             ],
           ),
           const SizedBox(height: 32),
@@ -88,7 +88,7 @@ class SocialResultsCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(24), // M3 Medium/Large shape
                 boxShadow: [
                   BoxShadow(
-                    color: colorScheme.shadow.withOpacity(0.2), 
+                    color: colorScheme.shadow.withValues(alpha: 0.2), 
                     blurRadius: 16,
                     offset: const Offset(0, 4)
                   )
@@ -145,7 +145,7 @@ class SocialResultsCard extends StatelessWidget {
                              : colorScheme.surfaceContainerLow,
                         borderRadius: BorderRadius.circular(16),
                         border: isFirst 
-                             ? Border.all(color: colorScheme.primary.withOpacity(0.5)) 
+                             ? Border.all(color: colorScheme.primary.withValues(alpha: 0.5)) 
                              : null
                     ),
                     child: Row(
@@ -175,9 +175,9 @@ class SocialResultsCard extends StatelessWidget {
                             Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                 decoration: BoxDecoration(
-                                    color: c.color.withOpacity(0.2), 
+                                    color: c.color.withValues(alpha: 0.2), 
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: c.color.withOpacity(0.5))
+                                    border: Border.all(color: c.color.withValues(alpha: 0.5))
                                 ),
                                 child: Text("${c.votes}", 
                                     style: theme.textTheme.titleMedium?.copyWith(

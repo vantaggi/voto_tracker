@@ -86,23 +86,14 @@ class HomePage extends StatelessWidget {
                           onTap: () async {
                               Navigator.pop(context);
                               final provider = context.read<ScrutinyProvider>();
-                              
-                              String? label;
-                              if (provider.winner != null) {
-                                  if (provider.winner == AppStrings.tie) {
-                                      label = "RISULTATO FINALE";
-                                  } else {
-                                      label = provider.remainingVotes <= 0 ? "ELETTO" : "MAGGIORANZA RAGGIUNTA";
-                                  }
-                              }
 
                               await SocialShareService.shareResults(
-                                  candidates: provider.sortedCandidates, 
+                                  candidates: provider.sortedCandidates,
                                   totalVotes: provider.totalVotesAssigned,
                                   totalVoters: provider.settings.totalVoters,
                                   remainingVotes: provider.remainingVotes,
                                   winner: provider.winner,
-                                  winnerLabel: label
+                                  winnerLabel: provider.winnerLabel
                               );
                           },
                       ),
@@ -113,24 +104,15 @@ class HomePage extends StatelessWidget {
                           onTap: () async {
                                Navigator.pop(context);
                                final provider = context.read<ScrutinyProvider>();
-                               
-                               String? label;
-                               if (provider.winner != null) {
-                                   if (provider.winner == AppStrings.tie) {
-                                       label = "RISULTATO FINALE";
-                                   } else {
-                                       label = provider.remainingVotes <= 0 ? "ELETTO" : "MAGGIORANZA RAGGIUNTA";
-                                   }
-                               }
 
                                await PdfExportService.exportToPdf(
-                                   candidates: provider.candidates, 
+                                   candidates: provider.sortedCandidates,
                                    totalVotesAssigned: provider.totalVotesAssigned,
                                    totalVoters: provider.settings.totalVoters,
                                    remainingVotes: provider.remainingVotes,
                                    historyPoints: provider.historyPoints,
                                    winner: provider.winner,
-                                   winnerLabel: label
+                                   winnerLabel: provider.winnerLabel
                                );
                           },
                       ),

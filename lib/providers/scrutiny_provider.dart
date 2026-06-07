@@ -11,7 +11,6 @@ class ScrutinyProvider extends ChangeNotifier {
 
   // Vote Log History (Replacing Snapshot History)
   final List<int> _voteLog = [];
-  Map<String, int> _baseVotes = {}; // For legacy data or manual overrides not in log
 
   // History accessors for UI consistency (simulated)
   bool get canUndo => _voteLog.isNotEmpty;
@@ -28,7 +27,18 @@ class ScrutinyProvider extends ChangeNotifier {
   int get totalVotesAssigned => _totalVotesAssigned;
   int get remainingVotes => _remainingVotes;
   String? get winner => _winner;
-  
+
+  // Etichetta coerente dello stato del vincitore (usata da UI, PDF e share).
+  // Il vincitore è dichiarato per vantaggio matematicamente incolmabile, non per
+  // maggioranza assoluta: l'etichetta riflette questa distinzione.
+  String? get winnerLabel {
+    if (_winner == null) return null;
+    if (_winner == AppStrings.tie) return AppStrings.finalResult;
+    return _remainingVotes <= 0
+        ? AppStrings.winnerElected
+        : AppStrings.winnerMathematical;
+  }
+
   // Magic Number calculation (Votes needed to guarantee win vs 2nd place)
   int? get votesUntilMajority {
       if (_candidates.isEmpty) return null;
@@ -122,7 +132,9 @@ class ScrutinyProvider extends ChangeNotifier {
         // Assuming no "base" votes for now to ensure graph consistency.
         // If we want to support editing "base", we need a separate store.
         // For this task: Everything in graph comes from log.
-        for (var c in _candidates) c.votes = 0;
+        for (var c in _candidates) {
+          c.votes = 0;
+        }
         _recalculateState();
     } else {
         // Legacy migration: If no log but we have votes, those are now "base" (invisible to history graph) 
@@ -145,8 +157,10 @@ class ScrutinyProvider extends ChangeNotifier {
   // NOTE: Replaces old _saveHistory
   void _recalculateState() {
       // 1. Reset votes to 0
-      for (var c in _candidates) c.votes = 0;
-      
+      for (var c in _candidates) {
+        c.votes = 0;
+      }
+
       // 2. Replay Log
       for (int candidateIndex in _voteLog) {
           if (candidateIndex >= 0 && candidateIndex < _candidates.length) {

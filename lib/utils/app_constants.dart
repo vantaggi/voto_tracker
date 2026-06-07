@@ -6,6 +6,9 @@ class AppStrings {
   static const String nullVotes = 'Schede Nulle';
   static const String winner = 'VINCITORE';
   static const String tie = 'Pareggio';
+  static const String winnerElected = 'ELETTO';
+  static const String winnerMathematical = 'VITTORIA MATEMATICA';
+  static const String finalResult = 'RISULTATO FINALE';
   static const String totalVoters = 'Votanti';
   static const String resetButtonTooltip = 'Reset voti';
   static const String settingsButtonTooltip = 'Impostazioni';

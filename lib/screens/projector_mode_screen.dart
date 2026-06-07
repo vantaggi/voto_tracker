@@ -64,7 +64,7 @@ class ProjectorModeScreen extends StatelessWidget {
                                             widthFactor: progress,
                                             child: Container(
                                                 decoration: BoxDecoration(
-                                                    color: candidate.color.withOpacity(0.3),
+                                                    color: candidate.color.withValues(alpha: 0.3),
                                                     borderRadius: BorderRadius.circular(24) // Expressive shape
                                                 ),
                                             ),
@@ -146,9 +146,8 @@ class ProjectorModeScreen extends StatelessWidget {
       final colorScheme = Theme.of(context).colorScheme;
 
       if (winner != null) {
-          final isFinal = provider.remainingVotes <= 0;
-          final label = winner == AppStrings.tie ? "RISULTATO FINALE" : (isFinal ? "ELETTO" : "MAGGIORANZA RAGGIUNTA");
-          
+          final label = provider.winnerLabel!;
+
           return Container(
               padding: const EdgeInsets.symmetric(vertical: 24),
               width: double.infinity,

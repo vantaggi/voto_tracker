@@ -96,7 +96,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
             const SizedBox(height: 8),
             Card(
               elevation: 0,
-              color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
               child: Column(
                 children: [
                   SwitchListTile(
@@ -158,7 +158,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(AppStrings.cancel),
+          child: const Text(AppStrings.cancel),
         ),
         FilledButton.tonal( // Tonal button for save
           onPressed: () {

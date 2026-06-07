@@ -77,7 +77,7 @@ class StatsHeader extends StatelessWidget {
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: colorScheme.shadow.withOpacity(0.1),
+                    color: colorScheme.shadow.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   )
@@ -86,9 +86,7 @@ class StatsHeader extends StatelessWidget {
               child: Column(
                 children: [
                    Text(
-                      provider.winner == AppStrings.tie 
-                          ? "RISULTATO FINALE" 
-                          : (provider.remainingVotes <= 0 ? "ELETTO" : "MAGGIORANZA RAGGIUNTA"),
+                      provider.winnerLabel!,
                       style: TextStyle(
                           color: provider.winner == AppStrings.tie 
                               ? colorScheme.onTertiaryContainer 
@@ -171,7 +169,7 @@ class StatsHeader extends StatelessWidget {
                   Icon(Icons.info_outline, size: 16, color: colorScheme.primary),
                   const SizedBox(width: 8),
                   Text(
-                      "Mancano ${provider.votesUntilMajority} voti per la maggioranza",
+                      "Mancano ${provider.votesUntilMajority} voti per la vittoria",
                       style: TextStyle(color: colorScheme.onSurfaceVariant, fontWeight: FontWeight.w500)
                   )
               ],
@@ -307,7 +305,7 @@ class _HoldToResetButtonState extends State<_HoldToResetButton> with SingleTicke
                      widthFactor: _controller.value,
                      alignment: Alignment.centerLeft,
                      child: Container(
-                       color: colorScheme.error.withOpacity(0.3),
+                       color: colorScheme.error.withValues(alpha: 0.3),
                      ),
                    );
                  },

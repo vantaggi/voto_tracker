@@ -120,7 +120,7 @@ class CandidateCard extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: (delta >= 0 ? Colors.green : Colors.red).withOpacity(0.1),
+                      color: (delta >= 0 ? Colors.green : Colors.red).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
@@ -143,7 +143,7 @@ class CandidateCard extends StatelessWidget {
                         Text(
                            '(vs ${previousPercentage!.toStringAsFixed(1)}%)',
                            style: theme.textTheme.labelMedium?.copyWith(
-                             color: colorScheme.onSurfaceVariant.withOpacity(0.8)
+                             color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8)
                            ),
                         )
                       ],
@@ -202,7 +202,7 @@ class CandidateCard extends StatelessWidget {
   void _showEditNameDialog(BuildContext context) {
     final nameController = TextEditingController(text: candidate.name);
     final prevController = TextEditingController(text: candidate.previousPercentage?.toString() ?? "");
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -259,6 +259,9 @@ class CandidateCard extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ).then((_) {
+      nameController.dispose();
+      prevController.dispose();
+    });
   }
 }
