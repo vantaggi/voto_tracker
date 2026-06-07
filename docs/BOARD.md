@@ -41,7 +41,7 @@ Esito dell'audit del codice + `dart analyze` (31 issue → 0).
 | FEAT-001 | **Internazionalizzazione reale IT/EN** (`flutter_localizations` + ARB) | 📅 Pianificato | 🟡 Media | 🟡 Medio | 6h | Oggi solo IT in `AppStrings` |
 | FEAT-003 | **Esporre export CSV/JSON in UI** | ✅ Fatto | 🟡 Media | 🟢 Basso | - | `DataExportService` + voci nel menu di export |
 | REFACTOR-001 | **Centralizzare le stringhe hardcoded residue** in `AppStrings` | 📅 Pianificato | 🟢 Bassa | 🟢 Basso | 2h | "Rimanenti", "Opzioni di Voto", ecc.; abilita FEAT-001 |
-| TEST-001 | **Test unitari su `ScrutinyProvider`** (vote-log, vincitore, undo) | 📅 Pianificato | 🔴 Alta | 🟢 Basso | 4h | La logica critica è scoperta |
+| TEST-001 | **Test unitari su `ScrutinyProvider`** (vote-log, vincitore, undo) | ✅ Fatto | 🔴 Alta | 🟢 Basso | - | 14 test in `test/`, tutti verdi |
 | FEAT-002 | **Redo** (oggi disabilitato nel modello a log sequenziale) | 📅 Pianificato | 🟢 Bassa | 🟡 Medio | 3h | Richiede redo-stack separato |
 | PERF-001 | **Audit replay vote-log** su scrutini molto grandi | 📅 Pianificato | 🟢 Bassa | 🟢 Basso | 2h | `_recalculateState` rigioca tutto il log |
 
