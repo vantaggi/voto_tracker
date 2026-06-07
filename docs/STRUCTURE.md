@@ -29,6 +29,7 @@ lib/
 │
 ├── services/
 │   ├── configuration_service.dart     # Import/export configurazione candidati (JSON via file_picker)
+│   ├── data_export_service.dart       # Export risultati grezzi CSV/JSON (condivisione file)
 │   ├── pdf_export_service.dart        # Report PDF a pagina singola (package pdf/printing)
 │   └── social_share_service.dart      # Screenshot di SocialResultsCard → condivisione PNG
 │

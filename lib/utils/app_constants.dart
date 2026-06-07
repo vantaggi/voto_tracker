@@ -29,6 +29,11 @@ class AppStrings {
   static const String cardOptions = 'Opzioni Schede';
   static const String exportData = 'Esportazione Dati';
   static const String exportTo = 'Esporta in';
+  static const String exportCsvTitle = 'Esporta CSV';
+  static const String exportCsvSubtitle = 'Tabella per fogli di calcolo';
+  static const String exportJsonTitle = 'Esporta JSON';
+  static const String exportJsonSubtitle = 'Dati strutturati completi';
+  static const String exportError = 'Errore durante l\'esportazione';
   static const String close = 'Chiudi';
   static const String copy = 'Copia';
   static const String dataCopied = 'Dati copiati negli appunti!';

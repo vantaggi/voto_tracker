@@ -13,6 +13,10 @@ Le sezioni sono generate dai commit convenzionali (vedi
 
 ## [Unreleased]
 
+### 🚀 Nuove Funzionalità
+- Export dei risultati in **CSV** e **JSON** dal menu di condivisione (i dati
+  erano già calcolati ma non raggiungibili dall'interfaccia).
+
 ## [1.1.2] - 2026-06-07
 
 ### 🐞 Bug Fix

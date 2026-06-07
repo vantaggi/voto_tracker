@@ -9,6 +9,7 @@ import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/screens/projector_mode_screen.dart';
 import 'package:voto_tracker/services/social_share_service.dart';
 import 'package:voto_tracker/services/pdf_export_service.dart';
+import 'package:voto_tracker/services/data_export_service.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -114,6 +115,36 @@ class HomePage extends StatelessWidget {
                                    winner: provider.winner,
                                    winnerLabel: provider.winnerLabel
                                );
+                          },
+                      ),
+                      ListTile(
+                          leading: const Icon(Icons.table_chart_outlined),
+                          title: const Text(AppStrings.exportCsvTitle),
+                          subtitle: const Text(AppStrings.exportCsvSubtitle),
+                          onTap: () async {
+                              final provider = context.read<ScrutinyProvider>();
+                              final messenger = ScaffoldMessenger.of(context);
+                              Navigator.pop(context);
+                              final ok = await DataExportService.shareCsv(provider.exportToCsv());
+                              if (!ok) {
+                                  messenger.showSnackBar(
+                                      const SnackBar(content: Text(AppStrings.exportError)));
+                              }
+                          },
+                      ),
+                      ListTile(
+                          leading: const Icon(Icons.data_object),
+                          title: const Text(AppStrings.exportJsonTitle),
+                          subtitle: const Text(AppStrings.exportJsonSubtitle),
+                          onTap: () async {
+                              final provider = context.read<ScrutinyProvider>();
+                              final messenger = ScaffoldMessenger.of(context);
+                              Navigator.pop(context);
+                              final ok = await DataExportService.shareJson(provider.exportToJson());
+                              if (!ok) {
+                                  messenger.showSnackBar(
+                                      const SnackBar(content: Text(AppStrings.exportError)));
+                              }
                           },
                       ),
                   ],

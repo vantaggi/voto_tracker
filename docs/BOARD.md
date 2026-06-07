@@ -39,7 +39,7 @@ Esito dell'audit del codice + `dart analyze` (31 issue → 0).
 | ID | Task | Status | Priorità | Rischio | Stima | Note |
 |:--|:--|:--:|:--:|:--:|:--:|:--|
 | FEAT-001 | **Internazionalizzazione reale IT/EN** (`flutter_localizations` + ARB) | 📅 Pianificato | 🟡 Media | 🟡 Medio | 6h | Oggi solo IT in `AppStrings` |
-| FEAT-003 | **Esporre export CSV/JSON in UI** | 📅 Pianificato | 🟡 Media | 🟢 Basso | 1h | `exportToCsv/Json` esistono ma non collegati; README li promette |
+| FEAT-003 | **Esporre export CSV/JSON in UI** | ✅ Fatto | 🟡 Media | 🟢 Basso | - | `DataExportService` + voci nel menu di export |
 | REFACTOR-001 | **Centralizzare le stringhe hardcoded residue** in `AppStrings` | 📅 Pianificato | 🟢 Bassa | 🟢 Basso | 2h | "Rimanenti", "Opzioni di Voto", ecc.; abilita FEAT-001 |
 | TEST-001 | **Test unitari su `ScrutinyProvider`** (vote-log, vincitore, undo) | 📅 Pianificato | 🔴 Alta | 🟢 Basso | 4h | La logica critica è scoperta |
 | FEAT-002 | **Redo** (oggi disabilitato nel modello a log sequenziale) | 📅 Pianificato | 🟢 Bassa | 🟡 Medio | 3h | Richiede redo-stack separato |

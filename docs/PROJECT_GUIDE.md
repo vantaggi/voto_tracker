@@ -83,7 +83,8 @@ lo stato iniziale; ogni voto aggiunge uno snapshot. Consumato da
 | `PdfExportService` | package `pdf` + `printing`, layout a pagina singola, font Roboto | PDF condiviso |
 | `SocialShareService` | `screenshot` cattura `SocialResultsCard` forzando il dark theme | PNG condiviso |
 | `ConfigurationService` | `file_picker` + `share_plus`, JSON candidati con voti azzerati | template di configurazione |
-| `ScrutinyProvider.exportToCsv/Json` | serializzazione diretta | stringa CSV / mappa JSON |
+| `DataExportService` | scrive su file temporaneo e condivide (`share_plus`) | file CSV / JSON dei risultati |
+| `ScrutinyProvider.exportToCsv/Json` | serializzazione diretta (consumata da `DataExportService`) | stringa CSV / mappa JSON |
 
 ## 5. Decisioni & vincoli (ADR leggeri)
 
