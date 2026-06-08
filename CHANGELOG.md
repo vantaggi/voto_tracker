@@ -14,6 +14,10 @@ Le sezioni sono generate dai commit convenzionali (vedi
 ## [Unreleased]
 
 ### 🚀 Nuove Funzionalità
+- **Interfaccia multilingua Italiano/Inglese** (`flutter_localizations` + ARB),
+  con selettore di lingua nelle impostazioni ("Sistema" per seguire il
+  dispositivo); identità di schede/vincitore portata su `enum` per consentire la
+  traduzione senza toccare la logica.
 - Export dei risultati in **CSV** e **JSON** dal menu di condivisione (i dati
   erano già calcolati ma non raggiungibili dall'interfaccia).
 - **Redo** ora funzionante: il pulsante di ripristino riapplica l'ultima azione

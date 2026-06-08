@@ -1,0 +1,73 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "Voto Tracker",
+  "settingsTooltip": "Settings",
+  "exportShareTooltip": "Export / Share",
+  "projectorMode": "Projector Mode",
+
+  "shareImageTitle": "Share social image",
+  "shareImageSubtitle": "Optimized for Instagram/WhatsApp",
+  "exportPdfTitle": "Export PDF report",
+  "exportPdfSubtitle": "Official document with charts",
+  "exportCsvTitle": "Export CSV",
+  "exportCsvSubtitle": "Table for spreadsheets",
+  "exportJsonTitle": "Export JSON",
+  "exportJsonSubtitle": "Full structured data",
+  "exportError": "Export failed",
+
+  "scrutinisedVotes": "Counted votes",
+  "remaining": "Remaining",
+  "votesTotal": "TOTAL VOTES",
+  "waitingForData": "Waiting for data...",
+  "votesToWin": "{count} votes left to win",
+  "@votesToWin": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "votes": "votes",
+  "votesShort": "Votes",
+
+  "winnerElected": "ELECTED",
+  "winnerMathematical": "MATHEMATICAL WIN",
+  "finalResult": "FINAL RESULT",
+  "tie": "Tie",
+  "winnerFallback": "WINNER",
+
+  "blankVotes": "Blank votes",
+  "spoiledVotes": "Null votes",
+
+  "editName": "Edit name",
+  "candidateName": "Candidate name",
+  "previousResultLabel": "Previous result (%)",
+  "previousResultHint": "E.g. 25.5",
+  "cancel": "Cancel",
+  "save": "Save",
+
+  "current": "Current",
+  "history": "History",
+  "percentages": "Percentages",
+  "noDataAvailable": "No data available",
+  "noHistoryAvailable": "No history available",
+  "noVotesRecorded": "No votes recorded",
+
+  "undoTooltip": "Undo last action",
+  "redoTooltip": "Redo action",
+  "resetButton": "HOLD TO RESET",
+
+  "scrutinyConfiguration": "Scrutiny configuration",
+  "totalVotersNumber": "Total number of voters",
+  "votersHint": "E.g. 100",
+  "participantsCount": "Number of candidates",
+  "votingOptions": "Voting options",
+  "dataManagement": "Data management",
+  "exportLabel": "Export",
+  "importLabel": "Import",
+  "configLoaded": "Configuration loaded successfully",
+
+  "language": "Language",
+  "languageSystem": "System",
+  "languageItalian": "Italiano",
+  "languageEnglish": "English"
+}

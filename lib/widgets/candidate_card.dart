@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/models/candidate.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
@@ -16,7 +17,8 @@ class CandidateCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+    final l10n = context.l10n;
+
     final provider = context.watch<ScrutinyProvider>();
     final totalVotes = provider.totalVotesAssigned;
     final currentPercentage = candidate.getPercentage(totalVotes);
@@ -73,7 +75,7 @@ class CandidateCard extends StatelessWidget {
                         const SizedBox(width: 12),
                         Expanded(
                             child: Text(
-                            candidate.name,
+                            localizedCandidateName(l10n, candidate),
                             style: theme.textTheme.titleLarge,
                             overflow: TextOverflow.ellipsis,
                             ),
@@ -84,7 +86,7 @@ class CandidateCard extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.edit_outlined),
                       onPressed: () => _showEditNameDialog(context),
-                      tooltip: AppStrings.editName,
+                      tooltip: l10n.editName,
                       style: IconButton.styleFrom(
                         visualDensity: VisualDensity.compact,
                       ),
@@ -106,7 +108,7 @@ class CandidateCard extends StatelessWidget {
                      ),
                      const SizedBox(width: 8),
                      Text(
-                       AppStrings.votes, 
+                       l10n.votes,
                        style: theme.textTheme.bodyLarge?.copyWith(
                          color: colorScheme.onSurfaceVariant
                        )
@@ -205,30 +207,32 @@ class CandidateCard extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text(AppStrings.editName),
+      builder: (context) {
+        final l10n = context.l10n;
+        return AlertDialog(
+        title: Text(l10n.editName),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
               TextField(
                 controller: nameController,
                 autofocus: true,
-                decoration: const InputDecoration(
-                    labelText: AppStrings.candidateName,
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person),
+                decoration: InputDecoration(
+                    labelText: l10n.candidateName,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.person),
                 ),
                 textCapitalization: TextCapitalization.words,
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: prevController,
-                decoration: const InputDecoration(
-                    labelText: AppStrings.previousResultLabel,
+                decoration: InputDecoration(
+                    labelText: l10n.previousResultLabel,
                     suffixText: "%",
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.percent),
-                    hintText: AppStrings.previousResultHint
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.percent),
+                    hintText: l10n.previousResultHint
                 ),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
               ),
@@ -237,28 +241,29 @@ class CandidateCard extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(AppStrings.cancel, style: Theme.of(context).textTheme.labelLarge),
+            child: Text(l10n.cancel, style: Theme.of(context).textTheme.labelLarge),
           ),
           FilledButton(
             onPressed: () {
               if (nameController.text.isNotEmpty) {
                 final provider = context.read<ScrutinyProvider>();
                 provider.renameCandidate(index, nameController.text);
-                
+
                 if (prevController.text.isNotEmpty) {
                     final val = double.tryParse(prevController.text.replaceAll(',', '.'));
                     provider.setCandidatePreviousPercentage(index, val);
                 } else {
                     provider.setCandidatePreviousPercentage(index, null);
                 }
-                
+
                 Navigator.pop(context);
               }
             },
-            child: const Text(AppStrings.save),
+            child: Text(l10n.save),
           ),
         ],
-      ),
+      );
+      },
     ).then((_) {
       nameController.dispose();
       prevController.dispose();

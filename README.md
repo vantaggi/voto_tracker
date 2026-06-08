@@ -29,9 +29,12 @@ Leggi questi file in QUEST'ORDINE prima di iniziare un task:
   prima registrare la decisione in `docs/PROJECT_GUIDE.md`.
 - **App 100% locale e offline.** Nessuna chiamata di rete, nessun login, nessun
   tenant. Non aggiungere SDK di telemetria/analytics o segreti nel repo.
-- **Stringhe centralizzate.** Ogni testo visibile all'utente vive in
-  `AppStrings` (`lib/utils/app_constants.dart`). MAI stringhe hardcoded nei
-  widget. Lingua di default: **Italiano**.
+- **Stringhe localizzate (i18n).** I testi della UI vivono nei file ARB
+  (`lib/l10n/app_it.arb`, `app_en.arb`) e si usano via `context.l10n.<chiave>`
+  (`AppLocalizations`). MAI stringhe hardcoded nei widget; dopo aver modificato
+  un ARB rigenera con `flutter gen-l10n`. `AppStrings` resta solo per i testi
+  dei contesti **senza** `BuildContext` (provider, servizi di export) e come
+  fallback dati. Lingue: **Italiano** (default) ed **Inglese**.
 - **Token UI, mai valori hardcoded.** Colori dal `ColorScheme` del tema
   (`lib/theme/app_theme.dart`); dimensioni/padding/raggi da `AppDimensions`.
   Niente `Color(0x...)` o numeri magici sparsi nei widget.
@@ -69,6 +72,8 @@ Voto Tracker è evoluto da un semplice contatore a uno strumento di analisi comp
 
 - **Tracciamento Voti in Tempo Reale**: aggiungi o rimuovi voti per ogni
   candidato con un'interfaccia semplice e reattiva.
+- **Multilingua IT/EN**: interfaccia localizzata in Italiano e Inglese, con
+  selettore di lingua nelle impostazioni (o "Sistema" per seguire il dispositivo).
 - **Dashboard Avanzata**: grafico a barre (risultati correnti), grafico a torta
   (percentuali) e grafico storico sincronizzato (andamento nel tempo).
 - **Calcolo del Vincitore Intelligente**: dichiara il vincitore appena raggiunge

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/models/settings.dart';
+import 'package:voto_tracker/providers/locale_provider.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/services/configuration_service.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
@@ -27,7 +29,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
     _showBlankVotes = settings.showBlankVotes;
     _showNullVotes = settings.showNullVotes;
   }
-  
+
   @override
   void dispose() {
       _totalVotersController.dispose();
@@ -36,6 +38,8 @@ class _SettingsDialogState extends State<SettingsDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final localeProvider = context.watch<LocaleProvider>();
     // Dialog theme is already handled by AppTheme (rounded corners, bg color)
     return AlertDialog(
       scrollable: true,
@@ -43,7 +47,10 @@ class _SettingsDialogState extends State<SettingsDialog> {
         children: [
           const Icon(Icons.settings_outlined, size: 28),
           const SizedBox(width: 12),
-          Text(AppStrings.scrutinyConfiguration, style: Theme.of(context).textTheme.headlineSmall),
+          Expanded(
+            child: Text(l10n.scrutinyConfiguration,
+                style: Theme.of(context).textTheme.headlineSmall),
+          ),
         ],
       ),
       content: SingleChildScrollView(
@@ -56,17 +63,16 @@ class _SettingsDialogState extends State<SettingsDialog> {
               controller: _totalVotersController,
               autofocus: true,
               keyboardType: TextInputType.number,
-              // Theme handles InputDecoration
-              decoration: const InputDecoration(
-                labelText: AppStrings.totalVotersNumber,
-                prefixIcon: Icon(Icons.people_outline),
-                hintText: AppStrings.votersHint,
+              decoration: InputDecoration(
+                labelText: l10n.totalVotersNumber,
+                prefixIcon: const Icon(Icons.people_outline),
+                hintText: l10n.votersHint,
               ),
             ),
             const SizedBox(height: 32),
-            
+
             Text(
-                '${AppStrings.participantsCount}: ${_participantsCount.toInt()}',
+                '${l10n.participantsCount}: ${_participantsCount.toInt()}',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)
             ),
             const SizedBox(height: 8),
@@ -90,9 +96,9 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 Text("${AppStrings.maxParticipants}", style: Theme.of(context).textTheme.bodySmall),
               ],
             ),
-            
+
             const SizedBox(height: 24),
-            Text(AppStrings.votingOptions, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text(l10n.votingOptions, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Card(
               elevation: 0,
@@ -100,14 +106,14 @@ class _SettingsDialogState extends State<SettingsDialog> {
               child: Column(
                 children: [
                   SwitchListTile(
-                    title: const Text(AppStrings.blankVotes),
+                    title: Text(l10n.blankVotes),
                     secondary: const Icon(Icons.check_box_outline_blank),
                     value: _showBlankVotes,
                     onChanged: (value) => setState(() => _showBlankVotes = value),
                   ),
                   const Divider(height: 1, indent: 16, endIndent: 16),
                   SwitchListTile(
-                    title: const Text(AppStrings.nullVotes),
+                    title: Text(l10n.spoiledVotes),
                      secondary: const Icon(Icons.block),
                     value: _showNullVotes,
                     onChanged: (value) => setState(() => _showNullVotes = value),
@@ -117,16 +123,37 @@ class _SettingsDialogState extends State<SettingsDialog> {
             ),
 
             const SizedBox(height: 24),
-            Text(AppStrings.dataManagement, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text(l10n.language, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            
+            SegmentedButton<String>(
+              showSelectedIcon: false,
+              segments: [
+                ButtonSegment(
+                    value: 'system',
+                    label: Text(l10n.languageSystem),
+                    icon: const Icon(Icons.brightness_auto_outlined)),
+                ButtonSegment(value: 'it', label: Text(l10n.languageItalian)),
+                ButtonSegment(value: 'en', label: Text(l10n.languageEnglish)),
+              ],
+              selected: {_localeKey(localeProvider.locale)},
+              onSelectionChanged: (selection) {
+                final value = selection.first;
+                final provider = context.read<LocaleProvider>();
+                provider.setLocale(value == 'system' ? null : Locale(value));
+              },
+            ),
+
+            const SizedBox(height: 24),
+            Text(l10n.dataManagement, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+
             // Using OutlinedButtons for secondary actions
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
                     icon: const Icon(Icons.upload_file),
-                    label: const Text(AppStrings.exportLabel),
+                    label: Text(l10n.exportLabel),
                     onPressed: () async {
                        final provider = context.read<ScrutinyProvider>();
                        await ConfigurationService.exportConfiguration(provider.candidates);
@@ -137,14 +164,17 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 Expanded(
                   child: OutlinedButton.icon(
                     icon: const Icon(Icons.download),
-                    label: const Text(AppStrings.importLabel),
+                    label: Text(l10n.importLabel),
                     onPressed: () async {
+                       final scrutiny = context.read<ScrutinyProvider>();
+                       final messenger = ScaffoldMessenger.of(context);
+                       final loadedMsg = l10n.configLoaded;
                        final candidates = await ConfigurationService.importConfiguration();
                        if (candidates != null && context.mounted) {
                            Navigator.pop(context); // Close dialog
-                           context.read<ScrutinyProvider>().loadConfiguration(candidates);
-                           ScaffoldMessenger.of(context).showSnackBar(
-                               const SnackBar(content: Text(AppStrings.configLoaded))
+                           scrutiny.loadConfiguration(candidates);
+                           messenger.showSnackBar(
+                               SnackBar(content: Text(loadedMsg))
                            );
                        }
                     },
@@ -158,7 +188,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text(AppStrings.cancel),
+          child: Text(l10n.cancel),
         ),
         FilledButton.tonal( // Tonal button for save
           onPressed: () {
@@ -169,7 +199,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 showBlankVotes: _showBlankVotes,
                 showNullVotes: _showNullVotes,
             );
-            
+
             final provider = context.read<ScrutinyProvider>();
             FocusScope.of(context).unfocus();
             Navigator.pop(context);
@@ -181,9 +211,12 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 }
             });
           },
-          child: const Text(AppStrings.save),
+          child: Text(l10n.save),
         ),
       ],
     );
   }
+
+  String _localeKey(Locale? locale) =>
+      locale == null ? 'system' : locale.languageCode;
 }

@@ -107,5 +107,23 @@ lo stato iniziale; ogni voto aggiunge uno snapshot. Consumato da
   cache-busting CDN, nessun deploy server. La "release" è una build store
   (`release-android` agent). Per questo gli strati Supabase/Vercel/cache-bust
   del workflow kit originale **non si applicano** qui.
-- **Stringhe in `AppStrings`:** abilita una futura i18n reale (FEAT-001) e tiene
-  i widget puliti.
+- **Stringhe localizzate (i18n):** la UI usa `AppLocalizations` (ARB IT/EN) via
+  `context.l10n`; `AppStrings` resta per i contesti senza `BuildContext` e i
+  fallback dati (vedi §6).
+
+## 6. Internazionalizzazione (i18n)
+
+- **Stack:** `flutter_localizations` + `gen-l10n`. Sorgenti in `lib/l10n/*.arb`
+  (template `app_en.arb`), config in `l10n.yaml` (`synthetic-package: false`,
+  output in `lib/l10n/`). Dopo aver toccato un ARB: `flutter gen-l10n`.
+- **Accesso:** `context.l10n.<chiave>` (estensione in `l10n/l10n_ext.dart`). Lo
+  stesso file espone `localizedCandidateName()` (nome reale o etichetta tecnica
+  localizzata) e `localizedWinnerLabel(WinnerStatus)`.
+- **Lingua:** `LocaleProvider` (persistito su `shared_preferences`, `null` =
+  sistema) wired in `main.dart` su `MaterialApp.locale`; selettore nelle
+  impostazioni. Il cambio lingua ricostruisce l'app via `Consumer<LocaleProvider>`.
+- **Confine localizzazione / dati:** si localizza solo a **display time**.
+  L'identità resta su `enum` (`CandidateType`, `WinnerStatus`); i nomi dei
+  candidati reali sono **dati editabili** (non tradotti), mentre schede
+  bianche/nulle e label vincitore si traducono dall'enum. Provider e servizi di
+  export restano in italiano (`AppStrings`) perché privi di contesto.

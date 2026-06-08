@@ -13,8 +13,15 @@ lib/
 │   ├── candidate.dart                 # Candidate: name, votes, color, rank, previousPercentage
 │   └── settings.dart                  # Settings: totalVoters, participantsCount, schede bianche/nulle
 │
+├── l10n/                              # Localizzazione i18n
+│   ├── app_en.arb                     # Stringhe inglese (template)
+│   ├── app_it.arb                     # Stringhe italiano
+│   ├── app_localizations*.dart        # AppLocalizations generato (flutter gen-l10n)
+│   └── l10n_ext.dart                  # context.l10n + helper nomi candidato / label vincitore
+│
 ├── providers/
-│   └── scrutiny_provider.dart         # ChangeNotifier centrale: vote-log, calcolo vincitore, undo, export
+│   ├── scrutiny_provider.dart         # ChangeNotifier centrale: vote-log, calcolo vincitore, undo, export
+│   └── locale_provider.dart           # Lingua scelta (persistita); null = segui il sistema
 │
 ├── screens/
 │   ├── home_page.dart                 # Schermata principale (grafici + controlli, responsive)
@@ -77,4 +84,5 @@ docs/
 
 scripts/
 └── bump_version.py             # Bump MANUALE di pubspec.yaml + rigenera CHANGELOG (alla release)
+l10n.yaml                       # Config gen-l10n (arb-dir, classe, output)
 ```

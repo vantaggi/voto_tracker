@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:voto_tracker/utils/app_constants.dart';
+import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/widgets/candidate_card.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
 
@@ -60,12 +60,13 @@ class StatsHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = context.watch<ScrutinyProvider>();
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          if (provider.winner != null)
+          if (provider.hasWinner)
             Container(
               margin: const EdgeInsets.only(bottom: 16),
               width: double.infinity,
@@ -86,10 +87,10 @@ class StatsHeader extends StatelessWidget {
               child: Column(
                 children: [
                    Text(
-                      provider.winnerLabel!,
+                      localizedWinnerLabel(l10n, provider.winnerStatus) ?? '',
                       style: TextStyle(
                           color: provider.isTie
-                              ? colorScheme.onTertiaryContainer 
+                              ? colorScheme.onTertiaryContainer
                               : colorScheme.onPrimaryContainer,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1.2
@@ -97,7 +98,7 @@ class StatsHeader extends StatelessWidget {
                    ),
                    const SizedBox(height: 8),
                    Text(
-                      provider.winner!.toUpperCase(),
+                      (provider.isTie ? l10n.tie : (provider.winnerName ?? '')).toUpperCase(),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           fontSize: 32,
@@ -121,10 +122,10 @@ class StatsHeader extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildStatItem(context, Icons.how_to_vote_outlined, AppStrings.scrutinisedVotes, 
+                  _buildStatItem(context, Icons.how_to_vote_outlined, l10n.scrutinisedVotes,
                       '${provider.totalVotesAssigned} / ${provider.settings.totalVoters}'),
                   Container(height: 48, width: 1, color: colorScheme.outlineVariant),
-                  _buildStatItem(context, Icons.pending_outlined, AppStrings.remaining,
+                  _buildStatItem(context, Icons.pending_outlined, l10n.remaining,
                       '${provider.remainingVotes}'),
                 ],
               ),
@@ -169,7 +170,7 @@ class StatsHeader extends StatelessWidget {
                   Icon(Icons.info_outline, size: 16, color: colorScheme.primary),
                   const SizedBox(width: 8),
                   Text(
-                      AppStrings.votesToWin(provider.votesUntilMajority ?? 0),
+                      context.l10n.votesToWin(provider.votesUntilMajority ?? 0),
                       style: TextStyle(color: colorScheme.onSurfaceVariant, fontWeight: FontWeight.w500)
                   )
               ],
@@ -209,7 +210,7 @@ class ControlButtons extends StatelessWidget {
                       HapticFeedback.mediumImpact();
                       provider.undo();
                   } : null,
-                  tooltip: AppStrings.undoTooltip,
+                  tooltip: context.l10n.undoTooltip,
                 ),
                 const SizedBox(width: 8),
                 IconButton( // Replaced IconButton.tonal
@@ -222,7 +223,7 @@ class ControlButtons extends StatelessWidget {
                       HapticFeedback.mediumImpact();
                       provider.redo();
                   } : null,
-                  tooltip: AppStrings.redoTooltip,
+                  tooltip: context.l10n.redoTooltip,
                 ),
               ],
             ),
@@ -290,7 +291,7 @@ class _HoldToResetButtonState extends State<_HoldToResetButton> with SingleTicke
                children: [
                  Icon(Icons.delete_forever, color: colorScheme.error),
                  const SizedBox(width: 8),
-                 Text(AppStrings.resetButton, style: TextStyle(color: colorScheme.error, fontWeight: FontWeight.bold))
+                 Text(context.l10n.resetButton, style: TextStyle(color: colorScheme.error, fontWeight: FontWeight.bold))
                ],
              )
            ),

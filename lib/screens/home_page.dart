@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:voto_tracker/utils/app_constants.dart';
+import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/widgets/charts_section.dart';
 import 'package:voto_tracker/widgets/candidates_section.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -17,26 +17,27 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     WakelockPlus.enable(); // Keep screen on while on this page
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppStrings.appTitle),
+        title: Text(l10n.appTitle),
         actions: [
             IconButton(
                 icon: const Icon(Icons.ios_share),
-                tooltip: AppStrings.exportShareTooltip,
+                tooltip: l10n.exportShareTooltip,
                 onPressed: () => _showExportOptions(context),
             ),
             IconButton(
                 icon: const Icon(Icons.tv),
-                tooltip: AppStrings.projectorMode,
+                tooltip: l10n.projectorMode,
                 onPressed: () => Navigator.push(
-                    context, 
+                    context,
                     MaterialPageRoute(builder: (context) => const ProjectorModeScreen())
                 ),
             ),
             IconButton(
                 icon: const Icon(Icons.settings),
-                tooltip: AppStrings.settingsButtonTooltip,
+                tooltip: l10n.settingsTooltip,
                 onPressed: () => showDialog(
                     context: context,
                     builder: (context) => const SettingsDialog()
@@ -62,7 +63,7 @@ class HomePage extends StatelessWidget {
                           return const SingleChildScrollView(
                               child: Column(
                                   children: [
-                                      SizedBox(height: 350, child: ChartsSection()), 
+                                      SizedBox(height: 350, child: ChartsSection()),
                                       Divider(height: 1),
                                       CandidatesSection(isScrollable: false),
                                   ]
@@ -76,14 +77,16 @@ class HomePage extends StatelessWidget {
   void _showExportOptions(BuildContext context) {
       showModalBottomSheet(
           context: context,
-          builder: (context) => SafeArea(
+          builder: (context) {
+            final l10n = context.l10n;
+            return SafeArea(
               child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                       ListTile(
                           leading: const Icon(Icons.image),
-                          title: const Text(AppStrings.shareImageTitle),
-                          subtitle: const Text(AppStrings.shareImageSubtitle),
+                          title: Text(l10n.shareImageTitle),
+                          subtitle: Text(l10n.shareImageSubtitle),
                           onTap: () async {
                               Navigator.pop(context);
                               final provider = context.read<ScrutinyProvider>();
@@ -100,8 +103,8 @@ class HomePage extends StatelessWidget {
                       ),
                       ListTile(
                           leading: const Icon(Icons.picture_as_pdf),
-                          title: const Text(AppStrings.exportPdfTitle),
-                          subtitle: const Text(AppStrings.exportPdfSubtitle),
+                          title: Text(l10n.exportPdfTitle),
+                          subtitle: Text(l10n.exportPdfSubtitle),
                           onTap: () async {
                                Navigator.pop(context);
                                final provider = context.read<ScrutinyProvider>();
@@ -119,37 +122,38 @@ class HomePage extends StatelessWidget {
                       ),
                       ListTile(
                           leading: const Icon(Icons.table_chart_outlined),
-                          title: const Text(AppStrings.exportCsvTitle),
-                          subtitle: const Text(AppStrings.exportCsvSubtitle),
+                          title: Text(l10n.exportCsvTitle),
+                          subtitle: Text(l10n.exportCsvSubtitle),
                           onTap: () async {
                               final provider = context.read<ScrutinyProvider>();
                               final messenger = ScaffoldMessenger.of(context);
+                              final errorMsg = l10n.exportError;
                               Navigator.pop(context);
                               final ok = await DataExportService.shareCsv(provider.exportToCsv());
                               if (!ok) {
-                                  messenger.showSnackBar(
-                                      const SnackBar(content: Text(AppStrings.exportError)));
+                                  messenger.showSnackBar(SnackBar(content: Text(errorMsg)));
                               }
                           },
                       ),
                       ListTile(
                           leading: const Icon(Icons.data_object),
-                          title: const Text(AppStrings.exportJsonTitle),
-                          subtitle: const Text(AppStrings.exportJsonSubtitle),
+                          title: Text(l10n.exportJsonTitle),
+                          subtitle: Text(l10n.exportJsonSubtitle),
                           onTap: () async {
                               final provider = context.read<ScrutinyProvider>();
                               final messenger = ScaffoldMessenger.of(context);
+                              final errorMsg = l10n.exportError;
                               Navigator.pop(context);
                               final ok = await DataExportService.shareJson(provider.exportToJson());
                               if (!ok) {
-                                  messenger.showSnackBar(
-                                      const SnackBar(content: Text(AppStrings.exportError)));
+                                  messenger.showSnackBar(SnackBar(content: Text(errorMsg)));
                               }
                           },
                       ),
                   ],
               )
-          )
+            );
+          }
       );
   }
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/theme/app_theme.dart';
-import 'package:voto_tracker/utils/app_constants.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 class ProjectorModeScreen extends StatelessWidget {
@@ -21,7 +21,7 @@ class ProjectorModeScreen extends StatelessWidget {
           return Scaffold(
             backgroundColor: colorScheme.surface, 
             appBar: AppBar(
-              title: const Text(AppStrings.projectorMode),
+              title: Text(context.l10n.projectorMode),
               backgroundColor: Colors.transparent,
               foregroundColor: colorScheme.onSurfaceVariant,
               elevation: 0,
@@ -34,7 +34,7 @@ class ProjectorModeScreen extends StatelessWidget {
                 if (candidates.isEmpty) {
                     return Center(
                         child: Text(
-                            AppStrings.waitingForData,
+                            context.l10n.waitingForData,
                             style: Theme.of(context).textTheme.displaySmall?.copyWith(color: colorScheme.onSurfaceVariant)
                         )
                     );
@@ -97,7 +97,7 @@ class ProjectorModeScreen extends StatelessWidget {
                                                     // Name
                                                     Expanded(
                                                         child: Text(
-                                                            candidate.name.toUpperCase(),
+                                                            localizedCandidateName(context.l10n, candidate).toUpperCase(),
                                                             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                                                                 fontWeight: FontWeight.w900,
                                                                 letterSpacing: 1.2,
@@ -142,11 +142,12 @@ class ProjectorModeScreen extends StatelessWidget {
   }
   
   Widget _buildHeader(BuildContext context, ScrutinyProvider provider) {
-      final winner = provider.winner;
+      final l10n = context.l10n;
       final colorScheme = Theme.of(context).colorScheme;
 
-      if (winner != null) {
-          final label = provider.winnerLabel!;
+      if (provider.hasWinner) {
+          final label = localizedWinnerLabel(l10n, provider.winnerStatus) ?? '';
+          final winnerText = provider.isTie ? l10n.tie : (provider.winnerName ?? '');
 
           return Container(
               padding: const EdgeInsets.symmetric(vertical: 24),
@@ -166,7 +167,7 @@ class ProjectorModeScreen extends StatelessWidget {
                         )
                     ),
                     Text(
-                        winner.toUpperCase(),
+                        winnerText.toUpperCase(),
                         style: Theme.of(context).textTheme.displayMedium?.copyWith(
                             color: provider.isTie ? colorScheme.onTertiaryContainer : colorScheme.onPrimaryContainer,
                             fontWeight: FontWeight.w900,
@@ -185,7 +186,7 @@ class ProjectorModeScreen extends StatelessWidget {
                    Icon(Icons.how_to_vote_outlined, color: colorScheme.onSurfaceVariant, size: 32),
                    const SizedBox(width: 16),
                    Text(
-                       "${AppStrings.votesTotal}: ${provider.totalVotesAssigned} / ${provider.settings.totalVoters}",
+                       "${l10n.votesTotal}: ${provider.totalVotesAssigned} / ${provider.settings.totalVoters}",
                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: colorScheme.onSurfaceVariant)
                    )
               ]

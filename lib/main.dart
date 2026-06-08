@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:voto_tracker/l10n/app_localizations.dart';
+import 'package:voto_tracker/providers/locale_provider.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/screens/home_page.dart';
 import 'package:voto_tracker/theme/app_theme.dart';
-import 'package:voto_tracker/utils/app_constants.dart';
 
 void main() {
   runApp(const VotoTrackerApp());
@@ -14,15 +15,25 @@ class VotoTrackerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ScrutinyProvider(),
-      child: MaterialApp(
-        title: AppStrings.appTitle,
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.system,
-        home: const HomePage(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ScrutinyProvider()),
+        ChangeNotifierProvider(create: (_) => LocaleProvider()),
+      ],
+      child: Consumer<LocaleProvider>(
+        builder: (context, localeProvider, _) {
+          return MaterialApp(
+            onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: ThemeMode.system,
+            locale: localeProvider.locale,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: const HomePage(),
+          );
+        },
       ),
     );
   }

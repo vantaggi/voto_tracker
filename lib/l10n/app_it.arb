@@ -1,0 +1,73 @@
+{
+  "@@locale": "it",
+
+  "appTitle": "Voto Tracker",
+  "settingsTooltip": "Impostazioni",
+  "exportShareTooltip": "Esporta / Condividi",
+  "projectorMode": "Modalità Proiettore",
+
+  "shareImageTitle": "Condividi immagine social",
+  "shareImageSubtitle": "Ottimizzata per Instagram/WhatsApp",
+  "exportPdfTitle": "Esporta Report PDF",
+  "exportPdfSubtitle": "Documento ufficiale con grafici",
+  "exportCsvTitle": "Esporta CSV",
+  "exportCsvSubtitle": "Tabella per fogli di calcolo",
+  "exportJsonTitle": "Esporta JSON",
+  "exportJsonSubtitle": "Dati strutturati completi",
+  "exportError": "Errore durante l'esportazione",
+
+  "scrutinisedVotes": "Voti Scrutinati",
+  "remaining": "Rimanenti",
+  "votesTotal": "VOTI TOTALI",
+  "waitingForData": "In attesa di dati...",
+  "votesToWin": "Mancano {count} voti per la vittoria",
+  "@votesToWin": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "votes": "voti",
+  "votesShort": "Voti",
+
+  "winnerElected": "ELETTO",
+  "winnerMathematical": "VITTORIA MATEMATICA",
+  "finalResult": "RISULTATO FINALE",
+  "tie": "Pareggio",
+  "winnerFallback": "VINCITORE",
+
+  "blankVotes": "Schede Bianche",
+  "spoiledVotes": "Schede Nulle",
+
+  "editName": "Modifica Nome",
+  "candidateName": "Nome Candidato",
+  "previousResultLabel": "Risultato Precedente (%)",
+  "previousResultHint": "Es. 25.5",
+  "cancel": "Annulla",
+  "save": "Salva",
+
+  "current": "Corrente",
+  "history": "Storico",
+  "percentages": "Percentuali",
+  "noDataAvailable": "Nessun dato disponibile",
+  "noHistoryAvailable": "Nessuno storico disponibile",
+  "noVotesRecorded": "Nessun voto registrato",
+
+  "undoTooltip": "Annulla ultima azione",
+  "redoTooltip": "Ripristina azione",
+  "resetButton": "TIENI PREMUTO PER RESETTARE",
+
+  "scrutinyConfiguration": "Configurazione Scrutinio",
+  "totalVotersNumber": "Numero Totale Votanti",
+  "votersHint": "Es. 100",
+  "participantsCount": "Numero Candidati",
+  "votingOptions": "Opzioni di Voto",
+  "dataManagement": "Gestione Dati",
+  "exportLabel": "Esporta",
+  "importLabel": "Importa",
+  "configLoaded": "Configurazione caricata con successo",
+
+  "language": "Lingua",
+  "languageSystem": "Sistema",
+  "languageItalian": "Italiano",
+  "languageEnglish": "English"
+}

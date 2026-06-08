@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
 
@@ -58,10 +59,10 @@ class ChartsSection extends StatelessWidget {
         labelStyle: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
         unselectedLabelStyle: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w500),
         overlayColor: WidgetStateProperty.all(Colors.transparent),
-        tabs: const [
-          Tab(text: AppStrings.current),
-          Tab(text: AppStrings.history),
-          Tab(text: AppStrings.percentages),
+        tabs: [
+          Tab(text: context.l10n.current),
+          Tab(text: context.l10n.history),
+          Tab(text: context.l10n.percentages),
         ],
       ),
     );
@@ -74,6 +75,7 @@ class _CurrentResultsChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<ScrutinyProvider>(builder: (context, provider, child) {
+      final l10n = context.l10n;
       final candidates = provider.sortedCandidates;
       if (candidates.isEmpty) {
         return Center(
@@ -82,7 +84,7 @@ class _CurrentResultsChart extends StatelessWidget {
           children: [
             Icon(Icons.bar_chart, size: 48, color: Theme.of(context).colorScheme.outline),
             const SizedBox(height: 16),
-            Text(AppStrings.noDataAvailable,
+            Text(l10n.noDataAvailable,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     )),
@@ -127,7 +129,7 @@ class _CurrentResultsChart extends StatelessWidget {
                     tooltipMargin: 8,
                     getTooltipItem: (group, groupIndex, rod, rodIndex) =>
                         BarTooltipItem(
-                            '${candidates[groupIndex].name}\n',
+                            '${localizedCandidateName(l10n, candidates[groupIndex])}\n',
                             TextStyle(
                                 color: colorScheme.onInverseSurface,
                                 fontWeight: FontWeight.bold,
@@ -135,7 +137,7 @@ class _CurrentResultsChart extends StatelessWidget {
                             ),
                             children: [
                               TextSpan(
-                                text: '${candidates[groupIndex].votes} ${AppStrings.votes}',
+                                text: '${candidates[groupIndex].votes} ${l10n.votes}',
                                 style: TextStyle(
                                   color: colorScheme.onInverseSurface.withValues(alpha: 0.8),
                                   fontSize: 12,
@@ -153,7 +155,7 @@ class _CurrentResultsChart extends StatelessWidget {
                       getTitlesWidget: (value, meta) {
                         if (value.toInt() < candidates.length &&
                             value.toInt() >= 0) {
-                          final name = candidates[value.toInt()].name;
+                          final name = localizedCandidateName(l10n, candidates[value.toInt()]);
                           return Padding(
                               padding: const EdgeInsets.only(top: 8),
                               child: Transform.rotate(
@@ -214,6 +216,7 @@ class _HistoryChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<ScrutinyProvider>(builder: (context, provider, child) {
+      final l10n = context.l10n;
       final historyPoints = provider.historyPoints;
       final candidates = provider.candidates;
       final theme = Theme.of(context);
@@ -233,7 +236,7 @@ class _HistoryChart extends StatelessWidget {
                     children: [
               Icon(Icons.show_chart, size: 48, color: colorScheme.outline),
               const SizedBox(height: 16),
-              Text(AppStrings.noHistoryAvailable,
+              Text(l10n.noHistoryAvailable,
                   style: theme.textTheme.bodyLarge
                       ?.copyWith(color: colorScheme.onSurfaceVariant))
             ])));
@@ -292,7 +295,7 @@ class _HistoryChart extends StatelessWidget {
               }).toList(),
               titlesData: FlTitlesData(
                 bottomTitles: AxisTitles(
-                    axisNameWidget: Text(AppStrings.scrutinisedVotes,
+                    axisNameWidget: Text(l10n.scrutinisedVotes,
                         style: theme.textTheme.labelSmall
                             ?.copyWith(color: colorScheme.onSurfaceVariant)),
                     sideTitles: SideTitles(
@@ -304,7 +307,7 @@ class _HistoryChart extends StatelessWidget {
                                 ?.copyWith(
                                     color: colorScheme.onSurfaceVariant)))),
                 leftTitles: AxisTitles(
-                    axisNameWidget: Text(AppStrings.votesShort,
+                    axisNameWidget: Text(l10n.votesShort,
                         style: theme.textTheme.labelSmall
                             ?.copyWith(color: colorScheme.onSurfaceVariant)),
                     sideTitles: SideTitles(
@@ -366,6 +369,7 @@ class _PercentageChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<ScrutinyProvider>(builder: (context, provider, child) {
+      final l10n = context.l10n;
       final candidates = provider.sortedCandidates;
       final totalVotes = provider.totalVotesAssigned;
       final theme = Theme.of(context);
@@ -385,7 +389,7 @@ class _PercentageChart extends StatelessWidget {
                   children: [
                     Icon(Icons.pie_chart_outline, size: 48, color: colorScheme.outline),
                     const SizedBox(height: 16),
-                    Text(AppStrings.noVotesRecorded,
+                    Text(l10n.noVotesRecorded,
                         style: theme.textTheme.bodyLarge?.copyWith(
                           color: colorScheme.onSurfaceVariant
                         )),
@@ -419,7 +423,7 @@ class _PercentageChart extends StatelessWidget {
                                 fontWeight: FontWeight.bold,
                                 color: _getContrastColor(candidate.color),
                             ),
-                            badgeWidget: _buildBadge(context, candidate.name, candidate.color),
+                            badgeWidget: _buildBadge(context, localizedCandidateName(l10n, candidate), candidate.color),
                             badgePositionPercentageOffset: 1.25,
                             borderSide: BorderSide(color: colorScheme.surfaceContainerLow, width: 2)
                         );
@@ -439,7 +443,7 @@ class _PercentageChart extends StatelessWidget {
                          ),
                        ),
                        Text(
-                         AppStrings.votesTotal,
+                         l10n.votesTotal,
                          style: theme.textTheme.labelMedium?.copyWith(
                              color: colorScheme.onSurfaceVariant,
                              letterSpacing: 1.5,
