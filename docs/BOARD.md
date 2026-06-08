@@ -4,12 +4,12 @@ Source of Truth per task, idee e avanzamento. Leggibile da umani e IA.
 Se un'informazione può stare qui, **non creare un nuovo `.md`**: il BOARD è
 l'unico posto dove vive lo stato dei task.
 
-## 🚀 Stato Corrente: v1.1.0
+## 🚀 Stato Corrente: v1.2.0
 
-**Branch attivo:** master · **Ultimo aggiornamento:** 2026-06-07
+**Branch attivo:** master · **Ultimo aggiornamento:** 2026-06-09
 
-L'app è funzionante e pubblicabile. Questa Wave 1 introduce il "sistema operativo"
-documentale e di automazione (AI Workflow Kit) sopra al codice esistente.
+L'app è funzionante e pubblicabile. Backlog Wave 1/1.1/2 completato: kit
+documentale, audit & bugfix, test, redo, performance e i18n IT/EN.
 
 ## 🎯 Wave 1 — Fondamenta AI-driven (giugno 2026)
 

@@ -13,19 +13,18 @@ Le sezioni sono generate dai commit convenzionali (vedi
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-06-09
+
 ### 🚀 Nuove Funzionalità
 - **Interfaccia multilingua Italiano/Inglese** (`flutter_localizations` + ARB),
   con selettore di lingua nelle impostazioni ("Sistema" per seguire il
   dispositivo); identità di schede/vincitore portata su `enum` per consentire la
-  traduzione senza toccare la logica.
+  traduzione senza toccare la logica. Localizzate anche le esportazioni (PDF,
+  immagine social, testo di condivisione).
 - Export dei risultati in **CSV** e **JSON** dal menu di condivisione (i dati
   erano già calcolati ma non raggiungibili dall'interfaccia).
 - **Redo** ora funzionante: il pulsante di ripristino riapplica l'ultima azione
   annullata (prima era inerte).
-
-### 🧪 Test
-- Aggiunti test unitari su `ScrutinyProvider` e `Settings` (vote-log, vincitore,
-  undo, clamp, export): 14 test, tutti verdi.
 
 ### ⚡ Prestazioni
 - I voti aggiornano i conteggi in modo incrementale invece di rigiocare l'intero
@@ -33,13 +32,14 @@ Le sezioni sono generate dai commit convenzionali (vedi
   completo resta solo al caricamento e ai reset).
 
 ### 🛠️ Refactoring
-- Centralizzate in `AppStrings` le stringhe UI residue di schermate e widget
-  (menu export, impostazioni, proiettore, card, grafici): niente più testi
-  hardcoded nell'interfaccia interattiva.
-- Localizzate anche le superfici di export (report PDF, immagine social, testo di
-  condivisione) tramite `ExportLabels` iniettato dai servizi.
-- `AppStrings` ripulito: restano solo i semi-dati non localizzati (brand, nomi di
-  default, etichette IT del vincitore per i getter retro-compatibili).
+- Identità di schede e vincitore portata su `enum` (`CandidateType`,
+  `WinnerStatus`), rimuovendo i confronti fragili su stringhe.
+- Stringhe della UI e delle esportazioni centralizzate (l10n / `AppStrings`
+  ridotto ai soli semi-dati non localizzati).
+
+### 🧪 Test
+- Aggiunta copertura su `ScrutinyProvider` e `Settings` (vote-log, vincitore,
+  undo/redo, tipi, clamp, export) e sulla localizzazione: 24 test, tutti verdi.
 
 ## [1.1.2] - 2026-06-07
 
@@ -77,7 +77,8 @@ Le sezioni sono generate dai commit convenzionali (vedi
 - Prima versione: tracciamento voti in tempo reale, grafici, calcolo vincitore,
   configurazione scrutinio ed esportazione CSV/JSON.
 
-[Unreleased]: https://github.com/vantaggi/voto_tracker/compare/v1.1.2...HEAD
+[Unreleased]: https://github.com/vantaggi/voto_tracker/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/vantaggi/voto_tracker/releases/tag/v1.2.0
 [1.1.2]: https://github.com/vantaggi/voto_tracker/releases/tag/v1.1.2
 [1.1.0]: https://github.com/vantaggi/voto_tracker/releases/tag/v1.1.0
 [1.0.0]: https://github.com/vantaggi/voto_tracker/releases/tag/v1.0.0
