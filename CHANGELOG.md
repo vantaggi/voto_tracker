@@ -13,6 +13,11 @@ Le sezioni sono generate dai commit convenzionali (vedi
 
 ## [Unreleased]
 
+### 🎨 Interfaccia & Design
+- Grafico "Corrente": asse Y con pochi tick leggibili (niente più interi
+  duplicati) ed etichette dei candidati orizzontali con ellissi al posto dei
+  nomi ruotati e illeggibili.
+
 ## [1.2.0] - 2026-06-09
 
 ### 🚀 Nuove Funzionalità

@@ -95,10 +95,16 @@ class _CurrentResultsChart extends StatelessWidget {
       final theme = Theme.of(context);
       final colorScheme = theme.colorScheme;
       
-      final double maxY = candidates.isEmpty
-          ? 10
-          : (candidates.map((e) => e.votes).reduce((a, b) => a > b ? a : b) + 5)
-              .toDouble();
+      final int maxVotes = candidates.isEmpty
+          ? 0
+          : candidates.map((e) => e.votes).reduce((a, b) => a > b ? a : b);
+      // Headroom proporzionato, mai meno di 5
+      final double maxY = (maxVotes + (maxVotes <= 5 ? 1 : (maxVotes * 0.15).ceil()))
+          .toDouble()
+          .clamp(5, double.infinity);
+      // Passo dell'asse Y: pochi tick leggibili (interi distinti)
+      final double yInterval = maxY <= 6 ? 1 : (maxY / 5).ceilToDouble();
+      final double labelWidth = candidates.length > 5 ? 44 : 72;
 
       return Card(
         elevation: 0,
@@ -115,7 +121,7 @@ class _CurrentResultsChart extends StatelessWidget {
             gridData: FlGridData(
               show: true,
               drawVerticalLine: false,
-              horizontalInterval: 5,
+              horizontalInterval: yInterval,
               getDrawingHorizontalLine: (value) => FlLine(
                 color: colorScheme.outlineVariant.withValues(alpha: 0.5),
                 strokeWidth: 1,
@@ -151,35 +157,42 @@ class _CurrentResultsChart extends StatelessWidget {
               bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 80, // Increased space for labels
+                      reservedSize: 40,
                       getTitlesWidget: (value, meta) {
-                        if (value.toInt() < candidates.length &&
-                            value.toInt() >= 0) {
-                          final name = localizedCandidateName(l10n, candidates[value.toInt()]);
-                          return Padding(
-                              padding: const EdgeInsets.only(top: 8),
-                              child: Transform.rotate(
-                                angle: -0.5, // Rotated for better fit
-                                child: Text(
-                                    name.length > 15
-                                        ? '${name.substring(0, 15)}...'
-                                        : name,
-                                    style: theme.textTheme.labelMedium
-                                        ?.copyWith(
-                                            color: colorScheme.onSurfaceVariant,
-                                            fontWeight: FontWeight.w600)),
-                              ));
+                        final i = value.toInt();
+                        if (i < 0 || i >= candidates.length) {
+                          return const SizedBox.shrink();
                         }
-                        return const SizedBox.shrink();
+                        final name = localizedCandidateName(l10n, candidates[i]);
+                        return Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: SizedBox(
+                              width: labelWidth,
+                              child: Text(
+                                  name,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                      fontWeight: FontWeight.w600)),
+                            ));
                       })),
               leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 30,
-                      getTitlesWidget: (value, meta) => Text(
-                          value.toInt().toString(),
-                          style: theme.textTheme.labelSmall
-                              ?.copyWith(color: colorScheme.onSurfaceVariant)))),
+                      reservedSize: 28,
+                      interval: yInterval,
+                      getTitlesWidget: (value, meta) {
+                        // Solo i tick allineati al passo, niente duplicati
+                        if ((value % yInterval).abs() > 0.01) {
+                          return const SizedBox.shrink();
+                        }
+                        return Text(
+                            value.toInt().toString(),
+                            style: theme.textTheme.labelSmall
+                                ?.copyWith(color: colorScheme.onSurfaceVariant));
+                      })),
               topTitles:
                   const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               rightTitles:
