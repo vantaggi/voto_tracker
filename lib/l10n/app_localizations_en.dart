@@ -174,4 +174,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get languageEnglish => 'English';
+
+  @override
+  String get reportSubtitle => 'OFFICIAL SCRUTINY REPORT';
+
+  @override
+  String get completion => 'COMPLETION';
+
+  @override
+  String get completionShort => 'COMPL.';
+
+  @override
+  String get rankingTitle => 'RANKING';
+
+  @override
+  String get trendTitle => 'VOTE TREND';
+
+  @override
+  String get insufficientData => 'Insufficient data';
+
+  @override
+  String get colPosition => 'POS';
+
+  @override
+  String get colCandidate => 'CANDIDATE';
+
+  @override
+  String get colStatus => 'STATUS';
+
+  @override
+  String get leader => 'LEADER';
+
+  @override
+  String get generatedWithPro => 'Generated with Voto Tracker Pro';
+
+  @override
+  String get pageFooter => 'Page 1 of 1';
+
+  @override
+  String get updateLabel => 'UPDATE';
+
+  @override
+  String get liveScrutiny => 'LIVE SCRUTINY';
+
+  @override
+  String get partialRanking => 'PARTIAL RANKING';
+
+  @override
+  String get generatedWith => 'Generated with Voto Tracker';
+
+  @override
+  String get countedShort => 'Counted';
 }

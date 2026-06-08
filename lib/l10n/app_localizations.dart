@@ -427,6 +427,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'English'**
   String get languageEnglish;
+
+  /// No description provided for @reportSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'OFFICIAL SCRUTINY REPORT'**
+  String get reportSubtitle;
+
+  /// No description provided for @completion.
+  ///
+  /// In en, this message translates to:
+  /// **'COMPLETION'**
+  String get completion;
+
+  /// No description provided for @completionShort.
+  ///
+  /// In en, this message translates to:
+  /// **'COMPL.'**
+  String get completionShort;
+
+  /// No description provided for @rankingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'RANKING'**
+  String get rankingTitle;
+
+  /// No description provided for @trendTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'VOTE TREND'**
+  String get trendTitle;
+
+  /// No description provided for @insufficientData.
+  ///
+  /// In en, this message translates to:
+  /// **'Insufficient data'**
+  String get insufficientData;
+
+  /// No description provided for @colPosition.
+  ///
+  /// In en, this message translates to:
+  /// **'POS'**
+  String get colPosition;
+
+  /// No description provided for @colCandidate.
+  ///
+  /// In en, this message translates to:
+  /// **'CANDIDATE'**
+  String get colCandidate;
+
+  /// No description provided for @colStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'STATUS'**
+  String get colStatus;
+
+  /// No description provided for @leader.
+  ///
+  /// In en, this message translates to:
+  /// **'LEADER'**
+  String get leader;
+
+  /// No description provided for @generatedWithPro.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated with Voto Tracker Pro'**
+  String get generatedWithPro;
+
+  /// No description provided for @pageFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'Page 1 of 1'**
+  String get pageFooter;
+
+  /// No description provided for @updateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'UPDATE'**
+  String get updateLabel;
+
+  /// No description provided for @liveScrutiny.
+  ///
+  /// In en, this message translates to:
+  /// **'LIVE SCRUTINY'**
+  String get liveScrutiny;
+
+  /// No description provided for @partialRanking.
+  ///
+  /// In en, this message translates to:
+  /// **'PARTIAL RANKING'**
+  String get partialRanking;
+
+  /// No description provided for @generatedWith.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated with Voto Tracker'**
+  String get generatedWith;
+
+  /// No description provided for @countedShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Counted'**
+  String get countedShort;
 }
 
 class _AppLocalizationsDelegate

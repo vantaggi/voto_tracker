@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:voto_tracker/l10n/export_labels.dart';
 import 'package:voto_tracker/models/candidate.dart';
 
 class SocialResultsCard extends StatelessWidget {
@@ -6,6 +7,7 @@ class SocialResultsCard extends StatelessWidget {
   final int totalVotes;
   final int totalVoters;
   final int remainingVotes;
+  final ExportLabels labels;
   final String? winner;
   final String? winnerLabel;
 
@@ -15,6 +17,7 @@ class SocialResultsCard extends StatelessWidget {
     required this.totalVotes,
     required this.totalVoters,
     required this.remainingVotes,
+    required this.labels,
     this.winner,
     this.winnerLabel,
   });
@@ -54,12 +57,12 @@ class SocialResultsCard extends StatelessWidget {
                Column(
                  crossAxisAlignment: CrossAxisAlignment.start,
                  children: [
-                    Text("AGGIORNAMENTO ${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')}", 
+                    Text("${labels.updateLabel} ${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')}",
                         style: theme.textTheme.labelMedium?.copyWith(
                             color: colorScheme.onSurfaceVariant, letterSpacing: 2
                         )),
                     const SizedBox(height: 4),
-                    Text("SCRUTINIO LIVE", 
+                    Text(labels.liveScrutiny,
                         style: theme.textTheme.headlineLarge?.copyWith(
                             fontWeight: FontWeight.w900,
                             letterSpacing: -1,
@@ -68,7 +71,7 @@ class SocialResultsCard extends StatelessWidget {
                     ),
                      const SizedBox(height: 8),
                      Text(
-                        "Scrutinate: $totalVotes / $totalVoters (${(totalVotes / (totalVoters == 0 ? 1 : totalVoters) * 100).toStringAsFixed(1)}%)\nRimanenti: $remainingVotes",
+                        "${labels.countedShort}: $totalVotes / $totalVoters (${(totalVotes / (totalVoters == 0 ? 1 : totalVoters) * 100).toStringAsFixed(1)}%)\n${labels.remaining}: $remainingVotes",
                         style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant)
                      ),
                  ]
@@ -96,7 +99,7 @@ class SocialResultsCard extends StatelessWidget {
             ),
             child: Column(
                 children: [
-                    Text(winnerLabel ?? "VINCITORE", 
+                    Text(winnerLabel ?? labels.winnerFallback,
                         style: theme.textTheme.titleSmall?.copyWith(
                             color: colorScheme.onPrimaryContainer, 
                             fontWeight: FontWeight.bold,
@@ -119,7 +122,7 @@ class SocialResultsCard extends StatelessWidget {
           if (winner == null)
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
-              child: Text("CLASSIFICA PARZIALE", 
+              child: Text(labels.partialRanking,
                   style: theme.textTheme.labelLarge?.copyWith(
                       color: colorScheme.primary, 
                       fontWeight: FontWeight.bold
@@ -161,7 +164,7 @@ class SocialResultsCard extends StatelessWidget {
                                 )
                             ),
                             const SizedBox(width: 12),
-                            Expanded(child: Text(c.name, 
+                            Expanded(child: Text(labels.nameOf(c),
                                 style: theme.textTheme.titleMedium?.copyWith(
                                     fontWeight: isFirst ? FontWeight.bold : FontWeight.w500
                                 )
@@ -201,7 +204,7 @@ class SocialResultsCard extends StatelessWidget {
                 children: [
                   Icon(Icons.bar_chart, size: 16, color: colorScheme.onSurfaceVariant),
                   const SizedBox(width: 8),
-                  Text("Generato con Voto Tracker", 
+                  Text(labels.generatedWith,
                       style: theme.textTheme.bodySmall?.copyWith(
                           color: colorScheme.onSurfaceVariant, 
                           fontStyle: FontStyle.italic

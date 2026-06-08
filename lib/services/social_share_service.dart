@@ -5,16 +5,18 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:voto_tracker/l10n/export_labels.dart';
 import 'package:voto_tracker/models/candidate.dart';
 import 'package:voto_tracker/theme/app_theme.dart';
 import 'package:voto_tracker/widgets/social_results_card.dart';
 
 class SocialShareService {
     static Future<void> shareResults({
-        required List<Candidate> candidates, 
+        required List<Candidate> candidates,
         required int totalVotes,
         required int totalVoters,
         required int remainingVotes,
+        required ExportLabels labels,
         String? winner,
         String? winnerLabel
     }) async {
@@ -27,11 +29,12 @@ class SocialShareService {
                 Theme(
                     data: AppTheme.darkTheme, // Force Dark Theme for consistent share image
                     child: SocialResultsCard(
-                        candidates: candidates, 
-                        totalVotes: totalVotes, 
+                        candidates: candidates,
+                        totalVotes: totalVotes,
                         totalVoters: totalVoters,
                         remainingVotes: remainingVotes,
-                        winner: winner, 
+                        labels: labels,
+                        winner: winner,
                         winnerLabel: winnerLabel
                     ),
                 ),
@@ -46,9 +49,9 @@ class SocialShareService {
             
             await Share.shareXFiles(
                 [XFile(file.path)], 
-                text: winner != null 
-                    ? '🏆 ${winnerLabel ?? "VINCITORE"}: $winner!'
-                    : '📊 Aggiornamento scrutinio in tempo reale - Voto Tracker'
+                text: winner != null
+                    ? '🏆 ${winnerLabel ?? labels.winnerFallback}: $winner!'
+                    : '📊 ${labels.liveScrutiny} · ${labels.appTitlePro}'
             );
             
         } catch(e) {

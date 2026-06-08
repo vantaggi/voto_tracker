@@ -1,8 +1,8 @@
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:voto_tracker/l10n/export_labels.dart';
 import 'package:voto_tracker/models/candidate.dart';
-import 'package:voto_tracker/utils/app_constants.dart';
 
 class PdfExportService {
   static Future<void> exportToPdf({
@@ -11,6 +11,7 @@ class PdfExportService {
     required int totalVoters,
     required int remainingVotes,
     required Map<int, Map<String, int>> historyPoints,
+    required ExportLabels labels,
     String? winner,
     String? winnerLabel,
   }) async {
@@ -28,11 +29,11 @@ class PdfExportService {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.stretch,
             children: [
-              _buildModernHeader(winner, winnerLabel),
+              _buildModernHeader(winner, winnerLabel, labels),
               pw.SizedBox(height: 24),
-              _buildStatsStrip(totalVotesAssigned, totalVoters, remainingVotes),
+              _buildStatsStrip(totalVotesAssigned, totalVoters, remainingVotes, labels),
               pw.SizedBox(height: 24),
-              
+
               pw.Row(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
@@ -40,26 +41,26 @@ class PdfExportService {
                        flex: 4,
                        child: pw.Column(
                            children: [
-                               _buildBarChart(candidates, totalVotesAssigned),
+                               _buildBarChart(candidates, totalVotesAssigned, labels),
                                pw.SizedBox(height: 24),
-                               _buildDonutChart(candidates, totalVotesAssigned, totalVoters),
+                               _buildDonutChart(candidates, totalVotesAssigned, totalVoters, labels),
                            ]
                        )
                    ),
                    pw.SizedBox(width: 24),
                    pw.Expanded(
                        flex: 6,
-                       child: _buildHistoryChart(historyPoints, candidates)
+                       child: _buildHistoryChart(historyPoints, candidates, labels)
                    ),
                 ]
               ),
-              
+
               pw.Spacer(),
-              
-              _buildCompactTable(candidates, totalVotesAssigned),
-              
+
+              _buildCompactTable(candidates, totalVotesAssigned, labels),
+
               pw.SizedBox(height: 16),
-              _buildFooter(),
+              _buildFooter(labels),
             ],
           );
         },
@@ -70,7 +71,7 @@ class PdfExportService {
         bytes: await doc.save(), filename: 'scrutinio_report.pdf');
   }
 
-  static pw.Widget _buildModernHeader(String? winner, String? winnerLabel) {
+  static pw.Widget _buildModernHeader(String? winner, String? winnerLabel, ExportLabels labels) {
       return pw.Row(
           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
           crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -78,10 +79,10 @@ class PdfExportService {
               pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                      pw.Text(AppStrings.appTitlePro.toUpperCase(), 
+                      pw.Text(labels.appTitlePro.toUpperCase(),
                           style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold, color: PdfColors.indigo900, letterSpacing: 1.2)
                       ),
-                      pw.Text('REPORT UFFICIALE SCRUTINIO', style: const pw.TextStyle(fontSize: 10, color: PdfColors.indigo500, letterSpacing: 2)),
+                      pw.Text(labels.reportSubtitle, style: const pw.TextStyle(fontSize: 10, color: PdfColors.indigo500, letterSpacing: 2)),
                   ]
               ),
               if (winner != null)
@@ -91,7 +92,7 @@ class PdfExportService {
                       color: PdfColors.amber,
                       borderRadius: pw.BorderRadius.circular(16), // M3 Medium Shape
                   ),
-                  child: pw.Text("${winnerLabel ?? 'VINCITORE'}: $winner", 
+                  child: pw.Text("${winnerLabel ?? labels.winnerFallback}: $winner",
                       style: pw.TextStyle(color: PdfColors.black, fontWeight: pw.FontWeight.bold))
               ),
               pw.Column(
@@ -111,7 +112,7 @@ class PdfExportService {
       );
   }
 
-  static pw.Widget _buildStatsStrip(int totalVotesAssigned, int totalVoters, int remainingVotes) {
+  static pw.Widget _buildStatsStrip(int totalVotesAssigned, int totalVoters, int remainingVotes, ExportLabels labels) {
       return pw.Container(
           padding: const pw.EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           decoration: pw.BoxDecoration(
@@ -121,11 +122,11 @@ class PdfExportService {
           child: pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
-                  _buildCompactStat("VOTI SCRUTINATI", "$totalVotesAssigned / $totalVoters"),
+                  _buildCompactStat(labels.countedVotes.toUpperCase(), "$totalVotesAssigned / $totalVoters"),
                   pw.Container(width: 1, height: 24, color: PdfColors.indigo100),
-                  _buildCompactStat("RIMANENTI", "$remainingVotes"),
+                  _buildCompactStat(labels.remaining.toUpperCase(), "$remainingVotes"),
                   pw.Container(width: 1, height: 24, color: PdfColors.indigo100),
-                  _buildCompactStat("COMPLETAMENTO", "${(totalVoters > 0 ? (totalVotesAssigned / totalVoters * 100) : 0).toStringAsFixed(1)}%"),
+                  _buildCompactStat(labels.completion, "${(totalVoters > 0 ? (totalVotesAssigned / totalVoters * 100) : 0).toStringAsFixed(1)}%"),
               ]
           )
       );
@@ -141,7 +142,7 @@ class PdfExportService {
       );
   }
 
-  static pw.Widget _buildBarChart(List<Candidate> candidates, int totalVotes) {
+  static pw.Widget _buildBarChart(List<Candidate> candidates, int totalVotes, ExportLabels labels) {
     if (candidates.isEmpty) return pw.Container();
     final maxVotes = candidates.isEmpty ? 10 : candidates.map((c) => c.votes).reduce((a, b) => a > b ? a : b);
     final scale = maxVotes > 0 ? 100.0 / maxVotes : 0.0; 
@@ -155,7 +156,7 @@ class PdfExportService {
         child: pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text('CLASSIFICA', style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: PdfColors.grey600)),
+            pw.Text(labels.ranking, style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: PdfColors.grey600)),
             pw.SizedBox(height: 12),
             ...candidates.map((c) {
               final barWidth = c.votes * scale;
@@ -165,7 +166,7 @@ class PdfExportService {
                   children: [
                     pw.Expanded(
                       flex: 4,
-                      child: pw.Text(c.name, style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey800), maxLines: 2, overflow: pw.TextOverflow.clip),
+                      child: pw.Text(labels.nameOf(c), style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey800), maxLines: 2, overflow: pw.TextOverflow.clip),
                     ),
                     pw.Expanded(
                         flex: 6,
@@ -194,8 +195,8 @@ class PdfExportService {
   }
 
   static pw.Widget _buildHistoryChart(
-      Map<int, Map<String, int>> historyPoints, List<Candidate> candidates) {
-    if (historyPoints.length < 2) return pw.Container(height: 200, child: pw.Center(child: pw.Text("Dati insufficenti")));
+      Map<int, Map<String, int>> historyPoints, List<Candidate> candidates, ExportLabels labels) {
+    if (historyPoints.length < 2) return pw.Container(height: 200, child: pw.Center(child: pw.Text(labels.insufficientData)));
 
     final sortedKeys = historyPoints.keys.toList()..sort();
     
@@ -247,7 +248,7 @@ class PdfExportService {
         child: pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-                pw.Text('ANDAMENTO VOTI', style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: PdfColors.grey600)),
+                pw.Text(labels.trend, style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: PdfColors.grey600)),
                 pw.SizedBox(height: 12),
                 pw.Expanded(
                     child: pw.Chart(
@@ -263,7 +264,7 @@ class PdfExportService {
     );
   }
   
-  static pw.Widget _buildDonutChart(List<Candidate> candidates, int totalVotes, int totalVoters) {
+  static pw.Widget _buildDonutChart(List<Candidate> candidates, int totalVotes, int totalVoters, ExportLabels labels) {
        if (totalVotes == 0) return pw.Container();
        final validCandidates = candidates.where((c) => c.votes > 0).toList();
        
@@ -289,7 +290,7 @@ class PdfExportService {
                                    mainAxisSize: pw.MainAxisSize.min,
                                    children: [
                                        pw.Text("${(totalVotes / (totalVoters > 0 ? totalVoters : 1) * 100).toInt()}%", style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: PdfColors.indigo900)),
-                                       pw.Text("COMPLET.", style: const pw.TextStyle(fontSize: 6, color: PdfColors.indigo300))
+                                       pw.Text(labels.completionShort, style: const pw.TextStyle(fontSize: 6, color: PdfColors.indigo300))
                                    ]
                                )
                            ]
@@ -317,7 +318,7 @@ class PdfExportService {
        );
   }
 
-  static pw.Widget _buildCompactTable(List<Candidate> candidates, int totalVotes) {
+  static pw.Widget _buildCompactTable(List<Candidate> candidates, int totalVotes, ExportLabels labels) {
     return pw.Container(
       decoration: pw.BoxDecoration(
         border: pw.Border.all(color: PdfColors.grey300),
@@ -327,16 +328,16 @@ class PdfExportService {
         verticalRadius: 12,
         horizontalRadius: 12,
         child: pw.TableHelper.fromTextArray(
-          headers: ['POS', 'CANDIDATO', 'VOTI', '%', 'STATUS'],
+          headers: [labels.colPosition, labels.colCandidate, labels.colVotes.toUpperCase(), '%', labels.colStatus],
           data: candidates.asMap().entries.map((entry) {
             final c = entry.value;
             final index = entry.key + 1;
             return [
               '$index',
-              c.name,
+              labels.nameOf(c),
               '${c.votes}',
               '${c.getPercentage(totalVotes).toStringAsFixed(1)}%',
-              (index == 1) ? 'LEADER' : '' 
+              (index == 1) ? labels.leader : ''
             ];
           }).toList(),
           headerStyle: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: PdfColors.white),
@@ -356,7 +357,7 @@ class PdfExportService {
     );
   }
 
-  static pw.Widget _buildFooter() {
+  static pw.Widget _buildFooter(ExportLabels labels) {
     return pw.Container(
         padding: const pw.EdgeInsets.only(top: 10),
         decoration: const pw.BoxDecoration(
@@ -365,8 +366,8 @@ class PdfExportService {
         child: pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
-                pw.Text('Generato con Voto Tracker Pro', style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey500)),
-                pw.Text('Pagina 1 di 1', style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey500)),
+                pw.Text(labels.generatedWithPro, style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey500)),
+                pw.Text(labels.pageFooter, style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey500)),
             ]
         )
     );

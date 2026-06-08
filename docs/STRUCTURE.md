@@ -17,7 +17,8 @@ lib/
 │   ├── app_en.arb                     # Stringhe inglese (template)
 │   ├── app_it.arb                     # Stringhe italiano
 │   ├── app_localizations*.dart        # AppLocalizations generato (flutter gen-l10n)
-│   └── l10n_ext.dart                  # context.l10n + helper nomi candidato / label vincitore
+│   ├── l10n_ext.dart                  # context.l10n + helper nomi candidato / label vincitore
+│   └── export_labels.dart             # Stringhe localizzate per PDF/social (servizi senza context)
 │
 ├── providers/
 │   ├── scrutiny_provider.dart         # ChangeNotifier centrale: vote-log, calcolo vincitore, undo, export

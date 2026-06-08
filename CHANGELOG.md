@@ -36,6 +36,10 @@ Le sezioni sono generate dai commit convenzionali (vedi
 - Centralizzate in `AppStrings` le stringhe UI residue di schermate e widget
   (menu export, impostazioni, proiettore, card, grafici): niente più testi
   hardcoded nell'interfaccia interattiva.
+- Localizzate anche le superfici di export (report PDF, immagine social, testo di
+  condivisione) tramite `ExportLabels` iniettato dai servizi.
+- `AppStrings` ripulito: restano solo i semi-dati non localizzati (brand, nomi di
+  default, etichette IT del vincitore per i getter retro-compatibili).
 
 ## [1.1.2] - 2026-06-07
 

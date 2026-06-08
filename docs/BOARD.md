@@ -39,10 +39,10 @@ Esito dell'audit del codice + `dart analyze` (31 issue → 0).
 | ID | Task | Status | Priorità | Rischio | Stima | Note |
 |:--|:--|:--:|:--:|:--:|:--:|:--|
 | FEAT-001 | **Internazionalizzazione reale IT/EN** (`flutter_localizations` + ARB) | ✅ Fatto | 🟡 Media | 🟡 Medio | - | ARB IT/EN, `context.l10n`, toggle lingua; 4 test l10n. Da verificare a runtime |
-| REFACTOR-003 | **Rimuovere le costanti `AppStrings` UI ora superate da l10n** | 📅 Pianificato | 🟢 Bassa | 🟢 Basso | 1h | Restano solo dati per provider/servizi |
+| REFACTOR-003 | **Rimuovere le costanti `AppStrings` UI ora superate da l10n** | ✅ Fatto | 🟢 Bassa | 🟢 Basso | - | `AppStrings` ridotto a 10 semi-dati non localizzati |
 | FEAT-003 | **Esporre export CSV/JSON in UI** | ✅ Fatto | 🟡 Media | 🟢 Basso | - | `DataExportService` + voci nel menu di export |
 | REFACTOR-001 | **Centralizzare le stringhe UI** di screen e widget in `AppStrings` | ✅ Fatto | 🟢 Bassa | 🟢 Basso | - | home_page, settings, proiettore, card, charts |
-| REFACTOR-002 | **Centralizzare le stringhe di export** (PDF, social card, share text) | 📅 Pianificato | 🟢 Bassa | 🟢 Basso | 1h | Molte interpolate; superficie separata |
+| REFACTOR-002 | **Localizzare le superfici di export** (PDF, social card, share text) | ✅ Fatto | 🟢 Bassa | 🟢 Basso | - | `ExportLabels` risolto da `context.l10n` e iniettato nei servizi |
 | TEST-001 | **Test unitari su `ScrutinyProvider`** (vote-log, vincitore, undo) | ✅ Fatto | 🔴 Alta | 🟢 Basso | - | 14 test in `test/`, tutti verdi |
 | FEAT-002 | **Redo** | ✅ Fatto | 🟢 Bassa | 🟢 Basso | - | Redo-stack nel provider; il pulsante UI esistente ora funziona |
 | PERF-001 | **Aggiornamento incrementale dei voti** (no replay a ogni tap) | ✅ Fatto | 🟢 Bassa | 🟢 Basso | - | Da O(voti) a O(candidati) per voto; replay solo su load/reset |

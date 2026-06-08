@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:voto_tracker/l10n/export_labels.dart';
 import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/widgets/charts_section.dart';
 import 'package:voto_tracker/widgets/candidates_section.dart';
@@ -79,6 +80,7 @@ class HomePage extends StatelessWidget {
           context: context,
           builder: (context) {
             final l10n = context.l10n;
+            final labels = ExportLabels.of(l10n);
             return SafeArea(
               child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -88,16 +90,19 @@ class HomePage extends StatelessWidget {
                           title: Text(l10n.shareImageTitle),
                           subtitle: Text(l10n.shareImageSubtitle),
                           onTap: () async {
-                              Navigator.pop(context);
                               final provider = context.read<ScrutinyProvider>();
+                              final winnerName = provider.isTie ? l10n.tie : provider.winnerName;
+                              final winnerLbl = localizedWinnerLabel(l10n, provider.winnerStatus);
+                              Navigator.pop(context);
 
                               await SocialShareService.shareResults(
                                   candidates: provider.sortedCandidates,
                                   totalVotes: provider.totalVotesAssigned,
                                   totalVoters: provider.settings.totalVoters,
                                   remainingVotes: provider.remainingVotes,
-                                  winner: provider.winner,
-                                  winnerLabel: provider.winnerLabel
+                                  labels: labels,
+                                  winner: winnerName,
+                                  winnerLabel: winnerLbl
                               );
                           },
                       ),
@@ -106,8 +111,10 @@ class HomePage extends StatelessWidget {
                           title: Text(l10n.exportPdfTitle),
                           subtitle: Text(l10n.exportPdfSubtitle),
                           onTap: () async {
-                               Navigator.pop(context);
                                final provider = context.read<ScrutinyProvider>();
+                               final winnerName = provider.isTie ? l10n.tie : provider.winnerName;
+                               final winnerLbl = localizedWinnerLabel(l10n, provider.winnerStatus);
+                               Navigator.pop(context);
 
                                await PdfExportService.exportToPdf(
                                    candidates: provider.sortedCandidates,
@@ -115,8 +122,9 @@ class HomePage extends StatelessWidget {
                                    totalVoters: provider.settings.totalVoters,
                                    remainingVotes: provider.remainingVotes,
                                    historyPoints: provider.historyPoints,
-                                   winner: provider.winner,
-                                   winnerLabel: provider.winnerLabel
+                                   labels: labels,
+                                   winner: winnerName,
+                                   winnerLabel: winnerLbl
                                );
                           },
                       ),

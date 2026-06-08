@@ -69,5 +69,23 @@
   "language": "Lingua",
   "languageSystem": "Sistema",
   "languageItalian": "Italiano",
-  "languageEnglish": "English"
+  "languageEnglish": "English",
+
+  "reportSubtitle": "REPORT UFFICIALE SCRUTINIO",
+  "completion": "COMPLETAMENTO",
+  "completionShort": "COMPLET.",
+  "rankingTitle": "CLASSIFICA",
+  "trendTitle": "ANDAMENTO VOTI",
+  "insufficientData": "Dati insufficienti",
+  "colPosition": "POS",
+  "colCandidate": "CANDIDATO",
+  "colStatus": "STATUS",
+  "leader": "LEADER",
+  "generatedWithPro": "Generato con Voto Tracker Pro",
+  "pageFooter": "Pagina 1 di 1",
+  "updateLabel": "AGGIORNAMENTO",
+  "liveScrutiny": "SCRUTINIO LIVE",
+  "partialRanking": "CLASSIFICA PARZIALE",
+  "generatedWith": "Generato con Voto Tracker",
+  "countedShort": "Scrutinate"
 }

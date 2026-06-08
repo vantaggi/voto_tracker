@@ -125,5 +125,10 @@ lo stato iniziale; ogni voto aggiunge uno snapshot. Consumato da
 - **Confine localizzazione / dati:** si localizza solo a **display time**.
   L'identità resta su `enum` (`CandidateType`, `WinnerStatus`); i nomi dei
   candidati reali sono **dati editabili** (non tradotti), mentre schede
-  bianche/nulle e label vincitore si traducono dall'enum. Provider e servizi di
-  export restano in italiano (`AppStrings`) perché privi di contesto.
+  bianche/nulle e label vincitore si traducono dall'enum.
+- **Export senza contesto:** PDF, immagine social e testo di condivisione girano
+  fuori dall'albero dei widget. Le loro stringhe sono risolte in `home_page` con
+  `ExportLabels.of(context.l10n)` e **iniettate** nei servizi
+  (`PdfExportService`, `SocialShareService`/`SocialResultsCard`). `AppStrings`
+  resta solo per i semi-dati non localizzati (brand, nomi di default, etichette
+  IT dei getter retro-compatibili `winner`/`winnerLabel`).
