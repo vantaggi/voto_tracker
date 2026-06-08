@@ -228,11 +228,14 @@ class ControlButtons extends StatelessWidget {
               ],
             ),
 
-            // Reset (Hold to delete)
-            _HoldToResetButton(onReset: () {
-                 provider.reset();
-                 HapticFeedback.heavyImpact();
-            }),
+            // Reset (Hold to delete) — Flexible così la label lunga (es. in
+            // italiano) si comprime invece di mandare la Row in overflow.
+            Flexible(
+              child: _HoldToResetButton(onReset: () {
+                   provider.reset();
+                   HapticFeedback.heavyImpact();
+              }),
+            ),
           ],
         ),
       ),
@@ -288,10 +291,18 @@ class _HoldToResetButtonState extends State<_HoldToResetButton> with SingleTicke
              ),
              padding: const EdgeInsets.symmetric(horizontal: 20),
              child: Row(
+               mainAxisSize: MainAxisSize.min,
                children: [
                  Icon(Icons.delete_forever, color: colorScheme.error),
                  const SizedBox(width: 8),
-                 Text(context.l10n.resetButton, style: TextStyle(color: colorScheme.error, fontWeight: FontWeight.bold))
+                 Flexible(
+                   child: Text(
+                     context.l10n.resetButton,
+                     maxLines: 1,
+                     overflow: TextOverflow.ellipsis,
+                     style: TextStyle(color: colorScheme.error, fontWeight: FontWeight.bold),
+                   ),
+                 )
                ],
              )
            ),

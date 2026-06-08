@@ -18,6 +18,12 @@ Le sezioni sono generate dai commit convenzionali (vedi
   duplicati) ed etichette dei candidati orizzontali con ellissi al posto dei
   nomi ruotati e illeggibili.
 
+### 🐞 Bug Fix
+- Corretto l'overflow della barra dei controlli quando la label del reset è più
+  lunga (es. in italiano "Tieni premuto per resettare"): il bottone ora si
+  comprime con ellissi. Aggiunto `navigatorKey` stabile e test di interazione
+  (apri/chiudi e cambio lingua delle impostazioni) per prevenire regressioni.
+
 ## [1.2.0] - 2026-06-09
 
 ### 🚀 Nuove Funzionalità
