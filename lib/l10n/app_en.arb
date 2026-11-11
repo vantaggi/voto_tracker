@@ -90,5 +90,12 @@
   "countedShort": "Counted",
   "appearance": "Appearance",
   "useSystemColors": "System colors",
-  "useSystemColorsSubtitle": "Use the colors of your wallpaper (Android 12+)"
+  "useSystemColorsSubtitle": "Use the colors of your wallpaper (Android 12+)",
+  "addVoteFor": "Add a vote to {name}",
+  "@addVoteFor": {"placeholders": {"name": {"type": "String"}}},
+  "removeVoteFor": "Remove a vote from {name}",
+  "@removeVoteFor": {"placeholders": {"name": {"type": "String"}}},
+  "candidateVotesSemantics": "{name}: {votes} votes",
+  "@candidateVotesSemantics": {"placeholders": {"name": {"type": "String"}, "votes": {"type": "int"}}},
+  "resetSemanticsHint": "Hold to reset the count"
 }

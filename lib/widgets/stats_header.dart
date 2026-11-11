@@ -79,22 +79,26 @@ class StatsHeader extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildStatItem(
-                    context,
-                    Icons.how_to_vote_outlined,
-                    l10n.scrutinisedVotes,
-                    '${provider.totalVotesAssigned} / ${provider.settings.totalVoters}',
+                  Expanded(
+                    child: _buildStatItem(
+                      context,
+                      Icons.how_to_vote_outlined,
+                      l10n.scrutinisedVotes,
+                      '${provider.totalVotesAssigned} / ${provider.settings.totalVoters}',
+                    ),
                   ),
                   Container(
                     height: 48,
                     width: 1,
                     color: colorScheme.outlineVariant,
                   ),
-                  _buildStatItem(
-                    context,
-                    Icons.pending_outlined,
-                    l10n.remaining,
-                    '${provider.remainingVotes}',
+                  Expanded(
+                    child: _buildStatItem(
+                      context,
+                      Icons.pending_outlined,
+                      l10n.remaining,
+                      '${provider.remainingVotes}',
+                    ),
                   ),
                 ],
               ),
@@ -123,11 +127,13 @@ class StatsHeader extends StatelessWidget {
         const SizedBox(height: AppSpacing.xs),
         Text(
           value,
+          textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.titleLarge
               ?.copyWith(fontWeight: FontWeight.bold),
         ),
         Text(
           label,
+          textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodySmall
               ?.copyWith(color: colorScheme.onSurfaceVariant),
         ),
@@ -156,11 +162,13 @@ class StatsHeader extends StatelessWidget {
         children: [
           Icon(Icons.info_outline, size: 16, color: colorScheme.primary),
           const SizedBox(width: AppSpacing.s),
-          Text(
-            context.l10n.votesToWin(provider.votesUntilMajority ?? 0),
-            style: TextStyle(
-              color: colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w500,
+          Flexible(
+            child: Text(
+              context.l10n.votesToWin(provider.votesUntilMajority ?? 0),
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],

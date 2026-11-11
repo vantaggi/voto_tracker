@@ -114,60 +114,69 @@ class _HoldToResetButtonState extends State<_HoldToResetButton>
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return GestureDetector(
-      onLongPressDown: (_) => _controller.forward(),
-      onLongPressEnd: (_) => _controller.reverse(),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Background container
-          Container(
-            height: AppTouch.minTarget,
-            decoration: BoxDecoration(
-              color: colorScheme.errorContainer,
-              borderRadius: BorderRadius.circular(
-                AppShapes.extraLargeCard,
-              ), // Stadium
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lPlus),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.delete_forever, color: colorScheme.error),
-                const SizedBox(width: AppSpacing.s),
-                Flexible(
-                  child: Text(
-                    context.l10n.resetButton,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: colorScheme.error,
-                      fontWeight: FontWeight.bold,
+    // Per i lettori di schermo il gesto "tieni premuto" diventa un'azione
+    // long press esplicita, con un suggerimento parlato.
+    return Semantics(
+      button: true,
+      label: context.l10n.resetButton,
+      hint: context.l10n.resetSemanticsHint,
+      onLongPress: widget.onReset,
+      excludeSemantics: true,
+      child: GestureDetector(
+        onLongPressDown: (_) => _controller.forward(),
+        onLongPressEnd: (_) => _controller.reverse(),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Background container
+            Container(
+              height: AppTouch.minTarget,
+              decoration: BoxDecoration(
+                color: colorScheme.errorContainer,
+                borderRadius: BorderRadius.circular(
+                  AppShapes.extraLargeCard,
+                ), // Stadium
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lPlus),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.delete_forever, color: colorScheme.error),
+                  const SizedBox(width: AppSpacing.s),
+                  Flexible(
+                    child: Text(
+                      context.l10n.resetButton,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: colorScheme.error,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          // Fill animation (clipped)
-          Positioned.fill(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(AppShapes.extraLargeCard),
-              child: AnimatedBuilder(
-                animation: _controller,
-                builder: (context, child) {
-                  return FractionallySizedBox(
-                    widthFactor: _controller.value,
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      color: colorScheme.error.withValues(alpha: 0.3),
-                    ),
-                  );
-                },
+                ],
               ),
             ),
-          ),
-        ],
+            // Fill animation (clipped)
+            Positioned.fill(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(AppShapes.extraLargeCard),
+                child: AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, child) {
+                    return FractionallySizedBox(
+                      widthFactor: _controller.value,
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        color: colorScheme.error.withValues(alpha: 0.3),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

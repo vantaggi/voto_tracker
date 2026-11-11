@@ -547,6 +547,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Use the colors of your wallpaper (Android 12+)'**
   String get useSystemColorsSubtitle;
+
+  /// No description provided for @addVoteFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a vote to {name}'**
+  String addVoteFor(String name);
+
+  /// No description provided for @removeVoteFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove a vote from {name}'**
+  String removeVoteFor(String name);
+
+  /// No description provided for @candidateVotesSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: {votes} votes'**
+  String candidateVotesSemantics(String name, int votes);
+
+  /// No description provided for @resetSemanticsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold to reset the count'**
+  String get resetSemanticsHint;
 }
 
 class _AppLocalizationsDelegate

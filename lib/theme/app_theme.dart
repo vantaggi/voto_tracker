@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:voto_tracker/theme/trend_colors.dart';
 
@@ -39,6 +40,17 @@ class AppTheme {
 
       // App Bar - Center Aligned, Surface Color
       appBarTheme: AppBarTheme(
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          systemNavigationBarColor: Colors.transparent,
+          systemNavigationBarContrastEnforced: false,
+          statusBarIconBrightness: brightness == Brightness.light
+              ? Brightness.dark
+              : Brightness.light,
+          systemNavigationBarIconBrightness: brightness == Brightness.light
+              ? Brightness.dark
+              : Brightness.light,
+        ),
         backgroundColor: colorScheme.surface,
         surfaceTintColor:
             Colors.transparent, // Avoid tint on scroll for cleaner look

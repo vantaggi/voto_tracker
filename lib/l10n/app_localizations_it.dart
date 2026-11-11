@@ -236,4 +236,22 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get useSystemColorsSubtitle =>
       'Usa i colori dello sfondo del telefono (Android 12+)';
+
+  @override
+  String addVoteFor(String name) {
+    return 'Aggiungi un voto a $name';
+  }
+
+  @override
+  String removeVoteFor(String name) {
+    return 'Togli un voto a $name';
+  }
+
+  @override
+  String candidateVotesSemantics(String name, int votes) {
+    return '$name: $votes voti';
+  }
+
+  @override
+  String get resetSemanticsHint => 'Tieni premuto per azzerare lo scrutinio';
 }

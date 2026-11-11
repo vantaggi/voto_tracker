@@ -45,35 +45,41 @@ class HomePage extends StatelessWidget {
             ),
           ],
         ),
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            // Only switch to side-by-side if we have enough width AND height
-            if (constraints.maxWidth > 800 && constraints.maxHeight > 500) {
-              // Desktop / Tablet Landscape
-              return const Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(flex: 3, child: ChartsSection()),
-                  VerticalDivider(width: 1),
-                  Expanded(flex: 2, child: CandidatesSection()),
-                ],
-              );
-            } else {
-              // Mobile
-              return const SingleChildScrollView(
-                child: Column(
+        // Edge-to-edge: l'AppBar gestisce l'inset in alto, la barra dei
+        // controlli quello in basso; qui restano i lati (notch in orizzontale).
+        body: SafeArea(
+          top: false,
+          bottom: false,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // Only switch to side-by-side if we have enough width AND height
+              if (constraints.maxWidth > 800 && constraints.maxHeight > 500) {
+                // Desktop / Tablet Landscape
+                return const Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(
-                      height: AppDimensions.chartsSectionHeight,
-                      child: ChartsSection(),
-                    ),
-                    Divider(height: 1),
-                    CandidatesSection(isScrollable: false),
+                    Expanded(flex: 3, child: ChartsSection()),
+                    VerticalDivider(width: 1),
+                    Expanded(flex: 2, child: CandidatesSection()),
                   ],
-                ),
-              );
-            }
-          },
+                );
+              } else {
+                // Mobile
+                return const SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: AppDimensions.chartsSectionHeight,
+                        child: ChartsSection(),
+                      ),
+                      Divider(height: 1),
+                      CandidatesSection(isScrollable: false),
+                    ],
+                  ),
+                );
+              }
+            },
+          ),
         ),
       ),
     );

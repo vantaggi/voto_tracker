@@ -23,6 +23,7 @@ class CandidateCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final l10n = context.l10n;
     final trend = TrendColors.of(context);
+    final name = localizedCandidateName(l10n, candidate);
 
     final provider = context.watch<ScrutinyProvider>();
     final totalVotes = provider.totalVotesAssigned;
@@ -107,26 +108,30 @@ class CandidateCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: AppSpacing.l),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Text(
-                    '${candidate.votes}',
-                    style: theme.textTheme.displayMedium?.copyWith(
-                      color: colorScheme.onSurface,
-                      fontWeight: FontWeight.w800,
+              Semantics(
+                label: l10n.candidateVotesSemantics(name, candidate.votes),
+                excludeSemantics: true,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      '${candidate.votes}',
+                      style: theme.textTheme.displayMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: AppSpacing.s),
-                  Text(
-                    l10n.votes,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
+                    const SizedBox(width: AppSpacing.s),
+                    Text(
+                      l10n.votes,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               // Swing Analysis Display
               if (delta != null)
@@ -196,7 +201,11 @@ class CandidateCard extends StatelessWidget {
                       padding: EdgeInsets.zero,
                       shape: const CircleBorder(), // Circular buttons for +/-
                     ),
-                    child: const Icon(Icons.remove, size: 28),
+                    child: Icon(
+                      Icons.remove,
+                      size: 28,
+                      semanticLabel: l10n.removeVoteFor(name),
+                    ),
                   ),
 
                   const SizedBox(width: AppSpacing.xxl),
@@ -218,7 +227,11 @@ class CandidateCard extends StatelessWidget {
                       elevation: 2,
                       shape: const CircleBorder(), // Circular buttons for +/-
                     ),
-                    child: const Icon(Icons.add, size: 36),
+                    child: Icon(
+                      Icons.add,
+                      size: 36,
+                      semanticLabel: l10n.addVoteFor(name),
+                    ),
                   ),
                 ],
               ),

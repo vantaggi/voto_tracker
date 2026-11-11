@@ -90,5 +90,12 @@
   "countedShort": "Scrutinate",
   "appearance": "Aspetto",
   "useSystemColors": "Colori di sistema",
-  "useSystemColorsSubtitle": "Usa i colori dello sfondo del telefono (Android 12+)"
+  "useSystemColorsSubtitle": "Usa i colori dello sfondo del telefono (Android 12+)",
+  "addVoteFor": "Aggiungi un voto a {name}",
+  "@addVoteFor": {"placeholders": {"name": {"type": "String"}}},
+  "removeVoteFor": "Togli un voto a {name}",
+  "@removeVoteFor": {"placeholders": {"name": {"type": "String"}}},
+  "candidateVotesSemantics": "{name}: {votes} voti",
+  "@candidateVotesSemantics": {"placeholders": {"name": {"type": "String"}, "votes": {"type": "int"}}},
+  "resetSemanticsHint": "Tieni premuto per azzerare lo scrutinio"
 }

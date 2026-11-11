@@ -236,4 +236,22 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get useSystemColorsSubtitle =>
       'Use the colors of your wallpaper (Android 12+)';
+
+  @override
+  String addVoteFor(String name) {
+    return 'Add a vote to $name';
+  }
+
+  @override
+  String removeVoteFor(String name) {
+    return 'Remove a vote from $name';
+  }
+
+  @override
+  String candidateVotesSemantics(String name, int votes) {
+    return '$name: $votes votes';
+  }
+
+  @override
+  String get resetSemanticsHint => 'Hold to reset the count';
 }

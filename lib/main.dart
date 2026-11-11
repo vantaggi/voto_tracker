@@ -1,4 +1,5 @@
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:voto_tracker/l10n/app_localizations.dart';
@@ -15,6 +16,10 @@ import 'package:voto_tracker/theme/app_theme.dart';
 final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Edge-to-edge (obbligatorio da Android 15): l'app disegna sotto le barre di
+  // sistema, che restano trasparenti; gli inset li gestiscono AppBar e SafeArea.
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   runApp(const VotoTrackerApp());
 }
 
