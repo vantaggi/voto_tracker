@@ -351,4 +351,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get quorumPercentLabel => 'Quorum (%)';
+
+  @override
+  String get ballotReadingTitle => 'Ballot reading';
+
+  @override
+  String ballotNumber(int n, int total) {
+    return 'Ballot $n of $total';
+  }
+
+  @override
+  String ballotLast(String name) {
+    return 'Last: $name';
+  }
+
+  @override
+  String get ballotUndo => 'Undo last';
+
+  @override
+  String get countingComplete => 'Count completed';
+
+  @override
+  String get ballotHint => 'Tap the name written on the ballot';
 }

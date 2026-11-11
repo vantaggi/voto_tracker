@@ -739,6 +739,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Quorum (%)'**
   String get quorumPercentLabel;
+
+  /// No description provided for @ballotReadingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ballot reading'**
+  String get ballotReadingTitle;
+
+  /// No description provided for @ballotNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Ballot {n} of {total}'**
+  String ballotNumber(int n, int total);
+
+  /// No description provided for @ballotLast.
+  ///
+  /// In en, this message translates to:
+  /// **'Last: {name}'**
+  String ballotLast(String name);
+
+  /// No description provided for @ballotUndo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo last'**
+  String get ballotUndo;
+
+  /// No description provided for @countingComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Count completed'**
+  String get countingComplete;
+
+  /// No description provided for @ballotHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the name written on the ballot'**
+  String get ballotHint;
 }
 
 class _AppLocalizationsDelegate

@@ -352,4 +352,26 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get quorumPercentLabel => 'Quorum (%)';
+
+  @override
+  String get ballotReadingTitle => 'Lettura schede';
+
+  @override
+  String ballotNumber(int n, int total) {
+    return 'Scheda $n di $total';
+  }
+
+  @override
+  String ballotLast(String name) {
+    return 'Ultima: $name';
+  }
+
+  @override
+  String get ballotUndo => 'Annulla ultima';
+
+  @override
+  String get countingComplete => 'Scrutinio completato';
+
+  @override
+  String get ballotHint => 'Tocca il nome scritto sulla scheda';
 }

@@ -6,6 +6,7 @@ import 'package:voto_tracker/widgets/candidates_section.dart';
 import 'package:voto_tracker/widgets/export_sheet.dart';
 import 'package:voto_tracker/widgets/keep_screen_on.dart';
 import 'package:voto_tracker/screens/settings_dialog.dart';
+import 'package:voto_tracker/screens/ballot_reading_screen.dart';
 import 'package:voto_tracker/screens/projector_mode_screen.dart';
 
 class HomePage extends StatelessWidget {
@@ -24,6 +25,16 @@ class HomePage extends StatelessWidget {
               icon: const Icon(Icons.ios_share),
               tooltip: l10n.exportShareTooltip,
               onPressed: () => showExportSheet(context),
+            ),
+            IconButton(
+              icon: const Icon(Icons.ballot_outlined),
+              tooltip: l10n.ballotReadingTitle,
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const BallotReadingScreen(),
+                ),
+              ),
             ),
             IconButton(
               icon: const Icon(Icons.tv),
