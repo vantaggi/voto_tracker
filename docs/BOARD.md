@@ -83,7 +83,7 @@ telefono resta da fare (vedi PR).
 | DOC-006 | **Docs allineate** alla Wave 4 | ✅ Fatto | 🟢 Bassa | 🟢 Basso | - | |
 | FEAT-007 | **Widget home screen / Quick Settings tile** | 📅 Pianificato | 🟢 Bassa | 🟡 Medio | - | Codice nativo, rimandato (piano, Fase 4) |
 | FEAT-008 | **Liste e preferenze** (voto di lista) | 📅 Pianificato | 🟢 Bassa | 🔴 Alto | - | Cambia il modello dati, serve una spec |
-| FIX-006 | **Dialog modifica candidato:** controller liberati prima della fine dell'animazione | 📅 Pianificato | 🟢 Bassa | 🟢 Basso | - | Stesso problema corretto nel dialog di rinomina dell'archivio |
+| FIX-006 | **Dialog modifica candidato:** controller liberati prima della fine dell'animazione | ✅ Fatto | 🔴 Alta | 🟢 Basso | - | Schermo rosso sul telefono alla prima prova; riprodotto e coperto da `test/edit_candidate_dialog_test.dart` |
 
 ## Convenzioni ID
 

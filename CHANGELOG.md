@@ -52,6 +52,9 @@ Le sezioni sono generate dai commit convenzionali (vedi
   nomi ruotati e illeggibili.
 
 ### 🐞 Bug Fix
+- Chiudere il dialog "Modifica nome" (Salva, Annulla o tocco fuori) mandava
+  l'app in errore (schermo rosso): i campi di testo venivano liberati mentre
+  l'animazione di chiusura li usava ancora.
 - "Mancano N voti per la vittoria" non considera più bianche e nulle come
   leader; a parità di voti la classifica non cambia più ordine a caso.
 - Corretto l'overflow della barra dei controlli quando la label del reset è più
