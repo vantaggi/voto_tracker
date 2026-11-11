@@ -20,6 +20,7 @@ Leggi questi file in QUEST'ORDINE prima di iniziare un task:
 | 4️⃣ | `docs/PROJECT_GUIDE.md` | Architettura, algoritmi, decisioni |
 | 5️⃣ | `docs/DESIGN_SYSTEM.md` | Token UI Material 3 + regole di stile |
 | 6️⃣ | `CHANGELOG.md` | Storico modifiche per versione |
+| ➕ | `CLAUDE.md` | Comandi, definizione di "fatto" e trappole note (per Claude Code) |
 
 ### Regole Assolute
 
