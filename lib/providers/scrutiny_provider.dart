@@ -2,15 +2,13 @@ import 'dart:convert';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:voto_tracker/domain/scrutiny_engine.dart';
 import 'package:voto_tracker/models/candidate.dart';
 import 'package:voto_tracker/models/settings.dart';
 import 'package:voto_tracker/theme/candidate_palette.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
 
-/// Stato del vincitore. Identità stabile (non basata su stringhe):
-/// `mathematical` = vantaggio incolmabile a scrutinio aperto,
-/// `elected` = primo a scrutinio chiuso, `tie` = pareggio finale.
-enum WinnerStatus { none, mathematical, elected, tie }
+export 'package:voto_tracker/domain/scrutiny_engine.dart' show WinnerStatus;
 
 class ScrutinyProvider extends ChangeNotifier {
   List<Candidate> _candidates = [];
@@ -74,26 +72,10 @@ class ScrutinyProvider extends ChangeNotifier {
     }
   }
 
-  // Magic Number calculation (Votes needed to guarantee win vs 2nd place)
-  int? get votesUntilMajority {
-    if (_candidates.isEmpty) return null;
-
-    // Use sorted copy to find actual leader and runner-up
-    final sorted = sortedCandidates;
-    if (sorted.length < 2) {
-      final majorityThreshold = (_settings.totalVoters / 2).floor() + 1;
-      if (sorted[0].votes >= majorityThreshold) return 0;
-      return majorityThreshold - sorted[0].votes;
-    }
-
-    final leader = sorted[0];
-    final second = sorted[1];
-
-    double val = (second.votes + _remainingVotes - leader.votes) / 2;
-    int needed = val.floor() + 1;
-
-    return needed < 0 ? 0 : needed;
-  }
+  /// Magic number: voti che mancano al primo per un vantaggio incolmabile
+  /// sul secondo (vedi [ScrutinyEngine.evaluate]).
+  int? get votesUntilMajority => _votesToWin;
+  int? _votesToWin;
 
   ScrutinyProvider() {
     _loadState();
@@ -196,20 +178,12 @@ class ScrutinyProvider extends ChangeNotifier {
     );
   }
 
-  // NOTE: Replaces old _saveHistory
+  /// Ricalcola i voti rigiocando il registro delle schede.
   void _recalculateState() {
-    // 1. Reset votes to 0
-    for (var c in _candidates) {
-      c.votes = 0;
+    final votes = ScrutinyEngine.tally(_candidates.length, _voteLog);
+    for (var i = 0; i < _candidates.length; i++) {
+      _candidates[i].votes = votes[i];
     }
-
-    // 2. Replay Log
-    for (int candidateIndex in _voteLog) {
-      if (candidateIndex >= 0 && candidateIndex < _candidates.length) {
-        _candidates[candidateIndex].votes++;
-      }
-    }
-
     _calculateResults();
   }
 
@@ -339,83 +313,43 @@ class ScrutinyProvider extends ChangeNotifier {
   }
 
   void _calculateResults() {
-    // DO NOT sort _candidates in place to prevent UI jumping
-    // Create a shadow list for ranking logic
-    final sortedList = List<Candidate>.from(_candidates);
-    sortedList.sort((a, b) => b.votes.compareTo(a.votes));
-
-    // Assign ranks
-    for (int i = 0; i < sortedList.length; i++) {
-      sortedList[i].rank = i + 1;
+    // L'ordine di _candidates non cambia mai (la UI non deve "saltare"):
+    // la classifica è nel campo rank.
+    final outcome = ScrutinyEngine.evaluate(
+      types: [for (final c in _candidates) c.type],
+      votes: [for (final c in _candidates) c.votes],
+      totalVoters: _settings.totalVoters,
+    );
+    for (var i = 0; i < _candidates.length; i++) {
+      _candidates[i].rank = outcome.ranks[i];
     }
-
-    _totalVotesAssigned = _candidates.fold(0, (sum, c) => sum + c.votes);
-    _remainingVotes = _settings.totalVoters - _totalVotesAssigned;
-
-    _winnerName = null;
-    _winnerStatus = WinnerStatus.none;
-
-    final validCandidates = sortedList
-        .where((c) => c.type == CandidateType.normal)
-        .toList();
-
-    if (validCandidates.isEmpty) return;
-
-    // Winner Calculation Logic (same as before)
-    if (validCandidates.length >= 2) {
-      final firstPlace = validCandidates[0];
-      final secondPlace = validCandidates[1];
-      final voteGap = firstPlace.votes - secondPlace.votes;
-
-      if (_remainingVotes >= 0 && voteGap > _remainingVotes) {
-        _winnerName = firstPlace.name;
-        _winnerStatus = WinnerStatus.mathematical;
-        // Don't return early, we need to ensure stats are consistent
-      }
-    }
-
-    if (_remainingVotes <= 0 && _totalVotesAssigned > 0) {
-      if (validCandidates.length >= 2 &&
-          validCandidates[0].votes == validCandidates[1].votes &&
-          validCandidates[0].votes > 0) {
-        _winnerName = null;
-        _winnerStatus = WinnerStatus.tie;
-      } else {
-        _winnerName = validCandidates.first.name;
-        _winnerStatus = WinnerStatus.elected;
-      }
-    }
+    _totalVotesAssigned = outcome.totalAssigned;
+    _remainingVotes = outcome.remaining;
+    _winnerStatus = outcome.status;
+    _winnerName = outcome.winnerIndex == null
+        ? null
+        : _candidates[outcome.winnerIndex!].name;
+    _votesToWin = outcome.votesToWin;
   }
 
-  // Getter for sorted candidates (for charts/export)
-  List<Candidate> get sortedCandidates {
-    final list = List<Candidate>.from(_candidates);
-    list.sort((a, b) => b.votes.compareTo(a.votes));
-    return list;
-  }
+  /// Candidati in ordine di classifica (per grafici ed export).
+  List<Candidate> get sortedCandidates => [
+    for (final i in ScrutinyEngine.ranking([
+      for (final c in _candidates) c.votes,
+    ]))
+      _candidates[i],
+  ];
 
+  /// Andamento per i grafici: schede scrutinate → voti per nome.
   Map<int, Map<String, int>> get historyPoints {
-    Map<int, Map<String, int>> points = {};
-
-    // Simulate replay to build graph
-    // Initial state (0 votes or Base if implemented)
-    Map<String, int> currentVotes = {for (var c in _candidates) c.name: 0};
-    int currentTotal = 0;
-
-    // Point 0
-    points[0] = Map.from(currentVotes);
-
-    for (int candidateIndex in _voteLog) {
-      if (candidateIndex >= 0 && candidateIndex < _candidates.length) {
-        String name = _candidates[candidateIndex].name;
-        currentVotes[name] = (currentVotes[name] ?? 0) + 1;
-        currentTotal++;
-
-        // Snapshot at this step
-        points[currentTotal] = Map.from(currentVotes);
-      }
-    }
-    return points;
+    final points = ScrutinyEngine.history(_candidates.length, _voteLog);
+    return {
+      for (var k = 0; k < points.length; k++)
+        k: {
+          for (var i = 0; i < _candidates.length; i++)
+            _candidates[i].name: points[k][i],
+        },
+    };
   }
 
   // Export Data Helper
