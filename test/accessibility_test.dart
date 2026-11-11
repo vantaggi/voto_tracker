@@ -56,6 +56,9 @@ void main() {
       find.bySemanticsLabel(RegExp(r'^Togli un voto a .+')),
       findsNWidgets(cards),
     );
+    // Il pulsante è in fondo alla lista: portalo in vista.
+    await tester.ensureVisible(find.text('TIENI PREMUTO PER RESETTARE'));
+    await tester.pumpAndSettle();
     expect(
       tester.getSemantics(find.bySemanticsLabel('TIENI PREMUTO PER RESETTARE')),
       matchesSemantics(
