@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:voto_tracker/utils/app_constants.dart';
 import 'package:provider/provider.dart';
 import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
@@ -22,7 +23,7 @@ class HistoryChart extends StatelessWidget {
             elevation: 0,
             color: colorScheme.surfaceContainerLow,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(AppShapes.extraLargeCard),
               side: BorderSide(color: colorScheme.outlineVariant),
             ),
             child: Center(
@@ -30,7 +31,7 @@ class HistoryChart extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.show_chart, size: 48, color: colorScheme.outline),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.l),
                   Text(
                     l10n.noHistoryAvailable,
                     style: theme.textTheme.bodyLarge?.copyWith(
@@ -62,11 +63,16 @@ class HistoryChart extends StatelessWidget {
           elevation: 0,
           color: colorScheme.surfaceContainerLow,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(AppShapes.extraLargeCard),
             side: BorderSide(color: colorScheme.outlineVariant),
           ),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 24, 16),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.l,
+              AppSpacing.xl,
+              AppSpacing.xl,
+              AppSpacing.l,
+            ),
             child: LineChart(
               LineChartData(
                 maxY: maxY,

@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:voto_tracker/utils/app_constants.dart';
 import 'package:provider/provider.dart';
 import 'package:voto_tracker/widgets/candidate_card.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
@@ -23,7 +24,12 @@ class CandidatesSection extends StatelessWidget {
             if (isScrollable)
               Expanded(
                 child: ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 80),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.l,
+                    0,
+                    AppSpacing.l,
+                    AppSpacing.bottomBarClearance,
+                  ),
                   physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: provider.candidates.length,
                   itemBuilder: (context, index) {
@@ -37,7 +43,12 @@ class CandidatesSection extends StatelessWidget {
             else
               ListView.builder(
                 shrinkWrap: true,
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 80),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.l,
+                  0,
+                  AppSpacing.l,
+                  AppSpacing.bottomBarClearance,
+                ),
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: provider.candidates.length,
                 itemBuilder: (context, index) {

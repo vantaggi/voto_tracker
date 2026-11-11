@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:voto_tracker/utils/app_constants.dart';
 import 'package:provider/provider.dart';
 import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
@@ -13,19 +14,22 @@ class StatsHeader extends StatelessWidget {
     final l10n = context.l10n;
 
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(AppSpacing.l),
       child: Column(
         children: [
           if (provider.hasWinner)
             Container(
-              margin: const EdgeInsets.only(bottom: 16),
+              margin: const EdgeInsets.only(bottom: AppSpacing.l),
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+              padding: const EdgeInsets.symmetric(
+                vertical: AppSpacing.xl,
+                horizontal: AppSpacing.l,
+              ),
               decoration: BoxDecoration(
                 color: provider.isTie
                     ? colorScheme.tertiaryContainer
                     : colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(AppShapes.extraLargeCard),
                 boxShadow: [
                   BoxShadow(
                     color: colorScheme.shadow.withValues(alpha: 0.1),
@@ -46,13 +50,12 @@ class StatsHeader extends StatelessWidget {
                       letterSpacing: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacing.s),
                   Text(
                     (provider.isTie ? l10n.tie : (provider.winnerName ?? ''))
                         .toUpperCase(),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 32,
+                    style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                       fontWeight: FontWeight.w900,
                       color: provider.isTie
                           ? colorScheme.onTertiaryContainer
@@ -69,7 +72,10 @@ class StatsHeader extends StatelessWidget {
             elevation: 0,
             color: colorScheme.surfaceContainer,
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              padding: const EdgeInsets.symmetric(
+                vertical: AppSpacing.l,
+                horizontal: AppSpacing.l,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -95,7 +101,7 @@ class StatsHeader extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.m),
 
           // Comparison Info
           _buildComparisonInfo(context, provider),
@@ -114,7 +120,7 @@ class StatsHeader extends StatelessWidget {
     return Column(
       children: [
         Icon(icon, color: colorScheme.primary, size: 28),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         Text(
           value,
           style: Theme.of(context).textTheme.titleLarge
@@ -136,17 +142,20 @@ class StatsHeader extends StatelessWidget {
 
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      padding: const EdgeInsets.symmetric(
+        vertical: AppSpacing.s,
+        horizontal: AppSpacing.l,
+      ),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppShapes.medium),
         border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.info_outline, size: 16, color: colorScheme.primary),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.s),
           Text(
             context.l10n.votesToWin(provider.votesUntilMajority ?? 0),
             style: TextStyle(

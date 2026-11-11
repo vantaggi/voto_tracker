@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:voto_tracker/theme/trend_colors.dart';
 
 class AppTheme {
   // Seed Color - Primary
@@ -26,6 +27,7 @@ class AppTheme {
 
     return ThemeData(
       useMaterial3: true,
+      extensions: [TrendColors.forScheme(colorScheme)],
       brightness: brightness,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: colorScheme.surface,

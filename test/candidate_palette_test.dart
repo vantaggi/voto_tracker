@@ -1,4 +1,3 @@
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:voto_tracker/models/candidate.dart';
 import 'package:voto_tracker/theme/app_theme.dart';

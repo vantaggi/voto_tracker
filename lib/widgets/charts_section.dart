@@ -17,7 +17,7 @@ class ChartsSection extends StatelessWidget {
         child: Column(
           children: [
             _buildTabBar(context),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.l),
             const Expanded(
               child: TabBarView(
                 children: [
@@ -38,11 +38,12 @@ class ChartsSection extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Container(
-      height: 48,
-      padding: const EdgeInsets.all(4),
+      // Tab alte almeno 48 dp: area di tocco + padding + bordo da 1.
+      height: AppTouch.minTarget + 2 * (AppSpacing.xs + 1),
+      padding: const EdgeInsets.all(AppSpacing.xs),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppShapes.extraLargeCard),
         border: Border.all(
           color: colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),
@@ -51,7 +52,7 @@ class ChartsSection extends StatelessWidget {
         indicatorSize: TabBarIndicatorSize.tab,
         dividerColor: Colors.transparent,
         indicator: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppShapes.largeIncreased),
           color: colorScheme.primary,
           boxShadow: [
             BoxShadow(

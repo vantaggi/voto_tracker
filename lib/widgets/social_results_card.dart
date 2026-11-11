@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:voto_tracker/utils/app_constants.dart';
 import 'package:voto_tracker/l10n/export_labels.dart';
 import 'package:voto_tracker/models/candidate.dart';
 
@@ -36,7 +37,7 @@ class SocialResultsCard extends StatelessWidget {
           1080 /
           2, // Scaled down for display, will be captured at higher pixel ratio
       height: 1350 / 2, // 4:5 Aspect Ratio (Instagram Portrait)
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.all(AppSpacing.xxl),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         // Subtle gradient overlay for extra polish
@@ -63,7 +64,7 @@ class SocialResultsCard extends StatelessWidget {
                       letterSpacing: 2,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xs),
                   Text(
                     labels.liveScrutiny,
                     style: theme.textTheme.headlineLarge?.copyWith(
@@ -72,7 +73,7 @@ class SocialResultsCard extends StatelessWidget {
                       color: colorScheme.onSurface,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacing.s),
                   Text(
                     "${labels.countedShort}: $totalVotes / $totalVoters (${(totalVotes / (totalVoters == 0 ? 1 : totalVoters) * 100).toStringAsFixed(1)}%)\n${labels.remaining}: $remainingVotes",
                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -88,13 +89,13 @@ class SocialResultsCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: AppSpacing.xxl),
 
           // Winner Badge (if present)
           if (winner != null)
             Container(
-              padding: const EdgeInsets.all(24),
-              margin: const EdgeInsets.only(bottom: 32),
+              padding: const EdgeInsets.all(AppSpacing.xl),
+              margin: const EdgeInsets.only(bottom: AppSpacing.xxl),
               decoration: BoxDecoration(
                 color: colorScheme.primaryContainer,
                 borderRadius: BorderRadius.circular(
@@ -118,7 +119,7 @@ class SocialResultsCard extends StatelessWidget {
                       letterSpacing: 1.5,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xs),
                   Text(
                     winner!.toUpperCase(),
                     style: theme.textTheme.displaySmall?.copyWith(
@@ -134,7 +135,7 @@ class SocialResultsCard extends StatelessWidget {
           // List Header
           if (winner == null)
             Padding(
-              padding: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.only(bottom: AppSpacing.l),
               child: Text(
                 labels.partialRanking,
                 style: theme.textTheme.labelLarge?.copyWith(
@@ -154,16 +155,16 @@ class SocialResultsCard extends StatelessWidget {
                 final bool isFirst = index == 0;
 
                 return Container(
-                  margin: const EdgeInsets.only(bottom: 12),
+                  margin: const EdgeInsets.only(bottom: AppSpacing.m),
                   padding: const EdgeInsets.symmetric(
-                    vertical: 12,
-                    horizontal: 16,
+                    vertical: AppSpacing.m,
+                    horizontal: AppSpacing.l,
                   ),
                   decoration: BoxDecoration(
                     color: isFirst
                         ? colorScheme.surfaceContainerHighest
                         : colorScheme.surfaceContainerLow,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppShapes.large),
                     border: isFirst
                         ? Border.all(
                             color: colorScheme.primary.withValues(alpha: 0.5),
@@ -185,7 +186,7 @@ class SocialResultsCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppSpacing.m),
                       Expanded(
                         child: Text(
                           labels.nameOf(c),
@@ -202,15 +203,15 @@ class SocialResultsCard extends StatelessWidget {
                           color: colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: AppSpacing.l),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
+                          horizontal: AppSpacing.m,
+                          vertical: AppSpacing.xs,
                         ),
                         decoration: BoxDecoration(
                           color: c.color.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(AppShapes.small),
                           border: Border.all(
                             color: c.color.withValues(alpha: 0.5),
                           ),
@@ -231,7 +232,7 @@ class SocialResultsCard extends StatelessWidget {
           ),
 
           const Divider(),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.l),
           Center(
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -241,7 +242,7 @@ class SocialResultsCard extends StatelessWidget {
                   size: 16,
                   color: colorScheme.onSurfaceVariant,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.s),
                 Text(
                   labels.generatedWith,
                   style: theme.textTheme.bodySmall?.copyWith(

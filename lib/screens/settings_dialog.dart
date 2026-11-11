@@ -25,7 +25,9 @@ class _SettingsDialogState extends State<SettingsDialog> {
   void initState() {
     super.initState();
     final settings = context.read<ScrutinyProvider>().settings;
-    _totalVotersController = TextEditingController(text: settings.totalVoters.toString());
+    _totalVotersController = TextEditingController(
+      text: settings.totalVoters.toString(),
+    );
     _participantsCount = settings.participantsCount.toDouble();
     _showBlankVotes = settings.showBlankVotes;
     _showNullVotes = settings.showNullVotes;
@@ -33,8 +35,8 @@ class _SettingsDialogState extends State<SettingsDialog> {
 
   @override
   void dispose() {
-      _totalVotersController.dispose();
-      super.dispose();
+    _totalVotersController.dispose();
+    super.dispose();
   }
 
   @override
@@ -47,10 +49,12 @@ class _SettingsDialogState extends State<SettingsDialog> {
       title: Row(
         children: [
           const Icon(Icons.settings_outlined, size: 28),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.m),
           Expanded(
-            child: Text(l10n.scrutinyConfiguration,
-                style: Theme.of(context).textTheme.headlineSmall),
+            child: Text(
+              l10n.scrutinyConfiguration,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
           ),
         ],
       ),
@@ -59,7 +63,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.s),
             TextFormField(
               controller: _totalVotersController,
               autofocus: true,
@@ -70,22 +74,28 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 hintText: l10n.votersHint,
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: AppSpacing.xxl),
 
             Text(
-                '${l10n.participantsCount}: ${_participantsCount.toInt()}',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)
+              '${l10n.participantsCount}: ${_participantsCount.toInt()}',
+              style: Theme.of(context).textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.s),
             Row(
               children: [
-                Text("${AppStrings.minParticipants}", style: Theme.of(context).textTheme.bodySmall),
+                Text(
+                  "${AppStrings.minParticipants}",
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
                 Expanded(
                   child: Slider(
                     value: _participantsCount,
                     min: AppStrings.minParticipants.toDouble(),
                     max: AppStrings.maxParticipants.toDouble(),
-                    divisions: (AppStrings.maxParticipants - AppStrings.minParticipants),
+                    divisions:
+                        (AppStrings.maxParticipants -
+                        AppStrings.minParticipants),
                     label: _participantsCount.toInt().toString(),
                     onChanged: (value) {
                       setState(() {
@@ -94,45 +104,60 @@ class _SettingsDialogState extends State<SettingsDialog> {
                     },
                   ),
                 ),
-                Text("${AppStrings.maxParticipants}", style: Theme.of(context).textTheme.bodySmall),
+                Text(
+                  "${AppStrings.maxParticipants}",
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
               ],
             ),
 
-            const SizedBox(height: 24),
-            Text(l10n.votingOptions, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.xl),
+            Text(
+              l10n.votingOptions,
+              style: Theme.of(context).textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: AppSpacing.s),
             Card(
               elevation: 0,
-              color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest
+                  .withValues(alpha: 0.5),
               child: Column(
                 children: [
                   SwitchListTile(
                     title: Text(l10n.blankVotes),
                     secondary: const Icon(Icons.check_box_outline_blank),
                     value: _showBlankVotes,
-                    onChanged: (value) => setState(() => _showBlankVotes = value),
+                    onChanged: (value) =>
+                        setState(() => _showBlankVotes = value),
                   ),
                   const Divider(height: 1, indent: 16, endIndent: 16),
                   SwitchListTile(
                     title: Text(l10n.spoiledVotes),
-                     secondary: const Icon(Icons.block),
+                    secondary: const Icon(Icons.block),
                     value: _showNullVotes,
-                    onChanged: (value) => setState(() => _showNullVotes = value),
+                    onChanged: (value) =>
+                        setState(() => _showNullVotes = value),
                   ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 24),
-            Text(l10n.language, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.xl),
+            Text(
+              l10n.language,
+              style: Theme.of(context).textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: AppSpacing.s),
             SegmentedButton<String>(
               showSelectedIcon: false,
               segments: [
                 ButtonSegment(
-                    value: 'system',
-                    label: Text(l10n.languageSystem),
-                    icon: const Icon(Icons.brightness_auto_outlined)),
+                  value: 'system',
+                  label: Text(l10n.languageSystem),
+                  icon: const Icon(Icons.brightness_auto_outlined),
+                ),
                 ButtonSegment(value: 'it', label: Text(l10n.languageItalian)),
                 ButtonSegment(value: 'en', label: Text(l10n.languageEnglish)),
               ],
@@ -144,9 +169,13 @@ class _SettingsDialogState extends State<SettingsDialog> {
               },
             ),
 
-            const SizedBox(height: 24),
-            Text(l10n.appearance, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.xl),
+            Text(
+              l10n.appearance,
+              style: Theme.of(context).textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: AppSpacing.s),
             SwitchListTile(
               title: Text(l10n.useSystemColors),
               subtitle: Text(l10n.useSystemColorsSubtitle),
@@ -156,9 +185,13 @@ class _SettingsDialogState extends State<SettingsDialog> {
                   context.read<AppearanceProvider>().setUseSystemColors(value),
             ),
 
-            const SizedBox(height: 24),
-            Text(l10n.dataManagement, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.xl),
+            Text(
+              l10n.dataManagement,
+              style: Theme.of(context).textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: AppSpacing.s),
 
             // Using OutlinedButtons for secondary actions
             Row(
@@ -168,33 +201,36 @@ class _SettingsDialogState extends State<SettingsDialog> {
                     icon: const Icon(Icons.upload_file),
                     label: Text(l10n.exportLabel),
                     onPressed: () async {
-                       final provider = context.read<ScrutinyProvider>();
-                       await ConfigurationService.exportConfiguration(provider.candidates);
+                      final provider = context.read<ScrutinyProvider>();
+                      await ConfigurationService.exportConfiguration(
+                        provider.candidates,
+                      );
                     },
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.m),
                 Expanded(
                   child: OutlinedButton.icon(
                     icon: const Icon(Icons.download),
                     label: Text(l10n.importLabel),
                     onPressed: () async {
-                       final scrutiny = context.read<ScrutinyProvider>();
-                       final messenger = ScaffoldMessenger.of(context);
-                       final loadedMsg = l10n.configLoaded;
-                       final candidates = await ConfigurationService.importConfiguration();
-                       if (candidates != null && context.mounted) {
-                           Navigator.pop(context); // Close dialog
-                           scrutiny.loadConfiguration(candidates);
-                           messenger.showSnackBar(
-                               SnackBar(content: Text(loadedMsg))
-                           );
-                       }
+                      final scrutiny = context.read<ScrutinyProvider>();
+                      final messenger = ScaffoldMessenger.of(context);
+                      final loadedMsg = l10n.configLoaded;
+                      final candidates =
+                          await ConfigurationService.importConfiguration();
+                      if (candidates != null && context.mounted) {
+                        Navigator.pop(context); // Close dialog
+                        scrutiny.loadConfiguration(candidates);
+                        messenger.showSnackBar(
+                          SnackBar(content: Text(loadedMsg)),
+                        );
+                      }
                     },
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -203,25 +239,26 @@ class _SettingsDialogState extends State<SettingsDialog> {
           onPressed: () => Navigator.pop(context),
           child: Text(l10n.cancel),
         ),
-        FilledButton.tonal( // Tonal button for save
+        FilledButton.tonal(
+          // Tonal button for save
           onPressed: () {
             final int voters = int.tryParse(_totalVotersController.text) ?? 100;
             final newSettings = Settings(
-                totalVoters: voters,
-                participantsCount: _participantsCount.toInt(),
-                showBlankVotes: _showBlankVotes,
-                showNullVotes: _showNullVotes,
+              totalVoters: voters,
+              participantsCount: _participantsCount.toInt(),
+              showBlankVotes: _showBlankVotes,
+              showNullVotes: _showNullVotes,
             );
 
             final provider = context.read<ScrutinyProvider>();
             FocusScope.of(context).unfocus();
             Navigator.pop(context);
             Future.delayed(const Duration(milliseconds: 150), () {
-                try {
-                   provider.updateSettings(newSettings);
-                } catch(e) {
-                   debugPrint("Error saving settings: $e");
-                }
+              try {
+                provider.updateSettings(newSettings);
+              } catch (e) {
+                debugPrint("Error saving settings: $e");
+              }
             });
           },
           child: Text(l10n.save),

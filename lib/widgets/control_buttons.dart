@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:voto_tracker/utils/app_constants.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:voto_tracker/l10n/l10n_ext.dart';
@@ -13,7 +14,7 @@ class ControlButtons extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.l),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
@@ -40,7 +41,7 @@ class ControlButtons extends StatelessWidget {
                       : null,
                   tooltip: context.l10n.undoTooltip,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.s),
                 IconButton(
                   // Replaced IconButton.tonal
                   style: IconButton.styleFrom(
@@ -121,17 +122,19 @@ class _HoldToResetButtonState extends State<_HoldToResetButton>
         children: [
           // Background container
           Container(
-            height: 48,
+            height: AppTouch.minTarget,
             decoration: BoxDecoration(
               color: colorScheme.errorContainer,
-              borderRadius: BorderRadius.circular(24), // Stadium
+              borderRadius: BorderRadius.circular(
+                AppShapes.extraLargeCard,
+              ), // Stadium
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lPlus),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(Icons.delete_forever, color: colorScheme.error),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.s),
                 Flexible(
                   child: Text(
                     context.l10n.resetButton,
@@ -149,7 +152,7 @@ class _HoldToResetButtonState extends State<_HoldToResetButton>
           // Fill animation (clipped)
           Positioned.fill(
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(AppShapes.extraLargeCard),
               child: AnimatedBuilder(
                 animation: _controller,
                 builder: (context, child) {

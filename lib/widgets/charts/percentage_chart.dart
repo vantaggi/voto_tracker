@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:voto_tracker/utils/app_constants.dart';
 import 'package:provider/provider.dart';
 import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
@@ -23,7 +24,7 @@ class PercentageChart extends StatelessWidget {
             elevation: 0,
             color: colorScheme.surfaceContainerLow,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(AppShapes.extraLargeCard),
               side: BorderSide(color: colorScheme.outlineVariant),
             ),
             child: Center(
@@ -35,7 +36,7 @@ class PercentageChart extends StatelessWidget {
                     size: 48,
                     color: colorScheme.outline,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.l),
                   Text(
                     l10n.noVotesRecorded,
                     style: theme.textTheme.bodyLarge?.copyWith(
@@ -52,11 +53,11 @@ class PercentageChart extends StatelessWidget {
           elevation: 0,
           color: colorScheme.surfaceContainerLow,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(AppShapes.extraLargeCard),
             side: BorderSide(color: colorScheme.outlineVariant),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(AppSpacing.xl),
             child: Stack(
               alignment: Alignment.center,
               children: [
@@ -71,11 +72,11 @@ class PercentageChart extends StatelessWidget {
                         value: candidate.votes.toDouble(),
                         title: '${percentage.toStringAsFixed(1)}%',
                         radius: 70, // Thicker ring
-                        titleStyle: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: CandidatePalette.onColor(candidate.color),
-                        ),
+                        titleStyle: Theme.of(context).textTheme.labelLarge
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: CandidatePalette.onColor(candidate.color),
+                            ),
                         badgeWidget: _buildBadge(
                           context,
                           localizedCandidateName(l10n, candidate),
@@ -124,10 +125,13 @@ class PercentageChart extends StatelessWidget {
   Widget _buildBadge(BuildContext context, String text, Color color) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.s,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppShapes.small),
         border: Border.all(color: color.withValues(alpha: 0.5)),
         boxShadow: [
           BoxShadow(
@@ -139,8 +143,7 @@ class PercentageChart extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: TextStyle(
-          fontSize: 11,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
           color: colorScheme.onSurfaceVariant,
           fontWeight: FontWeight.w600,
         ),

@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:voto_tracker/utils/app_constants.dart';
 import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/widgets/charts_section.dart';
 import 'package:voto_tracker/widgets/candidates_section.dart';
@@ -62,7 +63,10 @@ class HomePage extends StatelessWidget {
               return const SingleChildScrollView(
                 child: Column(
                   children: [
-                    SizedBox(height: 350, child: ChartsSection()),
+                    SizedBox(
+                      height: AppDimensions.chartsSectionHeight,
+                      child: ChartsSection(),
+                    ),
                     Divider(height: 1),
                     CandidatesSection(isScrollable: false),
                   ],

@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:voto_tracker/utils/app_constants.dart';
 import 'package:provider/provider.dart';
 import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
@@ -52,8 +53,8 @@ class ProjectorModeScreen extends StatelessWidget {
                       Expanded(
                         child: ListView.builder(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 32,
-                            vertical: 24,
+                            horizontal: AppSpacing.xxl,
+                            vertical: AppSpacing.xl,
                           ),
                           itemCount: candidates.length,
                           itemBuilder: (context, index) {
@@ -66,7 +67,9 @@ class ProjectorModeScreen extends StatelessWidget {
                                 : 0.0;
 
                             return Container(
-                              margin: const EdgeInsets.only(bottom: 24),
+                              margin: const EdgeInsets.only(
+                                bottom: AppSpacing.xl,
+                              ),
                               height: 100,
                               child: Stack(
                                 children: [
@@ -87,7 +90,7 @@ class ProjectorModeScreen extends StatelessWidget {
                                   // Content
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 24,
+                                      horizontal: AppSpacing.xl,
                                     ),
                                     child: Row(
                                       children: [
@@ -113,18 +116,20 @@ class ProjectorModeScreen extends StatelessWidget {
                                           alignment: Alignment.center,
                                           child: Text(
                                             "${index + 1}",
-                                            style: TextStyle(
-                                              fontSize: 32,
-                                              fontWeight: FontWeight.w900,
-                                              color: index == 0
-                                                  ? colorScheme
-                                                        .onPrimaryContainer
-                                                  : colorScheme
-                                                        .onSurfaceVariant,
-                                            ),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headlineLarge
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.w900,
+                                                  color: index == 0
+                                                      ? colorScheme
+                                                            .onPrimaryContainer
+                                                      : colorScheme
+                                                            .onSurfaceVariant,
+                                                ),
                                           ),
                                         ),
-                                        const SizedBox(width: 24),
+                                        const SizedBox(width: AppSpacing.xl),
                                         // Name
                                         Expanded(
                                           child: Text(
@@ -154,7 +159,7 @@ class ProjectorModeScreen extends StatelessWidget {
                                                     .onSurfaceVariant,
                                               ),
                                         ),
-                                        const SizedBox(width: 32),
+                                        const SizedBox(width: AppSpacing.xxl),
                                         // Votes
                                         Text(
                                           "${candidate.votes}",
@@ -197,7 +202,7 @@ class ProjectorModeScreen extends StatelessWidget {
           : (provider.winnerName ?? '');
 
       return Container(
-        padding: const EdgeInsets.symmetric(vertical: 24),
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
         width: double.infinity,
         decoration: BoxDecoration(
           color: provider.isTie
@@ -234,7 +239,7 @@ class ProjectorModeScreen extends StatelessWidget {
       );
     }
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppSpacing.xl),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -243,7 +248,7 @@ class ProjectorModeScreen extends StatelessWidget {
             color: colorScheme.onSurfaceVariant,
             size: 32,
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: AppSpacing.l),
           Text(
             "${l10n.votesTotal}: ${provider.totalVotesAssigned} / ${provider.settings.totalVoters}",
             style: Theme.of(context).textTheme.headlineSmall

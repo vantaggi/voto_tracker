@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:voto_tracker/utils/app_constants.dart';
 import 'package:provider/provider.dart';
 import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
@@ -23,7 +24,7 @@ class CurrentResultsChart extends StatelessWidget {
                   size: 48,
                   color: Theme.of(context).colorScheme.outline,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.l),
                 Text(
                   l10n.noDataAvailable,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -54,11 +55,16 @@ class CurrentResultsChart extends StatelessWidget {
           elevation: 0,
           color: colorScheme.surfaceContainerLow,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(AppShapes.extraLargeCard),
             side: BorderSide(color: colorScheme.outlineVariant),
           ),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.l,
+              AppSpacing.xl,
+              AppSpacing.l,
+              AppSpacing.l,
+            ),
             child: BarChart(
               BarChartData(
                 alignment: BarChartAlignment.spaceAround,
@@ -76,27 +82,25 @@ class CurrentResultsChart extends StatelessWidget {
                 barTouchData: BarTouchData(
                   touchTooltipData: BarTouchTooltipData(
                     getTooltipColor: (_) => colorScheme.inverseSurface,
-                    tooltipPadding: const EdgeInsets.all(8),
+                    tooltipPadding: const EdgeInsets.all(AppSpacing.s),
                     tooltipMargin: 8,
                     getTooltipItem: (group, groupIndex, rod, rodIndex) =>
                         BarTooltipItem(
                           '${localizedCandidateName(l10n, candidates[groupIndex])}\n',
-                          TextStyle(
+                          Theme.of(context).textTheme.titleSmall!.copyWith(
                             color: colorScheme.onInverseSurface,
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
                           ),
                           children: [
                             TextSpan(
                               text:
                                   '${candidates[groupIndex].votes} ${l10n.votes}',
-                              style: TextStyle(
-                                color: colorScheme.onInverseSurface.withValues(
-                                  alpha: 0.8,
-                                ),
-                                fontSize: 12,
-                                fontWeight: FontWeight.normal,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: colorScheme.onInverseSurface
+                                        .withValues(alpha: 0.8),
+                                    fontWeight: FontWeight.normal,
+                                  ),
                             ),
                           ],
                         ),
@@ -118,7 +122,7 @@ class CurrentResultsChart extends StatelessWidget {
                           candidates[i],
                         );
                         return Padding(
-                          padding: const EdgeInsets.only(top: 8),
+                          padding: const EdgeInsets.only(top: AppSpacing.s),
                           child: SizedBox(
                             width: labelWidth,
                             child: Text(

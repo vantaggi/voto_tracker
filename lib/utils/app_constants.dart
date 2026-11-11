@@ -46,4 +46,41 @@ class AppDimensions {
   static const double statItemPadding = 12.0;
   static const double comparisonBarHeight = 24.0;
   static const double comparisonNameWidth = 80.0;
+  static const double chartsSectionHeight = 350.0;
+}
+
+/// Scala di spaziatura (multipli di 4, griglia M3). Padding, margini e gap nei
+/// widget usano solo questi valori.
+class AppSpacing {
+  AppSpacing._();
+  static const double xs = 4;
+  static const double s = 8;
+  static const double m = 12;
+  static const double l = 16;
+  static const double lPlus = 20;
+  static const double xl = 24;
+  static const double xxl = 32;
+  static const double xxxl = 48;
+
+  /// Spazio in fondo alle liste perché l'ultimo elemento non finisca sotto
+  /// la barra dei controlli.
+  static const double bottomBarClearance = 80;
+}
+
+/// Scala delle forme (raggi degli angoli) Material 3.
+class AppShapes {
+  AppShapes._();
+  static const double extraSmall = 4;
+  static const double small = 8;
+  static const double medium = 12;
+  static const double large = 16;
+  static const double largeIncreased = 20;
+  static const double extraLargeCard = 24;
+  static const double extraLarge = 28;
+}
+
+/// Area minima di tocco (Material e WCAG 2.5.8).
+class AppTouch {
+  AppTouch._();
+  static const double minTarget = 48;
 }
