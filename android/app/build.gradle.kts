@@ -46,6 +46,11 @@ android {
     }
 
     buildTypes {
+        // La build di debug si installa accanto alla versione di release
+        // (firme diverse) senza doverla disinstallare e perdere i dati.
+        debug {
+            applicationIdSuffix = ".debug"
+        }
         release {
             if (keystorePropertiesFile.exists()) {
                 signingConfig = signingConfigs.getByName("release")
