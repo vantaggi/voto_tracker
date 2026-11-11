@@ -6,7 +6,7 @@ l'unico posto dove vive lo stato dei task.
 
 ## 🚀 Stato Corrente: v1.2.0
 
-**Branch attivo:** master · **Ultimo aggiornamento:** 2026-06-09
+**Branch attivo:** claude/project-thread-0j7sox (Fase 1) · **Ultimo aggiornamento:** 2026-11-11
 
 L'app è funzionante e pubblicabile. Backlog Wave 1/1.1/2 completato: kit
 documentale, audit & bugfix, test, redo, performance e i18n IT/EN.
@@ -46,6 +46,21 @@ Esito dell'audit del codice + `dart analyze` (31 issue → 0).
 | TEST-001 | **Test unitari su `ScrutinyProvider`** (vote-log, vincitore, undo) | ✅ Fatto | 🔴 Alta | 🟢 Basso | - | 14 test in `test/`, tutti verdi |
 | FEAT-002 | **Redo** | ✅ Fatto | 🟢 Bassa | 🟢 Basso | - | Redo-stack nel provider; il pulsante UI esistente ora funziona |
 | PERF-001 | **Aggiornamento incrementale dei voti** (no replay a ogni tap) | ✅ Fatto | 🟢 Bassa | 🟢 Basso | - | Da O(voti) a O(candidati) per voto; replay solo su load/reset |
+
+## 🧱 Wave 3 — Modernizzazione, Fase 1: Fondamenta (novembre 2026)
+
+Spec: `specs/fase-1-fondamenta.md`. Piano completo nel documento di modernizzazione.
+
+| ID | Task | Status | Priorità | Rischio | Stima | Note |
+|:--|:--|:--:|:--:|:--:|:--:|:--|
+| INFRA-005a | **Migrazione a `material_ui` / `cupertino_ui`** (Flutter 3.47+) | ✅ Fatto | 🔴 Alta | 🟡 Medio | - | Corretto bug: italiano non riconosciuto con i delegate generati |
+| INFRA-005b | **`flutter_lints` 6** + `dart fix` | ✅ Fatto | 🟡 Media | 🟢 Basso | - | |
+| INFRA-005c | **Dipendenze minori** aggiornate, SDK `^3.13.0` | ✅ Fatto | 🟡 Media | 🟢 Basso | - | |
+| INFRA-005d | **Major:** share_plus 13, file_picker 13, wakelock_plus 1.8, fl_chart 1.3 | 🏗️ In corso | 🟡 Media | 🟡 Medio | - | Codice migrato; da verificare a mano in locale (export, import, grafici, build Android) |
+| REFACTOR-004a | **Wakelock fuori dal `build`** con conteggio delle richieste | ✅ Fatto | 🟡 Media | 🟢 Basso | - | `KeepScreenOn` + `WakelockService` |
+| REFACTOR-004b | **`ExportController`** + `export_sheet.dart` | ✅ Fatto | 🟡 Media | 🟢 Basso | - | `home_page.dart` 167 → 77 righe |
+| REFACTOR-004c | **Split dei widget** sopra 200 righe | ✅ Fatto | 🟢 Bassa | 🟢 Basso | - | Golden della Home invariati |
+| DOC-004 | **Docs allineate** (testi da ARB, `material_ui`, nuova struttura) | ✅ Fatto | 🟢 Bassa | 🟢 Basso | - | |
 
 ## Convenzioni ID
 

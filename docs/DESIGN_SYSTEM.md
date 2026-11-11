@@ -5,7 +5,7 @@ Fonte tecnica: `lib/theme/app_theme.dart` e `AppDimensions` in
 `lib/utils/app_constants.dart`.
 
 > **Regola d'oro:** niente valori hardcoded nei widget. Colori dal `ColorScheme`,
-> dimensioni/raggi da `AppDimensions`, testi da `AppStrings`.
+> dimensioni/raggi da `AppDimensions`, testi dai file ARB via `context.l10n`.
 
 ## 1. Colore
 
@@ -71,7 +71,8 @@ SnackBar (floating, `inverseSurface`).
 
 ## 6. Regole pratiche
 
-- Nuovo testo visibile → aggiungilo a `AppStrings`, poi referenzialo.
+- Nuovo testo visibile → aggiungilo a `lib/l10n/app_en.arb` e `app_it.arb`,
+  rigenera con `flutter gen-l10n` e usalo via `context.l10n`.
 - Nuovo padding/raggio ricorrente → aggiungilo a `AppDimensions`, non inline.
 - Nuovo colore → derivalo dal `ColorScheme`; se serve un colore-dato (es. nuova
   categoria di scheda), documenta la scelta qui.

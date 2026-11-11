@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
@@ -47,12 +47,12 @@ class SocialShareService {
             final file = File('${directory.path}/$fileName');
             await file.writeAsBytes(image);
             
-            await Share.shareXFiles(
-                [XFile(file.path)], 
+            await SharePlus.instance.share(ShareParams(
+                files: [XFile(file.path)],
                 text: winner != null
                     ? '🏆 ${winnerLabel ?? labels.winnerFallback}: $winner!'
                     : '📊 ${labels.liveScrutiny} · ${labels.appTitlePro}'
-            );
+            ));
             
         } catch(e) {
             debugPrint("Error sharing image: $e");

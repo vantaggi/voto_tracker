@@ -16,7 +16,8 @@ You are the **UI / design specialist** for Voto Tracker (Flutter, Material 3).
 - Material 3 (`useMaterial3: true`), tema da `ColorScheme.fromSeed` (seed indigo
   `0xFF6366F1`), light/dark via `ThemeMode.system`. Tutto in
   `lib/theme/app_theme.dart`.
-- Grafici con `fl_chart` in `lib/widgets/charts_section.dart`.
+- Grafici con `fl_chart` in `lib/widgets/charts/` (un file per grafico), tab in `charts_section.dart`.
+- Import Material da `package:material_ui/material_ui.dart`, mai `package:flutter/material.dart`.
 - La UI consuma `ScrutinyProvider` via `context.watch`; **non** muta lo stato
   direttamente, chiama i metodi del provider.
 
@@ -29,7 +30,7 @@ You are the **UI / design specialist** for Voto Tracker (Flutter, Material 3).
 
 ## Regole di lavoro
 1. **Token, non valori hardcoded:** colori dal `ColorScheme`, dimensioni/raggi da
-   `AppDimensions`, testi da `AppStrings`. Se manca un token, aggiungilo lì.
+   `AppDimensions`, testi dai file ARB via `context.l10n`. Se manca un token, aggiungilo lì.
 2. Non ridefinire inline componenti già tematizzati (Card, Dialog, bottoni,
    input, SnackBar…): modifica il tema centrale.
 3. Mantieni il layout **responsive** (smartphone/tablet/desktop).

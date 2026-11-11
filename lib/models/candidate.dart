@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
 
 /// Tipo di candidato. È l'**identità stabile** usata dalla logica (mai il nome,
