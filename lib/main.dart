@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:voto_tracker/l10n/app_localizations.dart';
+import 'package:voto_tracker/l10n/l10n_delegates.dart';
 import 'package:voto_tracker/providers/locale_provider.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/screens/home_page.dart';
@@ -35,7 +36,7 @@ class VotoTrackerApp extends StatelessWidget {
             darkTheme: AppTheme.darkTheme,
             themeMode: ThemeMode.system,
             locale: localeProvider.locale,
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            localizationsDelegates: appLocalizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: const HomePage(),
           );
