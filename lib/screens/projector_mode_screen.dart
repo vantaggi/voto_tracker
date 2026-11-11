@@ -163,11 +163,7 @@ class ProjectorModeScreen extends StatelessWidget {
                                               .displayMedium
                                               ?.copyWith(
                                                 fontWeight: FontWeight.bold,
-                                                color:
-                                                    candidate.color ==
-                                                        Colors.black
-                                                    ? colorScheme.onSurface
-                                                    : candidate.color,
+                                                color: candidate.color,
                                               ),
                                         ),
                                       ],

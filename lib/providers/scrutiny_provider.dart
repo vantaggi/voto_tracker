@@ -1,8 +1,10 @@
 import 'dart:convert';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:voto_tracker/models/candidate.dart';
 import 'package:voto_tracker/models/settings.dart';
+import 'package:voto_tracker/theme/candidate_palette.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
 
 /// Stato del vincitore. Identità stabile (non basata su stringhe):
@@ -74,23 +76,23 @@ class ScrutinyProvider extends ChangeNotifier {
 
   // Magic Number calculation (Votes needed to guarantee win vs 2nd place)
   int? get votesUntilMajority {
-      if (_candidates.isEmpty) return null;
-      
-      // Use sorted copy to find actual leader and runner-up
-      final sorted = sortedCandidates;
-      if (sorted.length < 2) {
-           final majorityThreshold = (_settings.totalVoters / 2).floor() + 1;
-           if (sorted[0].votes >= majorityThreshold) return 0;
-           return majorityThreshold - sorted[0].votes;
-      }
-      
-      final leader = sorted[0];
-      final second = sorted[1];
-      
-      double val = (second.votes + _remainingVotes - leader.votes) / 2;
-      int needed = val.floor() + 1;
-      
-      return needed < 0 ? 0 : needed;
+    if (_candidates.isEmpty) return null;
+
+    // Use sorted copy to find actual leader and runner-up
+    final sorted = sortedCandidates;
+    if (sorted.length < 2) {
+      final majorityThreshold = (_settings.totalVoters / 2).floor() + 1;
+      if (sorted[0].votes >= majorityThreshold) return 0;
+      return majorityThreshold - sorted[0].votes;
+    }
+
+    final leader = sorted[0];
+    final second = sorted[1];
+
+    double val = (second.votes + _remainingVotes - leader.votes) / 2;
+    int needed = val.floor() + 1;
+
+    return needed < 0 ? 0 : needed;
   }
 
   ScrutinyProvider() {
@@ -101,39 +103,37 @@ class ScrutinyProvider extends ChangeNotifier {
   void _initializeCandidates() {
     _candidates = List.generate(
       _settings.participantsCount,
-      (index) {
-          final List<Color> distinctColors = [
-              Colors.red, Colors.blue, Colors.green, Colors.orange, 
-              Colors.purple, Colors.teal, Colors.pink, Colors.brown,
-              Colors.lime, Colors.indigo, Colors.cyan, Colors.deepOrange,
-              Colors.lightGreen, Colors.blueGrey, Colors.amberAccent
-          ];
-          return Candidate(
-            name: '${AppStrings.candidatePrefix} ${index + 1}',
-            votes: 0,
-            color: distinctColors[index % distinctColors.length],
-          );
-      },
+      (index) => Candidate(
+        name: '${AppStrings.candidatePrefix} ${index + 1}',
+        votes: 0,
+        color: CandidatePalette.forIndex(index),
+      ),
     );
     if (_settings.showBlankVotes) {
-      _candidates.add(Candidate(
+      _candidates.add(
+        Candidate(
           name: AppStrings.blankVotes,
           votes: 0,
-          color: Colors.grey,
-          type: CandidateType.blank));
+          color: CandidatePalette.blank,
+          type: CandidateType.blank,
+        ),
+      );
     }
     if (_settings.showNullVotes) {
-      _candidates.add(Candidate(
+      _candidates.add(
+        Candidate(
           name: AppStrings.nullVotes,
           votes: 0,
-          color: Colors.black,
-          type: CandidateType.spoiled));
+          color: CandidatePalette.spoiled,
+          type: CandidateType.spoiled,
+        ),
+      );
     }
   }
 
   Future<void> _loadState() async {
     final prefs = await SharedPreferences.getInstance();
-    
+
     // Load Settings
     final String? settingsJson = prefs.getString('settings');
     if (settingsJson != null) {
@@ -157,28 +157,28 @@ class ScrutinyProvider extends ChangeNotifier {
     } else {
       _initializeCandidates();
     }
-    
+
     // Load Vote Log
     final List<String>? log = prefs.getStringList('vote_log');
     if (log != null) {
-        _voteLog.clear();
-        _voteLog.addAll(log.map((e) => int.parse(e)));
-        // If we have a log, valid candidates votes are strictly derived from it + base
-        // We assume loaded _candidates votes are the "base" if log exists? 
-        // Actually, safer to treat loaded candidates as having "base votes" equal to their current count 
-        // IF the log is empty. If log exists, we might need to reconcile.
-        // Simplified approach: Clear candidates votes, and just replay log.
-        // Assuming no "base" votes for now to ensure graph consistency.
-        // If we want to support editing "base", we need a separate store.
-        // For this task: Everything in graph comes from log.
-        for (var c in _candidates) {
-          c.votes = 0;
-        }
-        _recalculateState();
+      _voteLog.clear();
+      _voteLog.addAll(log.map((e) => int.parse(e)));
+      // If we have a log, valid candidates votes are strictly derived from it + base
+      // We assume loaded _candidates votes are the "base" if log exists?
+      // Actually, safer to treat loaded candidates as having "base votes" equal to their current count
+      // IF the log is empty. If log exists, we might need to reconcile.
+      // Simplified approach: Clear candidates votes, and just replay log.
+      // Assuming no "base" votes for now to ensure graph consistency.
+      // If we want to support editing "base", we need a separate store.
+      // For this task: Everything in graph comes from log.
+      for (var c in _candidates) {
+        c.votes = 0;
+      }
+      _recalculateState();
     } else {
-        // Legacy migration: If no log but we have votes, those are now "base" (invisible to history graph) 
-        // OR we try to reverse engineer? No, simpler to just start fresh or treat as base.
-        // Let's treat current votes as Base Votes so they appear in counts but maybe as a starting flat line
+      // Legacy migration: If no log but we have votes, those are now "base" (invisible to history graph)
+      // OR we try to reverse engineer? No, simpler to just start fresh or treat as base.
+      // Let's treat current votes as Base Votes so they appear in counts but maybe as a starting flat line
     }
 
     _calculateResults();
@@ -190,39 +190,42 @@ class ScrutinyProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('candidates', jsonEncode(_candidates));
     await prefs.setString('settings', jsonEncode(_settings));
-    await prefs.setStringList('vote_log', _voteLog.map((e) => e.toString()).toList());
+    await prefs.setStringList(
+      'vote_log',
+      _voteLog.map((e) => e.toString()).toList(),
+    );
   }
 
   // NOTE: Replaces old _saveHistory
   void _recalculateState() {
-      // 1. Reset votes to 0
-      for (var c in _candidates) {
-        c.votes = 0;
-      }
+    // 1. Reset votes to 0
+    for (var c in _candidates) {
+      c.votes = 0;
+    }
 
-      // 2. Replay Log
-      for (int candidateIndex in _voteLog) {
-          if (candidateIndex >= 0 && candidateIndex < _candidates.length) {
-              _candidates[candidateIndex].votes++;
-          }
+    // 2. Replay Log
+    for (int candidateIndex in _voteLog) {
+      if (candidateIndex >= 0 && candidateIndex < _candidates.length) {
+        _candidates[candidateIndex].votes++;
       }
-      
-      _calculateResults();
+    }
+
+    _calculateResults();
   }
 
   void vote(int index, {bool increment = true}) {
     if (index < 0 || index >= _candidates.length) return;
 
     if (increment) {
-        if (_remainingVotes <= 0) return;
-        _voteLog.add(index);
-        _candidates[index].votes++;
+      if (_remainingVotes <= 0) return;
+      _voteLog.add(index);
+      _candidates[index].votes++;
     } else {
-        // Rimuove l'ultima occorrenza di questo candidato dal log
-        int lastIndex = _voteLog.lastIndexOf(index);
-        if (lastIndex == -1) return; // niente da rimuovere
-        _voteLog.removeAt(lastIndex);
-        _candidates[index].votes--;
+      // Rimuove l'ultima occorrenza di questo candidato dal log
+      int lastIndex = _voteLog.lastIndexOf(index);
+      if (lastIndex == -1) return; // niente da rimuovere
+      _voteLog.removeAt(lastIndex);
+      _candidates[index].votes--;
     }
 
     _redoStack.clear(); // una nuova azione invalida il redo
@@ -235,7 +238,8 @@ class ScrutinyProvider extends ChangeNotifier {
 
   void undo() {
     if (_voteLog.isEmpty) return;
-    final removed = _voteLog.removeLast(); // sposta l'ultima azione sul redo-stack
+    final removed = _voteLog
+        .removeLast(); // sposta l'ultima azione sul redo-stack
     _redoStack.add(removed);
     if (removed >= 0 && removed < _candidates.length) {
       _candidates[removed].votes--;
@@ -247,7 +251,8 @@ class ScrutinyProvider extends ChangeNotifier {
 
   void redo() {
     if (_redoStack.isEmpty) return;
-    final restored = _redoStack.removeLast(); // riapplica l'ultima azione annullata
+    final restored = _redoStack
+        .removeLast(); // riapplica l'ultima azione annullata
     _voteLog.add(restored);
     if (restored >= 0 && restored < _candidates.length) {
       _candidates[restored].votes++;
@@ -265,30 +270,32 @@ class ScrutinyProvider extends ChangeNotifier {
     _persistState();
     notifyListeners();
   }
-  
-  void loadConfiguration(List<Candidate> newCandidates) {
-      _candidates = newCandidates;
-      // Ensure votes are 0 if it's just a config load
-      for (var c in _candidates) {
-          c.votes = 0;
-      }
-      
-      // Update settings participant count if needed
-      final validCount = _candidates.where((c) => c.type == CandidateType.normal).length;
-      if (validCount != _settings.participantsCount) {
-          _settings = Settings(
-              totalVoters: _settings.totalVoters,
-              participantsCount: validCount,
-              showBlankVotes: _candidates.any((c) => c.type == CandidateType.blank),
-              showNullVotes: _candidates.any((c) => c.type == CandidateType.spoiled)
-          );
-      }
 
-      _voteLog.clear();
-      _redoStack.clear();
-      _recalculateState();
-      _persistState();
-      notifyListeners();
+  void loadConfiguration(List<Candidate> newCandidates) {
+    _candidates = newCandidates;
+    // Ensure votes are 0 if it's just a config load
+    for (var c in _candidates) {
+      c.votes = 0;
+    }
+
+    // Update settings participant count if needed
+    final validCount = _candidates
+        .where((c) => c.type == CandidateType.normal)
+        .length;
+    if (validCount != _settings.participantsCount) {
+      _settings = Settings(
+        totalVoters: _settings.totalVoters,
+        participantsCount: validCount,
+        showBlankVotes: _candidates.any((c) => c.type == CandidateType.blank),
+        showNullVotes: _candidates.any((c) => c.type == CandidateType.spoiled),
+      );
+    }
+
+    _voteLog.clear();
+    _redoStack.clear();
+    _recalculateState();
+    _persistState();
+    notifyListeners();
   }
 
   void updateSettings(Settings newSettings) {
@@ -297,17 +304,20 @@ class ScrutinyProvider extends ChangeNotifier {
     // Ideally we should prompt user, but for now we follow simple logic:
     // If participants count changed, reset.
     // If just total voters changed, recalculate.
-    
+
     // We can try to be smart:
-    bool needsReset = _candidates.length != 
-        (newSettings.participantsCount + (newSettings.showBlankVotes ? 1 : 0) + (newSettings.showNullVotes ? 1 : 0));
-        
+    bool needsReset =
+        _candidates.length !=
+        (newSettings.participantsCount +
+            (newSettings.showBlankVotes ? 1 : 0) +
+            (newSettings.showNullVotes ? 1 : 0));
+
     if (needsReset) {
-        reset();
+      reset();
     } else {
-        _calculateResults();
-        _persistState();
-        notifyListeners();
+      _calculateResults();
+      _persistState();
+      notifyListeners();
     }
   }
 
@@ -336,7 +346,7 @@ class ScrutinyProvider extends ChangeNotifier {
 
     // Assign ranks
     for (int i = 0; i < sortedList.length; i++) {
-        sortedList[i].rank = i + 1;
+      sortedList[i].rank = i + 1;
     }
 
     _totalVotesAssigned = _candidates.fold(0, (sum, c) => sum + c.votes);
@@ -345,8 +355,9 @@ class ScrutinyProvider extends ChangeNotifier {
     _winnerName = null;
     _winnerStatus = WinnerStatus.none;
 
-    final validCandidates =
-        sortedList.where((c) => c.type == CandidateType.normal).toList();
+    final validCandidates = sortedList
+        .where((c) => c.type == CandidateType.normal)
+        .toList();
 
     if (validCandidates.isEmpty) return;
 
@@ -378,31 +389,31 @@ class ScrutinyProvider extends ChangeNotifier {
 
   // Getter for sorted candidates (for charts/export)
   List<Candidate> get sortedCandidates {
-      final list = List<Candidate>.from(_candidates);
-      list.sort((a, b) => b.votes.compareTo(a.votes));
-      return list;
+    final list = List<Candidate>.from(_candidates);
+    list.sort((a, b) => b.votes.compareTo(a.votes));
+    return list;
   }
 
   Map<int, Map<String, int>> get historyPoints {
     Map<int, Map<String, int>> points = {};
-    
+
     // Simulate replay to build graph
     // Initial state (0 votes or Base if implemented)
     Map<String, int> currentVotes = {for (var c in _candidates) c.name: 0};
     int currentTotal = 0;
-    
+
     // Point 0
     points[0] = Map.from(currentVotes);
 
     for (int candidateIndex in _voteLog) {
-        if (candidateIndex >= 0 && candidateIndex < _candidates.length) {
-             String name = _candidates[candidateIndex].name;
-             currentVotes[name] = (currentVotes[name] ?? 0) + 1;
-             currentTotal++;
-             
-             // Snapshot at this step
-             points[currentTotal] = Map.from(currentVotes);
-        }
+      if (candidateIndex >= 0 && candidateIndex < _candidates.length) {
+        String name = _candidates[candidateIndex].name;
+        currentVotes[name] = (currentVotes[name] ?? 0) + 1;
+        currentTotal++;
+
+        // Snapshot at this step
+        points[currentTotal] = Map.from(currentVotes);
+      }
     }
     return points;
   }
@@ -412,23 +423,25 @@ class ScrutinyProvider extends ChangeNotifier {
     final buffer = StringBuffer();
     buffer.writeln('Candidato,Voti,Percentuale');
     for (var c in _candidates) {
-      buffer.writeln('${c.name},${c.votes},${c.getPercentage(_totalVotesAssigned).toStringAsFixed(2)}%');
+      buffer.writeln(
+        '${c.name},${c.votes},${c.getPercentage(_totalVotesAssigned).toStringAsFixed(2)}%',
+      );
     }
     buffer.writeln('Totale Voti,$_totalVotesAssigned,');
     buffer.writeln('Votanti Previsti,${_settings.totalVoters},');
     return buffer.toString();
   }
-  
+
   Map<String, dynamic> exportToJson() {
-      return {
-          'candidates': _candidates.map((c) => c.toJson()).toList(),
-          'settings': _settings.toJson(),
-          'stats': {
-              'totalVotes': _totalVotesAssigned,
-              'totalVoters': _settings.totalVoters,
-              'winner': winner,
-              'winnerStatus': _winnerStatus.name
-          }
-      };
+    return {
+      'candidates': _candidates.map((c) => c.toJson()).toList(),
+      'settings': _settings.toJson(),
+      'stats': {
+        'totalVotes': _totalVotesAssigned,
+        'totalVoters': _settings.totalVoters,
+        'winner': winner,
+        'winnerStatus': _winnerStatus.name,
+      },
+    };
   }
 }

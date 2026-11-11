@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
+import 'package:voto_tracker/theme/candidate_palette.dart';
 
 class PercentageChart extends StatelessWidget {
   const PercentageChart({super.key});
@@ -73,7 +74,7 @@ class PercentageChart extends StatelessWidget {
                         titleStyle: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
-                          color: _getContrastColor(candidate.color),
+                          color: CandidatePalette.onColor(candidate.color),
                         ),
                         badgeWidget: _buildBadge(
                           context,
@@ -145,11 +146,5 @@ class PercentageChart extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Color _getContrastColor(Color color) {
-    return ThemeData.estimateBrightnessForColor(color) == Brightness.dark
-        ? Colors.white
-        : Colors.black;
   }
 }

@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:voto_tracker/theme/candidate_palette.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
 
 /// Tipo di candidato. È l'**identità stabile** usata dalla logica (mai il nome,
@@ -43,7 +44,9 @@ class Candidate {
     return Candidate(
       name: json['name'],
       votes: json['votes'],
-      color: Color(json['color']),
+      // CandidatePalette.display: il nero puro delle schede nulle salvate
+      // fino alla 1.2 diventa il grigio scuro della palette.
+      color: CandidatePalette.display(Color(json['color'])),
       type: _typeFromJson(json),
       rank: json['rank'] ?? 0,
       previousPercentage: json['previousPercentage'] != null
