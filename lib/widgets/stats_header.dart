@@ -26,7 +26,7 @@ class StatsHeader extends StatelessWidget {
                 horizontal: AppSpacing.l,
               ),
               decoration: BoxDecoration(
-                color: provider.isTie
+                color: provider.isInconclusive
                     ? colorScheme.tertiaryContainer
                     : colorScheme.primaryContainer,
                 borderRadius: BorderRadius.circular(AppShapes.extraLargeCard),
@@ -43,7 +43,7 @@ class StatsHeader extends StatelessWidget {
                   Text(
                     localizedWinnerLabel(l10n, provider.winnerStatus) ?? '',
                     style: TextStyle(
-                      color: provider.isTie
+                      color: provider.isInconclusive
                           ? colorScheme.onTertiaryContainer
                           : colorScheme.onPrimaryContainer,
                       fontWeight: FontWeight.bold,
@@ -52,12 +52,15 @@ class StatsHeader extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpacing.s),
                   Text(
-                    (provider.isTie ? l10n.tie : (provider.winnerName ?? ''))
-                        .toUpperCase(),
+                    localizedOutcomeHeadline(
+                      l10n,
+                      provider.winnerStatus,
+                      provider.winnerName,
+                    ).toUpperCase(),
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                       fontWeight: FontWeight.w900,
-                      color: provider.isTie
+                      color: provider.isInconclusive
                           ? colorScheme.onTertiaryContainer
                           : colorScheme.onPrimaryContainer,
                       height: 1.1,

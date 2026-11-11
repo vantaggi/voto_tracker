@@ -20,6 +20,10 @@ class _SettingsDialogState extends State<SettingsDialog> {
   late double _participantsCount;
   late bool _showBlankVotes;
   late bool _showNullVotes;
+  late VictoryRule _rule;
+  late bool _quorumOn;
+  late TextEditingController _eligibleController;
+  late TextEditingController _quorumController;
 
   @override
   void initState() {
@@ -31,11 +35,21 @@ class _SettingsDialogState extends State<SettingsDialog> {
     _participantsCount = settings.participantsCount.toDouble();
     _showBlankVotes = settings.showBlankVotes;
     _showNullVotes = settings.showNullVotes;
+    _rule = settings.victoryRule;
+    _quorumOn = settings.hasQuorum;
+    _eligibleController = TextEditingController(
+      text: settings.eligibleVoters?.toString() ?? '',
+    );
+    _quorumController = TextEditingController(
+      text: (settings.quorumPercent ?? 50).toString(),
+    );
   }
 
   @override
   void dispose() {
     _totalVotersController.dispose();
+    _eligibleController.dispose();
+    _quorumController.dispose();
     super.dispose();
   }
 
@@ -144,6 +158,9 @@ class _SettingsDialogState extends State<SettingsDialog> {
             ),
 
             const SizedBox(height: AppSpacing.xl),
+            _buildRulesSection(context),
+
+            const SizedBox(height: AppSpacing.xl),
             Text(
               l10n.language,
               style: Theme.of(context).textTheme.titleMedium
@@ -248,6 +265,13 @@ class _SettingsDialogState extends State<SettingsDialog> {
               participantsCount: _participantsCount.toInt(),
               showBlankVotes: _showBlankVotes,
               showNullVotes: _showNullVotes,
+              victoryRule: _rule,
+              eligibleVoters: _quorumOn
+                  ? int.tryParse(_eligibleController.text)
+                  : null,
+              quorumPercent: _quorumOn
+                  ? int.tryParse(_quorumController.text)?.clamp(1, 100)
+                  : null,
             );
 
             final provider = context.read<ScrutinyProvider>();
@@ -263,6 +287,81 @@ class _SettingsDialogState extends State<SettingsDialog> {
           },
           child: Text(l10n.save),
         ),
+      ],
+    );
+  }
+
+  /// FEAT-005: regola di vittoria e quorum di affluenza.
+  Widget _buildRulesSection(BuildContext context) {
+    final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.victoryRuleTitle,
+          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: AppSpacing.s),
+        SegmentedButton<VictoryRule>(
+          showSelectedIcon: false,
+          segments: [
+            ButtonSegment(
+              value: VictoryRule.plurality,
+              label: Text(l10n.rulePlurality),
+            ),
+            ButtonSegment(
+              value: VictoryRule.absoluteMajority,
+              label: Text(l10n.ruleAbsoluteMajority),
+            ),
+          ],
+          selected: {_rule},
+          onSelectionChanged: (s) => setState(() => _rule = s.first),
+        ),
+        if (_rule == VictoryRule.absoluteMajority)
+          Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.s),
+            child: Text(
+              l10n.ruleAbsoluteMajorityHint,
+              style: textTheme.bodySmall,
+            ),
+          ),
+        const SizedBox(height: AppSpacing.s),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.quorumTitle),
+          subtitle: Text(l10n.quorumSubtitle),
+          value: _quorumOn,
+          onChanged: (v) => setState(() => _quorumOn = v),
+        ),
+        if (_quorumOn)
+          Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: TextField(
+                  key: const ValueKey('eligibleVoters'),
+                  controller: _eligibleController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: l10n.eligibleVotersLabel,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.m),
+              Expanded(
+                flex: 2,
+                child: TextField(
+                  key: const ValueKey('quorumPercent'),
+                  controller: _quorumController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: l10n.quorumPercentLabel,
+                  ),
+                ),
+              ),
+            ],
+          ),
       ],
     );
   }

@@ -1,9 +1,20 @@
 import 'package:voto_tracker/models/candidate.dart';
+import 'package:voto_tracker/models/settings.dart';
 
 /// Stato del vincitore. Identità stabile (non basata su stringhe):
-/// `mathematical` = vantaggio incolmabile a scrutinio aperto,
-/// `elected` = primo a scrutinio chiuso, `tie` = pareggio finale.
-enum WinnerStatus { none, mathematical, elected, tie }
+/// `mathematical` = vittoria già certa a scrutinio aperto,
+/// `elected` = vincitore a scrutinio chiuso, `tie` = pareggio finale,
+/// `noMajority` = maggioranza assoluta non raggiunta (serve un ballottaggio),
+/// `noQuorum` = affluenza sotto il quorum, elezione non valida.
+enum WinnerStatus { none, mathematical, elected, tie, noMajority, noQuorum }
+
+/// Esiti senza un vincitore da proclamare.
+extension WinnerStatusX on WinnerStatus {
+  bool get isInconclusive =>
+      this == WinnerStatus.tie ||
+      this == WinnerStatus.noMajority ||
+      this == WinnerStatus.noQuorum;
+}
 
 /// Esito di uno scrutinio calcolato da [ScrutinyEngine]. Tutti gli indici si
 /// riferiscono all'ordine dei candidati passato all'engine (quello mostrato a
@@ -78,14 +89,17 @@ class ScrutinyEngine {
     return order;
   }
 
-  /// Calcola totali, classifica, vincitore e magic number.
+  /// Calcola totali, classifica, vincitore e magic number secondo [rule].
   ///
   /// Solo i candidati [CandidateType.normal] possono vincere; bianche e nulle
-  /// contano nel totale scrutinato.
+  /// contano nel totale scrutinato. Con [quorumReached] falso nessun
+  /// vincitore viene proclamato ([WinnerStatus.noQuorum]).
   static ScrutinyOutcome evaluate({
     required List<CandidateType> types,
     required List<int> votes,
     required int totalVoters,
+    VictoryRule rule = VictoryRule.plurality,
+    bool quorumReached = true,
   }) {
     assert(types.length == votes.length);
     final order = ranking(votes);
@@ -96,6 +110,7 @@ class ScrutinyEngine {
 
     final total = votes.fold<int>(0, (sum, v) => sum + v);
     final remaining = totalVoters - total;
+    final closed = remaining <= 0 && total > 0;
     final valid = order.where((i) => types[i] == CandidateType.normal).toList();
 
     var status = WinnerStatus.none;
@@ -104,28 +119,45 @@ class ScrutinyEngine {
 
     if (valid.isNotEmpty) {
       final first = votes[valid[0]];
-      if (valid.length >= 2) {
-        final second = votes[valid[1]];
-        // Vantaggio incolmabile: anche se tutte le schede mancanti andassero
-        // al secondo, il primo resterebbe davanti.
-        if (remaining >= 0 && first - second > remaining) {
-          status = WinnerStatus.mathematical;
-          winner = valid[0];
-        }
-        final needed = ((second + remaining - first) / 2).floor() + 1;
-        votesToWin = needed < 0 ? 0 : needed;
-      } else {
-        final majority = (totalVoters / 2).floor() + 1;
-        votesToWin = first >= majority ? 0 : majority - first;
+      final second = valid.length >= 2 ? votes[valid[1]] : null;
+      final tieAtTop = second != null && first == second && first > 0;
+      // Più della metà delle schede attese.
+      final majority = (totalVoters / 2).floor() + 1;
+
+      switch (rule) {
+        case VictoryRule.plurality:
+          if (second != null) {
+            // Vantaggio incolmabile: anche se tutte le schede mancanti
+            // andassero al secondo, il primo resterebbe davanti.
+            if (remaining >= 0 && first - second > remaining) {
+              status = WinnerStatus.mathematical;
+              winner = valid[0];
+            }
+            final needed = ((second + remaining - first) / 2).floor() + 1;
+            votesToWin = needed < 0 ? 0 : needed;
+          } else {
+            votesToWin = first >= majority ? 0 : majority - first;
+          }
+          if (closed) {
+            status = tieAtTop ? WinnerStatus.tie : WinnerStatus.elected;
+            winner = tieAtTop ? null : valid[0];
+          }
+        case VictoryRule.absoluteMajority:
+          votesToWin = first >= majority ? 0 : majority - first;
+          if (first >= majority) {
+            status = closed ? WinnerStatus.elected : WinnerStatus.mathematical;
+            winner = valid[0];
+          } else if (closed) {
+            status = tieAtTop ? WinnerStatus.tie : WinnerStatus.noMajority;
+          } else if (first + remaining < majority) {
+            // Nessuno può più arrivare alla maggioranza.
+            status = WinnerStatus.noMajority;
+          }
       }
 
-      if (remaining <= 0 && total > 0) {
-        final tie =
-            valid.length >= 2 &&
-            votes[valid[0]] == votes[valid[1]] &&
-            votes[valid[0]] > 0;
-        status = tie ? WinnerStatus.tie : WinnerStatus.elected;
-        winner = tie ? null : valid[0];
+      if (!quorumReached && (closed || status != WinnerStatus.none)) {
+        status = WinnerStatus.noQuorum;
+        winner = null;
       }
     }
 

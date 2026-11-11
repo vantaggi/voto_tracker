@@ -197,15 +197,17 @@ class ProjectorModeScreen extends StatelessWidget {
 
     if (provider.hasWinner) {
       final label = localizedWinnerLabel(l10n, provider.winnerStatus) ?? '';
-      final winnerText = provider.isTie
-          ? l10n.tie
-          : (provider.winnerName ?? '');
+      final winnerText = localizedOutcomeHeadline(
+        l10n,
+        provider.winnerStatus,
+        provider.winnerName,
+      );
 
       return Container(
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
         width: double.infinity,
         decoration: BoxDecoration(
-          color: provider.isTie
+          color: provider.isInconclusive
               ? colorScheme.tertiaryContainer
               : colorScheme.primaryContainer,
           borderRadius: const BorderRadius.vertical(
@@ -218,7 +220,7 @@ class ProjectorModeScreen extends StatelessWidget {
             Text(
               label,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                color: provider.isTie
+                color: provider.isInconclusive
                     ? colorScheme.onTertiaryContainer
                     : colorScheme.onPrimaryContainer,
                 fontWeight: FontWeight.bold,
@@ -227,7 +229,7 @@ class ProjectorModeScreen extends StatelessWidget {
             Text(
               winnerText.toUpperCase(),
               style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                color: provider.isTie
+                color: provider.isInconclusive
                     ? colorScheme.onTertiaryContainer
                     : colorScheme.onPrimaryContainer,
                 fontWeight: FontWeight.w900,

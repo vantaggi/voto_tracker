@@ -320,4 +320,36 @@ class AppLocalizationsIt extends AppLocalizations {
   String archiveActions(String title) {
     return 'Azioni per $title';
   }
+
+  @override
+  String get outcomeNoMajority => 'Ballottaggio';
+
+  @override
+  String get outcomeNoQuorum => 'Quorum non raggiunto';
+
+  @override
+  String get victoryRuleTitle => 'Regola di vittoria';
+
+  @override
+  String get rulePlurality => 'Maggioranza relativa';
+
+  @override
+  String get ruleAbsoluteMajority => 'Maggioranza assoluta';
+
+  @override
+  String get ruleAbsoluteMajorityHint =>
+      'Vince chi supera la metà delle schede, bianche e nulle comprese';
+
+  @override
+  String get quorumTitle => 'Quorum di affluenza';
+
+  @override
+  String get quorumSubtitle =>
+      'Valido solo se votano abbastanza aventi diritto';
+
+  @override
+  String get eligibleVotersLabel => 'Aventi diritto';
+
+  @override
+  String get quorumPercentLabel => 'Quorum (%)';
 }

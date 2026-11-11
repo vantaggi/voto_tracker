@@ -7,7 +7,8 @@ import 'package:voto_tracker/models/settings.dart';
 import 'package:voto_tracker/theme/candidate_palette.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
 
-export 'package:voto_tracker/domain/scrutiny_engine.dart' show WinnerStatus;
+export 'package:voto_tracker/domain/scrutiny_engine.dart'
+    show WinnerStatus, WinnerStatusX;
 
 class ScrutinyProvider extends ChangeNotifier {
   List<Candidate> _candidates = [];
@@ -39,6 +40,9 @@ class ScrutinyProvider extends ChangeNotifier {
   WinnerStatus get winnerStatus => _winnerStatus;
   bool get hasWinner => _winnerStatus != WinnerStatus.none;
   bool get isTie => _winnerStatus == WinnerStatus.tie;
+
+  /// Esito senza vincitore (pareggio, maggioranza o quorum non raggiunti).
+  bool get isInconclusive => _winnerStatus.isInconclusive;
   String? get winnerName => _winnerName;
 
   // Stringa di visualizzazione retro-compatibile: nome del vincitore, oppure
@@ -46,6 +50,8 @@ class ScrutinyProvider extends ChangeNotifier {
   String? get winner {
     switch (_winnerStatus) {
       case WinnerStatus.none:
+      case WinnerStatus.noMajority:
+      case WinnerStatus.noQuorum:
         return null;
       case WinnerStatus.tie:
         return AppStrings.tie;
@@ -63,6 +69,8 @@ class ScrutinyProvider extends ChangeNotifier {
       case WinnerStatus.none:
         return null;
       case WinnerStatus.tie:
+      case WinnerStatus.noMajority:
+      case WinnerStatus.noQuorum:
         return AppStrings.finalResult;
       case WinnerStatus.elected:
         return AppStrings.winnerElected;
@@ -341,6 +349,9 @@ class ScrutinyProvider extends ChangeNotifier {
         participantsCount: validCount,
         showBlankVotes: _candidates.any((c) => c.type == CandidateType.blank),
         showNullVotes: _candidates.any((c) => c.type == CandidateType.spoiled),
+        victoryRule: _settings.victoryRule,
+        eligibleVoters: _settings.eligibleVoters,
+        quorumPercent: _settings.quorumPercent,
       );
     }
 
@@ -398,6 +409,8 @@ class ScrutinyProvider extends ChangeNotifier {
       types: [for (final c in _candidates) c.type],
       votes: [for (final c in _candidates) c.votes],
       totalVoters: _settings.totalVoters,
+      rule: _settings.victoryRule,
+      quorumReached: _settings.quorumReached,
     );
     for (var i = 0; i < _candidates.length; i++) {
       _candidates[i].rank = outcome.ranks[i];

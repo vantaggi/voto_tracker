@@ -121,5 +121,15 @@
   "archiveOpened": "Opened “{title}”",
   "@archiveOpened": {"placeholders": {"title": {"type": "String"}}},
   "archiveActions": "Actions for {title}",
-  "@archiveActions": {"placeholders": {"title": {"type": "String"}}}
+  "@archiveActions": {"placeholders": {"title": {"type": "String"}}},
+  "outcomeNoMajority": "Runoff",
+  "outcomeNoQuorum": "Quorum not reached",
+  "victoryRuleTitle": "Victory rule",
+  "rulePlurality": "Plurality",
+  "ruleAbsoluteMajority": "Absolute majority",
+  "ruleAbsoluteMajorityHint": "Wins whoever gets more than half of the ballots, blank and spoiled included",
+  "quorumTitle": "Turnout quorum",
+  "quorumSubtitle": "Valid only if enough eligible voters take part",
+  "eligibleVotersLabel": "Eligible voters",
+  "quorumPercentLabel": "Quorum (%)"
 }

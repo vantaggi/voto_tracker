@@ -121,5 +121,15 @@
   "archiveOpened": "Aperto «{title}»",
   "@archiveOpened": {"placeholders": {"title": {"type": "String"}}},
   "archiveActions": "Azioni per {title}",
-  "@archiveActions": {"placeholders": {"title": {"type": "String"}}}
+  "@archiveActions": {"placeholders": {"title": {"type": "String"}}},
+  "outcomeNoMajority": "Ballottaggio",
+  "outcomeNoQuorum": "Quorum non raggiunto",
+  "victoryRuleTitle": "Regola di vittoria",
+  "rulePlurality": "Maggioranza relativa",
+  "ruleAbsoluteMajority": "Maggioranza assoluta",
+  "ruleAbsoluteMajorityHint": "Vince chi supera la metà delle schede, bianche e nulle comprese",
+  "quorumTitle": "Quorum di affluenza",
+  "quorumSubtitle": "Valido solo se votano abbastanza aventi diritto",
+  "eligibleVotersLabel": "Aventi diritto",
+  "quorumPercentLabel": "Quorum (%)"
 }

@@ -18,7 +18,13 @@ class ExportController {
   final ExportLabels labels;
 
   /// Nome mostrato come vincitore: la label di pareggio in caso di parità.
-  String? get winnerName => _provider.isTie ? _l10n.tie : _provider.winnerName;
+  String? get winnerName => _provider.hasWinner
+      ? localizedOutcomeHeadline(
+          _l10n,
+          _provider.winnerStatus,
+          _provider.winnerName,
+        )
+      : null;
 
   String? get winnerLabel =>
       localizedWinnerLabel(_l10n, _provider.winnerStatus);

@@ -679,6 +679,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Actions for {title}'**
   String archiveActions(String title);
+
+  /// No description provided for @outcomeNoMajority.
+  ///
+  /// In en, this message translates to:
+  /// **'Runoff'**
+  String get outcomeNoMajority;
+
+  /// No description provided for @outcomeNoQuorum.
+  ///
+  /// In en, this message translates to:
+  /// **'Quorum not reached'**
+  String get outcomeNoQuorum;
+
+  /// No description provided for @victoryRuleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Victory rule'**
+  String get victoryRuleTitle;
+
+  /// No description provided for @rulePlurality.
+  ///
+  /// In en, this message translates to:
+  /// **'Plurality'**
+  String get rulePlurality;
+
+  /// No description provided for @ruleAbsoluteMajority.
+  ///
+  /// In en, this message translates to:
+  /// **'Absolute majority'**
+  String get ruleAbsoluteMajority;
+
+  /// No description provided for @ruleAbsoluteMajorityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Wins whoever gets more than half of the ballots, blank and spoiled included'**
+  String get ruleAbsoluteMajorityHint;
+
+  /// No description provided for @quorumTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Turnout quorum'**
+  String get quorumTitle;
+
+  /// No description provided for @quorumSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid only if enough eligible voters take part'**
+  String get quorumSubtitle;
+
+  /// No description provided for @eligibleVotersLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Eligible voters'**
+  String get eligibleVotersLabel;
+
+  /// No description provided for @quorumPercentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Quorum (%)'**
+  String get quorumPercentLabel;
 }
 
 class _AppLocalizationsDelegate

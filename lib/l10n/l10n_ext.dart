@@ -32,7 +32,30 @@ String? localizedWinnerLabel(AppLocalizations l10n, WinnerStatus status) {
     case WinnerStatus.mathematical:
       return l10n.winnerMathematical;
     case WinnerStatus.tie:
+    case WinnerStatus.noMajority:
+    case WinnerStatus.noQuorum:
       return l10n.finalResult;
+  }
+}
+
+/// Testo grande dell'esito: nome del vincitore, "PAREGGIO", "BALLOTTAGGIO"
+/// o "QUORUM NON RAGGIUNTO".
+String localizedOutcomeHeadline(
+  AppLocalizations l10n,
+  WinnerStatus status,
+  String? winnerName,
+) {
+  switch (status) {
+    case WinnerStatus.tie:
+      return l10n.tie;
+    case WinnerStatus.noMajority:
+      return l10n.outcomeNoMajority;
+    case WinnerStatus.noQuorum:
+      return l10n.outcomeNoQuorum;
+    case WinnerStatus.none:
+    case WinnerStatus.elected:
+    case WinnerStatus.mathematical:
+      return winnerName ?? '';
   }
 }
 
