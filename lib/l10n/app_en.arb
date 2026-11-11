@@ -87,5 +87,8 @@
   "liveScrutiny": "LIVE SCRUTINY",
   "partialRanking": "PARTIAL RANKING",
   "generatedWith": "Generated with Voto Tracker",
-  "countedShort": "Counted"
+  "countedShort": "Counted",
+  "appearance": "Appearance",
+  "useSystemColors": "System colors",
+  "useSystemColorsSubtitle": "Use the colors of your wallpaper (Android 12+)"
 }

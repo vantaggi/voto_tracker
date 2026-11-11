@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/models/settings.dart';
+import 'package:voto_tracker/providers/appearance_provider.dart';
 import 'package:voto_tracker/providers/locale_provider.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/services/configuration_service.dart';
@@ -141,6 +142,18 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 final provider = context.read<LocaleProvider>();
                 provider.setLocale(value == 'system' ? null : Locale(value));
               },
+            ),
+
+            const SizedBox(height: 24),
+            Text(l10n.appearance, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            SwitchListTile(
+              title: Text(l10n.useSystemColors),
+              subtitle: Text(l10n.useSystemColorsSubtitle),
+              secondary: const Icon(Icons.palette_outlined),
+              value: context.watch<AppearanceProvider>().useSystemColors,
+              onChanged: (value) =>
+                  context.read<AppearanceProvider>().setUseSystemColors(value),
             ),
 
             const SizedBox(height: 24),

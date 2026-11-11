@@ -87,5 +87,8 @@
   "liveScrutiny": "SCRUTINIO LIVE",
   "partialRanking": "CLASSIFICA PARZIALE",
   "generatedWith": "Generato con Voto Tracker",
-  "countedShort": "Scrutinate"
+  "countedShort": "Scrutinate",
+  "appearance": "Aspetto",
+  "useSystemColors": "Colori di sistema",
+  "useSystemColorsSubtitle": "Usa i colori dello sfondo del telefono (Android 12+)"
 }

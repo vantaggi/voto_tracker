@@ -4,14 +4,24 @@ class AppTheme {
   // Seed Color - Primary
   static const Color primarySeed = Color(0xFF6366F1); // Indigo
 
-  static ThemeData lightTheme = _buildTheme(Brightness.light);
-  static ThemeData darkTheme = _buildTheme(Brightness.dark);
+  /// Temi con il seed del brand: usati quando il colore di sistema non c'è
+  /// (iOS, desktop, Android < 12) o è disattivato, e per l'immagine social.
+  static final ThemeData lightTheme = build(Brightness.light);
+  static final ThemeData darkTheme = build(Brightness.dark);
 
-  static ThemeData _buildTheme(Brightness brightness) {
+  /// Costruisce il tema. Con [systemPrimary] (colore dinamico del sistema) lo
+  /// schema nasce da quel colore con la variante `tonalSpot`, la stessa di
+  /// Material You; senza, dal seed indigo con la variante `fidelity`.
+  /// In entrambi i casi tutti i ruoli M3 (surfaceContainer*, ecc.) sono
+  /// generati da `fromSeed`, così i widget non dipendono da cosa fornisce
+  /// il sistema.
+  static ThemeData build(Brightness brightness, {Color? systemPrimary}) {
     final colorScheme = ColorScheme.fromSeed(
-      seedColor: primarySeed,
+      seedColor: systemPrimary ?? primarySeed,
       brightness: brightness,
-      dynamicSchemeVariant: DynamicSchemeVariant.fidelity, // More vibrant/expressive
+      dynamicSchemeVariant: systemPrimary != null
+          ? DynamicSchemeVariant.tonalSpot
+          : DynamicSchemeVariant.fidelity,
     );
 
     return ThemeData(
@@ -19,7 +29,7 @@ class AppTheme {
       brightness: brightness,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: colorScheme.surface,
-      
+
       // M3 Typography
       textTheme: (brightness == Brightness.light
           ? Typography.material2021().black
@@ -28,7 +38,8 @@ class AppTheme {
       // App Bar - Center Aligned, Surface Color
       appBarTheme: AppBarTheme(
         backgroundColor: colorScheme.surface,
-        surfaceTintColor: Colors.transparent, // Avoid tint on scroll for cleaner look
+        surfaceTintColor:
+            Colors.transparent, // Avoid tint on scroll for cleaner look
         foregroundColor: colorScheme.onSurface,
         centerTitle: true,
         elevation: 0,
@@ -48,10 +59,7 @@ class AppTheme {
         margin: EdgeInsets.zero, // Handle margins in layout
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24), // Expressive Large Shape
-          side: BorderSide(
-            color: colorScheme.outlineVariant, 
-            width: 1
-          ),
+          side: BorderSide(color: colorScheme.outlineVariant, width: 1),
         ),
       ),
 
@@ -59,9 +67,7 @@ class AppTheme {
       dialogTheme: DialogThemeData(
         backgroundColor: colorScheme.surfaceContainerHigh,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         titleTextStyle: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.w600,
@@ -125,7 +131,10 @@ class AppTheme {
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: colorScheme.primary, width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
         labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
         floatingLabelStyle: TextStyle(color: colorScheme.primary),
       ),
@@ -135,9 +144,7 @@ class AppTheme {
         backgroundColor: colorScheme.primaryContainer,
         foregroundColor: colorScheme.onPrimaryContainer,
         elevation: 0, // Flat look usually preferred or low elevation
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
 
       // Sliders & Switches
@@ -168,7 +175,7 @@ class AppTheme {
         thickness: 1,
         space: 1,
       ),
-      
+
       snackBarTheme: SnackBarThemeData(
         backgroundColor: colorScheme.inverseSurface,
         contentTextStyle: TextStyle(color: colorScheme.onInverseSurface),
@@ -177,4 +184,25 @@ class AppTheme {
       ),
     );
   }
+}
+
+/// Coppia di temi effettivi dell'app (colore di sistema o brand), esposta via
+/// Provider alle schermate che forzano un tema (es. proiettore, sempre scuro).
+class AppThemes {
+  const AppThemes({required this.light, required this.dark});
+
+  final ThemeData light;
+  final ThemeData dark;
+
+  static final AppThemes brand = AppThemes(
+    light: AppTheme.lightTheme,
+    dark: AppTheme.darkTheme,
+  );
+
+  factory AppThemes.from({Color? systemPrimary}) => systemPrimary == null
+      ? brand
+      : AppThemes(
+          light: AppTheme.build(Brightness.light, systemPrimary: systemPrimary),
+          dark: AppTheme.build(Brightness.dark, systemPrimary: systemPrimary),
+        );
 }

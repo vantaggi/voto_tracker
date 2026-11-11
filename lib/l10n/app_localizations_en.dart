@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -225,4 +226,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get countedShort => 'Counted';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get useSystemColors => 'System colors';
+
+  @override
+  String get useSystemColorsSubtitle =>
+      'Use the colors of your wallpaper (Android 12+)';
 }

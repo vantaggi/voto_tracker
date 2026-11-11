@@ -14,7 +14,7 @@ class ProjectorModeScreen extends StatelessWidget {
     // but use our Expressive M3 Dark Theme.
     return KeepScreenOn(
       child: Theme(
-        data: AppTheme.darkTheme,
+        data: context.read<AppThemes>().dark,
         child: Builder(
           builder: (context) {
             final colorScheme = Theme.of(context).colorScheme;

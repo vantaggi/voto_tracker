@@ -1,7 +1,9 @@
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:voto_tracker/l10n/app_localizations.dart';
 import 'package:voto_tracker/l10n/l10n_delegates.dart';
+import 'package:voto_tracker/providers/appearance_provider.dart';
 import 'package:voto_tracker/providers/locale_provider.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/screens/home_page.dart';
@@ -25,20 +27,34 @@ class VotoTrackerApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => ScrutinyProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
+        ChangeNotifierProvider(create: (_) => AppearanceProvider()),
       ],
-      child: Consumer<LocaleProvider>(
-        builder: (context, localeProvider, _) {
-          return MaterialApp(
-            navigatorKey: _navigatorKey,
-            onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: ThemeMode.system,
-            locale: localeProvider.locale,
-            localizationsDelegates: appLocalizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: const HomePage(),
+      child: DynamicColorBuilder(
+        builder: (lightDynamic, darkDynamic) {
+          return Consumer2<LocaleProvider, AppearanceProvider>(
+            builder: (context, localeProvider, appearance, _) {
+              final themes = AppThemes.from(
+                systemPrimary: appearance.useSystemColors
+                    ? lightDynamic?.primary
+                    : null,
+              );
+              return Provider<AppThemes>.value(
+                value: themes,
+                child: MaterialApp(
+                  navigatorKey: _navigatorKey,
+                  onGenerateTitle: (context) =>
+                      AppLocalizations.of(context).appTitle,
+                  debugShowCheckedModeBanner: false,
+                  theme: themes.light,
+                  darkTheme: themes.dark,
+                  themeMode: ThemeMode.system,
+                  locale: localeProvider.locale,
+                  localizationsDelegates: appLocalizationsDelegates,
+                  supportedLocales: AppLocalizations.supportedLocales,
+                  home: const HomePage(),
+                ),
+              );
+            },
           );
         },
       ),
