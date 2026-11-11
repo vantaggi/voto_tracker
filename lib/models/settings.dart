@@ -10,12 +10,10 @@ class Settings {
   Settings({
     int totalVoters = 100,
     int participantsCount = 4,
-    bool showBlankVotes = true,
-    bool showNullVotes = true,
+    this._showBlankVotes = true,
+    this._showNullVotes = true,
   })  : _totalVoters = math.max(1, totalVoters),
-        _participantsCount = math.max(AppStrings.minParticipants, participantsCount),
-        _showBlankVotes = showBlankVotes,
-        _showNullVotes = showNullVotes;
+        _participantsCount = math.max(AppStrings.minParticipants, participantsCount);
 
   int get totalVoters => _totalVoters;
   int get participantsCount => _participantsCount;

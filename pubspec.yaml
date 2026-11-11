@@ -9,7 +9,8 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.2.0+5
 
 environment:
-  sdk: ">=3.2.2 <4.0.0"
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 dependencies:
@@ -46,7 +47,7 @@ dev_dependencies:
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^6.0.0
 
 # The following section is specific to Flutter packages.
 flutter:
