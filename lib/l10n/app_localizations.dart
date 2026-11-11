@@ -571,6 +571,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hold to reset the count'**
   String get resetSemanticsHint;
+
+  /// No description provided for @navScrutiny.
+  ///
+  /// In en, this message translates to:
+  /// **'Count'**
+  String get navScrutiny;
+
+  /// No description provided for @navArchive.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get navArchive;
+
+  /// No description provided for @archiveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Count archive'**
+  String get archiveTitle;
+
+  /// No description provided for @newScrutiny.
+  ///
+  /// In en, this message translates to:
+  /// **'New count'**
+  String get newScrutiny;
+
+  /// No description provided for @defaultScrutinyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Count of {date}'**
+  String defaultScrutinyTitle(String date);
+
+  /// No description provided for @archiveOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get archiveOpen;
+
+  /// No description provided for @archiveDuplicate.
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate as template'**
+  String get archiveDuplicate;
+
+  /// No description provided for @archiveRename.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get archiveRename;
+
+  /// No description provided for @archiveDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get archiveDelete;
+
+  /// No description provided for @archiveCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get archiveCurrent;
+
+  /// No description provided for @archiveBallots.
+  ///
+  /// In en, this message translates to:
+  /// **'{counted} of {total} ballots'**
+  String archiveBallots(int counted, int total);
+
+  /// No description provided for @archiveLeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Leading: {name}'**
+  String archiveLeader(String name);
+
+  /// No description provided for @archiveDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this count?'**
+  String get archiveDeleteTitle;
+
+  /// No description provided for @archiveDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'“{title}” and all its ballots will be deleted. This cannot be undone.'**
+  String archiveDeleteBody(String title);
+
+  /// No description provided for @archiveRenameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty for the default title'**
+  String get archiveRenameHint;
+
+  /// No description provided for @scrutinyTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get scrutinyTitleLabel;
+
+  /// No description provided for @archiveOpened.
+  ///
+  /// In en, this message translates to:
+  /// **'Opened “{title}”'**
+  String archiveOpened(String title);
+
+  /// No description provided for @archiveActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions for {title}'**
+  String archiveActions(String title);
 }
 
 class _AppLocalizationsDelegate

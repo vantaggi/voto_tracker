@@ -1,6 +1,7 @@
-import 'package:flutter/widgets.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:voto_tracker/l10n/app_localizations.dart';
 import 'package:voto_tracker/models/candidate.dart';
+import 'package:voto_tracker/models/scrutiny.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
 
 /// Scorciatoia per accedere alle stringhe localizzate: `context.l10n.save`.
@@ -33,4 +34,13 @@ String? localizedWinnerLabel(AppLocalizations l10n, WinnerStatus status) {
     case WinnerStatus.tie:
       return l10n.finalResult;
   }
+}
+
+/// Titolo da mostrare per uno scrutinio: quello scelto dall'utente oppure
+/// "Scrutinio del <data di creazione>".
+String scrutinyDisplayTitle(BuildContext context, Scrutiny s) {
+  final title = s.title;
+  if (title != null && title.isNotEmpty) return title;
+  final date = MaterialLocalizations.of(context).formatMediumDate(s.createdAt);
+  return AppLocalizations.of(context).defaultScrutinyTitle(date);
 }

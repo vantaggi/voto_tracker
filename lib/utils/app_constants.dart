@@ -47,6 +47,9 @@ class AppDimensions {
   static const double comparisonBarHeight = 24.0;
   static const double comparisonNameWidth = 80.0;
   static const double chartsSectionHeight = 350.0;
+
+  /// Sotto questa larghezza: NavigationBar; sopra: NavigationRail (M3).
+  static const double compactBreakpoint = 600.0;
 }
 
 /// Scala di spaziatura (multipli di 4, griglia M3). Padding, margini e gap nei

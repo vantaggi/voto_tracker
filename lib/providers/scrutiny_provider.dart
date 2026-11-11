@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:voto_tracker/data/scrutiny_repository.dart';
 import 'package:voto_tracker/domain/scrutiny_engine.dart';
 import 'package:voto_tracker/models/candidate.dart';
+import 'package:voto_tracker/models/scrutiny.dart';
 import 'package:voto_tracker/models/settings.dart';
 import 'package:voto_tracker/theme/candidate_palette.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
@@ -154,6 +155,106 @@ class ScrutinyProvider extends ChangeNotifier {
       ..clear()
       ..addAll(_voteLog);
     await repository.save(archive);
+  }
+
+  // --- Archivio (FEAT-004) ---------------------------------------------------
+
+  /// Scrutini salvati, dal più recente. Vuoto finché il caricamento non è
+  /// finito.
+  List<Scrutiny> get archive {
+    final items = List<Scrutiny>.of(_archive?.items ?? const []);
+    items.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    return items;
+  }
+
+  /// Id dello scrutinio aperto (`null` durante il caricamento).
+  String? get currentScrutinyId => _archive?.currentId;
+
+  /// Scrutinio aperto (`null` durante il caricamento).
+  Scrutiny? get currentScrutiny => _archive?.current;
+
+  /// Nuovo scrutinio vuoto con le impostazioni di quello aperto.
+  Future<void> newScrutiny() async {
+    final archive = _archive, repository = _repository;
+    if (archive == null || repository == null) return;
+    await _persistState();
+    _settings = Settings.fromJson(_settings.toJson());
+    _initializeCandidates();
+    final t = repository.now();
+    final created = Scrutiny(
+      id: repository.newId(),
+      createdAt: t,
+      updatedAt: t,
+      settings: _settings,
+      candidates: _candidates,
+    );
+    await _openNew(created);
+  }
+
+  /// Nuovo scrutinio con candidati e impostazioni di [id], senza schede.
+  Future<void> duplicateAsTemplate(String id) async {
+    final archive = _archive, repository = _repository;
+    if (archive == null || repository == null) return;
+    await _persistState();
+    final source = archive.items.firstWhere((s) => s.id == id);
+    await _openNew(
+      source.asTemplate(id: repository.newId(), now: repository.now()),
+    );
+  }
+
+  Future<void> _openNew(Scrutiny scrutiny) async {
+    _archive!
+      ..items.add(scrutiny)
+      ..currentId = scrutiny.id;
+    _applyCurrent();
+    await _repository!.save(_archive!);
+    notifyListeners();
+  }
+
+  /// Riapre uno scrutinio dell'archivio.
+  Future<void> openScrutiny(String id) async {
+    final archive = _archive;
+    if (archive == null || archive.currentId == id) return;
+    if (!archive.items.any((s) => s.id == id)) return;
+    await _persistState();
+    archive.currentId = id;
+    _applyCurrent();
+    await _repository!.save(archive);
+    notifyListeners();
+  }
+
+  /// Cambia il titolo; `null` o vuoto torna al titolo predefinito.
+  Future<void> renameScrutiny(String id, String? title) async {
+    final archive = _archive;
+    if (archive == null) return;
+    final trimmed = title?.trim();
+    archive.items.firstWhere((s) => s.id == id).title =
+        (trimmed == null || trimmed.isEmpty) ? null : trimmed;
+    await _repository!.save(archive);
+    notifyListeners();
+  }
+
+  /// Elimina uno scrutinio. Se era quello aperto si apre il più recente fra
+  /// i rimasti; se non ne resta nessuno se ne crea uno nuovo.
+  Future<void> deleteScrutiny(String id) async {
+    final archive = _archive;
+    if (archive == null) return;
+    final wasCurrent = archive.currentId == id;
+    if (wasCurrent && archive.items.length == 1) {
+      await newScrutiny();
+    } else if (!wasCurrent) {
+      await _persistState();
+    }
+    archive.items.removeWhere((s) => s.id == id);
+    if (wasCurrent && archive.currentId == id) {
+      final latest = archive.items.reduce(
+        (a, b) => a.updatedAt.isAfter(b.updatedAt) ? a : b,
+      );
+      archive.currentId = latest.id;
+      _applyCurrent();
+    }
+    await _repository!.save(archive);
+    notifyListeners();
   }
 
   /// Ricalcola i voti rigiocando il registro delle schede.

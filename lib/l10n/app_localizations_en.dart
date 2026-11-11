@@ -254,4 +254,70 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get resetSemanticsHint => 'Hold to reset the count';
+
+  @override
+  String get navScrutiny => 'Count';
+
+  @override
+  String get navArchive => 'Archive';
+
+  @override
+  String get archiveTitle => 'Count archive';
+
+  @override
+  String get newScrutiny => 'New count';
+
+  @override
+  String defaultScrutinyTitle(String date) {
+    return 'Count of $date';
+  }
+
+  @override
+  String get archiveOpen => 'Open';
+
+  @override
+  String get archiveDuplicate => 'Duplicate as template';
+
+  @override
+  String get archiveRename => 'Rename';
+
+  @override
+  String get archiveDelete => 'Delete';
+
+  @override
+  String get archiveCurrent => 'Open';
+
+  @override
+  String archiveBallots(int counted, int total) {
+    return '$counted of $total ballots';
+  }
+
+  @override
+  String archiveLeader(String name) {
+    return 'Leading: $name';
+  }
+
+  @override
+  String get archiveDeleteTitle => 'Delete this count?';
+
+  @override
+  String archiveDeleteBody(String title) {
+    return '“$title” and all its ballots will be deleted. This cannot be undone.';
+  }
+
+  @override
+  String get archiveRenameHint => 'Leave empty for the default title';
+
+  @override
+  String get scrutinyTitleLabel => 'Title';
+
+  @override
+  String archiveOpened(String title) {
+    return 'Opened “$title”';
+  }
+
+  @override
+  String archiveActions(String title) {
+    return 'Actions for $title';
+  }
 }

@@ -7,7 +7,7 @@ import 'package:voto_tracker/l10n/l10n_delegates.dart';
 import 'package:voto_tracker/providers/appearance_provider.dart';
 import 'package:voto_tracker/providers/locale_provider.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
-import 'package:voto_tracker/screens/home_page.dart';
+import 'package:voto_tracker/screens/app_shell.dart';
 import 'package:voto_tracker/theme/app_theme.dart';
 
 /// Chiave stabile del Navigator: sopravvive ai rebuild di `MaterialApp` causati
@@ -56,7 +56,7 @@ class VotoTrackerApp extends StatelessWidget {
                   locale: localeProvider.locale,
                   localizationsDelegates: appLocalizationsDelegates,
                   supportedLocales: AppLocalizations.supportedLocales,
-                  home: const HomePage(),
+                  home: const AppShell(),
                 ),
               );
             },

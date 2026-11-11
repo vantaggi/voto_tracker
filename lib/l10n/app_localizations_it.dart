@@ -254,4 +254,70 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get resetSemanticsHint => 'Tieni premuto per azzerare lo scrutinio';
+
+  @override
+  String get navScrutiny => 'Scrutinio';
+
+  @override
+  String get navArchive => 'Archivio';
+
+  @override
+  String get archiveTitle => 'Archivio scrutini';
+
+  @override
+  String get newScrutiny => 'Nuovo scrutinio';
+
+  @override
+  String defaultScrutinyTitle(String date) {
+    return 'Scrutinio del $date';
+  }
+
+  @override
+  String get archiveOpen => 'Apri';
+
+  @override
+  String get archiveDuplicate => 'Duplica come modello';
+
+  @override
+  String get archiveRename => 'Rinomina';
+
+  @override
+  String get archiveDelete => 'Elimina';
+
+  @override
+  String get archiveCurrent => 'Aperto';
+
+  @override
+  String archiveBallots(int counted, int total) {
+    return '$counted su $total schede';
+  }
+
+  @override
+  String archiveLeader(String name) {
+    return 'In testa: $name';
+  }
+
+  @override
+  String get archiveDeleteTitle => 'Eliminare lo scrutinio?';
+
+  @override
+  String archiveDeleteBody(String title) {
+    return '«$title» e tutte le sue schede verranno eliminati. L\'operazione non si può annullare.';
+  }
+
+  @override
+  String get archiveRenameHint => 'Lascia vuoto per il titolo predefinito';
+
+  @override
+  String get scrutinyTitleLabel => 'Titolo';
+
+  @override
+  String archiveOpened(String title) {
+    return 'Aperto «$title»';
+  }
+
+  @override
+  String archiveActions(String title) {
+    return 'Azioni per $title';
+  }
 }
