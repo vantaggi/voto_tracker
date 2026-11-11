@@ -70,7 +70,7 @@ Implicazioni da rispettare:
 4. **Vittoria matematica anticipata:** se `voteGap(1°, 2°) > remainingVotes`, il
    primo è già vincitore (vantaggio incolmabile).
 5. **Fine scrutinio** (`remainingVotes <= 0`): vincitore = primo, oppure
-   `AppStrings.tie` se i primi due pareggiano con voti > 0.
+   `WinnerStatus.tie` se i primi due pareggiano con voti > 0.
 
 ### 3.2 Magic number — `votesUntilMajority`
 Stima i voti che il leader deve ancora prendere per chiudere i giochi contro il

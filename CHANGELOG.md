@@ -13,6 +13,17 @@ Le sezioni sono generate dai commit convenzionali (vedi
 
 ## [Unreleased]
 
+### 🛠️ Refactoring
+- Migrazione a Flutter 3.50 e ai package `material_ui` / `cupertino_ui` (Material
+  e Cupertino sono usciti dal framework in Flutter 3.47). Corretto un problema
+  che con il nuovo Material faceva ignorare la lingua italiana.
+- Dipendenze aggiornate: `flutter_lints` 6, `share_plus` 13, `file_picker` 13,
+  `wakelock_plus` 1.8, `fl_chart` 1.3 e minori.
+- Lo schermo resta acceso solo mentre Home o proiettore sono aperti (prima il
+  wakelock veniva riattivato a ogni rebuild e mai spento).
+- Esportazioni riunite in `ExportController`; widget grandi divisi in file più
+  piccoli. Aggiunti test sul controller, sul menu export e golden della Home.
+
 ### 🎨 Interfaccia & Design
 - Grafico "Corrente": asse Y con pochi tick leggibili (niente più interi
   duplicati) ed etichette dei candidati orizzontali con ellissi al posto dei

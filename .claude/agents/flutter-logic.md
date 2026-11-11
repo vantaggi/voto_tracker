@@ -25,14 +25,14 @@ You are the **application-logic specialist** for Voto Tracker (Flutter/Dart).
   export CSV/JSON, `historyPoints`, `votesUntilMajority`.
 - `lib/models/candidate.dart`, `lib/models/settings.dart` — modelli + JSON.
 - `lib/services/*.dart` — pdf, social share, configuration (stateless statici).
-- `lib/utils/app_constants.dart` — `AppStrings` (testi) consumati dalla logica.
+- `lib/utils/app_constants.dart` — `AppStrings`: solo semi-dati non localizzati (nomi di default, brand).
 
 ## Regole di lavoro
 1. Non scrivere `candidate.votes` fuori dal replay del log
    (`_recalculateState()`). Aggiungi/rimuovi voti agendo sul `_voteLog`.
 2. Mai ordinare `_candidates` in place: usa `sortedCandidates` o una copia ombra.
 3. Ogni mutazione di stato chiama `_persistState()` + `notifyListeners()`.
-4. Testi visibili → `AppStrings`, mai hardcoded.
+4. Testi visibili → file ARB (`lib/l10n/`) via `context.l10n`, mai hardcoded.
 5. Errori: `debugPrint("contesto: $e")` nel catch; mai swallow silenzioso.
 6. Verifica con `flutter analyze` (deve passare pulito) e `flutter test`.
 

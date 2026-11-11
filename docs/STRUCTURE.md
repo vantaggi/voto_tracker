@@ -17,6 +17,7 @@ lib/
 │   ├── app_en.arb                     # Stringhe inglese (template)
 │   ├── app_it.arb                     # Stringhe italiano
 │   ├── app_localizations*.dart        # AppLocalizations generato (flutter gen-l10n)
+│   ├── l10n_delegates.dart            # Delegate di localizzazione (material_ui/cupertino_ui)
 │   ├── l10n_ext.dart                  # context.l10n + helper nomi candidato / label vincitore
 │   └── export_labels.dart             # Stringhe localizzate per PDF/social (servizi senza context)
 │
@@ -31,11 +32,21 @@ lib/
 │
 ├── widgets/
 │   ├── candidate_card.dart            # Card singolo candidato: voto +/-, %, swing, stato
-│   ├── candidates_section.dart        # Lista/griglia delle candidate card
-│   ├── charts_section.dart            # Tab Corrente / Storico / Percentuali (fl_chart)
+│   ├── candidates_section.dart        # Lista delle candidate card (+ StatsHeader e ControlButtons)
+│   ├── stats_header.dart              # Statistiche e confronto fra i primi due
+│   ├── control_buttons.dart           # Undo / redo e reset a pressione prolungata
+│   ├── charts_section.dart            # Tab Corrente / Storico / Percentuali
+│   ├── charts/                        # Un file per grafico (fl_chart)
+│   │   ├── current_results_chart.dart
+│   │   ├── history_chart.dart
+│   │   └── percentage_chart.dart
+│   ├── export_sheet.dart              # Bottom sheet delle esportazioni
+│   ├── keep_screen_on.dart            # Schermo acceso mentre la schermata è aperta
 │   └── social_results_card.dart       # Card renderizzata per l'immagine social
 │
 ├── services/
+│   ├── export_controller.dart         # Prepara lo stato per PNG/PDF/CSV/JSON (un solo punto)
+│   ├── wakelock_service.dart          # Wakelock con conteggio delle richieste
 │   ├── configuration_service.dart     # Import/export configurazione candidati (JSON via file_picker)
 │   ├── data_export_service.dart       # Export risultati grezzi CSV/JSON (condivisione file)
 │   ├── pdf_export_service.dart        # Report PDF a pagina singola (package pdf/printing)
@@ -45,7 +56,7 @@ lib/
 │   └── app_theme.dart                 # Tema Material 3, seed indigo, light/dark
 │
 └── utils/
-    └── app_constants.dart             # AppStrings (testi IT) + AppDimensions (spaziature/raggi)
+    └── app_constants.dart             # AppStrings (semi-dati non localizzati) + AppDimensions
 ```
 
 ## Cartelle di piattaforma (generate da Flutter)

@@ -23,7 +23,8 @@ Leggi questi file in QUEST'ORDINE prima di iniziare un task:
 
 ### Regole Assolute
 
-- **Stack:** Flutter + Dart (SDK `>=3.2.2 <4.0.0`), Material 3. State management
+- **Stack:** Flutter ≥ 3.47 + Dart (SDK `^3.13.0`), Material 3 dal package
+  **`material_ui`** (mai `package:flutter/material.dart`, deprecato). State management
   con **`provider`** (`ChangeNotifier`). Persistenza con **`shared_preferences`**.
   NON introdurre altri framework di state (Bloc, Riverpod…) o un backend senza
   prima registrare la decisione in `docs/PROJECT_GUIDE.md`.
@@ -32,7 +33,9 @@ Leggi questi file in QUEST'ORDINE prima di iniziare un task:
 - **Stringhe localizzate (i18n).** I testi della UI vivono nei file ARB
   (`lib/l10n/app_it.arb`, `app_en.arb`) e si usano via `context.l10n.<chiave>`
   (`AppLocalizations`). MAI stringhe hardcoded nei widget; dopo aver modificato
-  un ARB rigenera con `flutter gen-l10n`. `AppStrings` resta solo per i testi
+  un ARB rigenera con `flutter gen-l10n`. I delegate di localizzazione si
+  prendono da `appLocalizationsDelegates` (`lib/l10n/l10n_delegates.dart`), non
+  dalla lista generata. `AppStrings` resta solo per i testi
   dei contesti **senza** `BuildContext` (provider, servizi di export) e come
   fallback dati. Lingue: **Italiano** (default) ed **Inglese**.
 - **Token UI, mai valori hardcoded.** Colori dal `ColorScheme` del tema
