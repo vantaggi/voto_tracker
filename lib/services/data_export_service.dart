@@ -27,10 +27,10 @@ class DataExportService {
       final directory = await getTemporaryDirectory();
       final file = File('${directory.path}/$filename');
       await file.writeAsString(content);
-      await Share.shareXFiles(
-        [XFile(file.path, mimeType: mimeType)],
+      await SharePlus.instance.share(ShareParams(
+        files: [XFile(file.path, mimeType: mimeType)],
         text: 'Voto Tracker — risultati scrutinio',
-      );
+      ));
       return true;
     } catch (e) {
       debugPrint("Error exporting data ($filename): $e");

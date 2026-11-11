@@ -24,7 +24,7 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
+  cupertino_icons: ^2.0.0
 
   # Dependency for creating interactive and advanced charts.
   # Dependency for creating interactive and advanced charts.
@@ -33,10 +33,10 @@ dependencies:
   shared_preferences: ^2.5.2
   pdf: ^3.11.0
   printing: ^5.13.0
-  wakelock_plus: ^1.2.9
-  share_plus: ^10.1.4
+  wakelock_plus: ^1.8.2
+  share_plus: ^13.3.1
   path_provider: ^2.1.5
-  file_picker: ^8.1.7
+  file_picker: ^13.3.3
   screenshot: ^3.0.0
   material_ui: ^1.11.0
   cupertino_ui: ^1.1.6

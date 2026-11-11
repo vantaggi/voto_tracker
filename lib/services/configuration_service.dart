@@ -10,14 +10,15 @@ class ConfigurationService {
   
   static Future<List<Candidate>?> importConfiguration() async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      final picked = await FilePicker.pickFile(
         type: FileType.custom,
         allowedExtensions: ['json'],
       );
 
-      if (result != null && result.files.single.path != null) {
-        File file = File(result.files.single.path!);
-        String content = await file.readAsString();
+      if (picked != null) {
+        // readAsBytes funziona anche con gli URI content:// di Android, dove
+        // `path` può essere null.
+        final content = utf8.decode(await picked.readAsBytes());
         List<dynamic> jsonList = jsonDecode(content);
         return jsonList.map((e) => Candidate.fromJson(e)).toList();
       }
@@ -45,7 +46,8 @@ class ConfigurationService {
       final file = File('${directory.path}/voto_tracker_config.json');
       await file.writeAsString(jsonString);
 
-      await Share.shareXFiles([XFile(file.path)], text: 'Voto Tracker Configuration');
+      await SharePlus.instance.share(ShareParams(
+          files: [XFile(file.path)], text: 'Voto Tracker Configuration'));
     } catch (e) {
        debugPrint("Error exporting configuration: $e");
     }

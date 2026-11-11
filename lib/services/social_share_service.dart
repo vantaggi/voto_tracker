@@ -47,12 +47,12 @@ class SocialShareService {
             final file = File('${directory.path}/$fileName');
             await file.writeAsBytes(image);
             
-            await Share.shareXFiles(
-                [XFile(file.path)], 
+            await SharePlus.instance.share(ShareParams(
+                files: [XFile(file.path)],
                 text: winner != null
                     ? '🏆 ${winnerLabel ?? labels.winnerFallback}: $winner!'
                     : '📊 ${labels.liveScrutiny} · ${labels.appTitlePro}'
-            );
+            ));
             
         } catch(e) {
             debugPrint("Error sharing image: $e");
