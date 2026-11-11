@@ -13,7 +13,29 @@ Le sezioni sono generate dai commit convenzionali (vedi
 
 ## [Unreleased]
 
+### 🚀 Nuove Funzionalità
+- **Archivio scrutini:** più scrutini salvati, con nuovo, duplica come modello
+  (stessi candidati, nessuna scheda), riapri, rinomina ed elimina con conferma.
+- **Navigazione Scrutinio / Archivio:** barra in basso sul telefono, barra
+  laterale su tablet e desktop.
+- **Regole di vittoria:** maggioranza relativa (come prima) o assoluta, e quorum
+  di affluenza; nuovi esiti "Ballottaggio" e "Quorum non raggiunto".
+- **Lettura schede:** una scheda alla volta con pulsanti grandi, "Scheda N di M",
+  annulla sempre visibile e protezione dai doppi tocchi.
+- **Colore dinamico (Material You):** su Android 12+ l'app prende i colori dello
+  sfondo; si può disattivare in Impostazioni → Aspetto.
+
+### 🎨 Interfaccia & Design
+- Palette dei candidati ridisegnata (HCT) per essere leggibile in light e dark;
+  le schede nulle non sono più nere (invisibili nel tema scuro).
+- Spaziature, raggi e testi solo da token e `textTheme`; aree di tocco ≥ 48 dp.
+- Edge-to-edge con barre di sistema trasparenti; etichette per i lettori di
+  schermo su voti, +/- e reset; nessun overflow con testo al 200%.
+
 ### 🛠️ Refactoring
+- Logica dello scrutinio in `ScrutinyEngine` (puro, testato a parte) e
+  persistenza in `ScrutinyRepository` con schema v2. I dati della 1.x vengono
+  migrati al primo avvio; le vecchie chiavi restano come copia di sicurezza.
 - Migrazione a Flutter 3.50 e ai package `material_ui` / `cupertino_ui` (Material
   e Cupertino sono usciti dal framework in Flutter 3.47). Corretto un problema
   che con il nuovo Material faceva ignorare la lingua italiana.
@@ -30,6 +52,8 @@ Le sezioni sono generate dai commit convenzionali (vedi
   nomi ruotati e illeggibili.
 
 ### 🐞 Bug Fix
+- "Mancano N voti per la vittoria" non considera più bianche e nulle come
+  leader; a parità di voti la classifica non cambia più ordine a caso.
 - Corretto l'overflow della barra dei controlli quando la label del reset è più
   lunga (es. in italiano "Tieni premuto per resettare"): il bottone ora si
   comprime con ellissi. Aggiunto `navigatorKey` stabile e test di interazione

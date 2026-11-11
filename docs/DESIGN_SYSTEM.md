@@ -4,56 +4,58 @@ Token UI e regole di stile. Responsabilità unica: **come deve apparire** l'app.
 Fonte tecnica: `lib/theme/app_theme.dart` e `AppDimensions` in
 `lib/utils/app_constants.dart`.
 
-> **Regola d'oro:** niente valori hardcoded nei widget. Colori dal `ColorScheme`,
-> dimensioni/raggi da `AppDimensions`, testi dai file ARB via `context.l10n`.
+> **Regola d'oro:** niente valori hardcoded nei widget. Colori dal `ColorScheme`
+> (o `CandidatePalette` / `TrendColors`), spaziature da `AppSpacing`, raggi da
+> `AppShapes`, testi dal `textTheme` e dai file ARB via `context.l10n`.
+> `test/design_tokens_test.dart` fallisce se in `lib/widgets` o `lib/screens`
+> compaiono `Colors.*` (tranne `transparent`), `fontSize`, `EdgeInsets`,
+> `SizedBox` o `BorderRadius.circular` con numeri.
 
 ## 1. Colore
 
-- **Material 3** (`useMaterial3: true`) con `ColorScheme.fromSeed`.
-- **Seed:** `Color(0xFF6366F1)` (indigo) — `AppTheme.primarySeed`.
-- **Variante schema:** `DynamicSchemeVariant.fidelity` (più vivace/espressivo).
-- **Light & dark** generati dallo stesso seed; `themeMode: ThemeMode.system`.
-- Usa **sempre** i ruoli del `ColorScheme`, mai colori letterali:
-  - sfondi: `surface`, `surfaceContainerLow/High/Highest`
-  - testo: `onSurface`, `onSurfaceVariant`
-  - bordi: `outline`, `outlineVariant`
-  - azione: `primary` / `onPrimary`, `primaryContainer` / `onPrimaryContainer`
-- **Eccezione legittima:** i colori identificativi dei candidati sono una palette
-  distinta dedicata (`Candidate.color`), non un token di tema. Schede bianche =
-  grigio, schede nulle = nero (vedi `_initializeCandidates`).
+- **Material 3** con `ColorScheme.fromSeed`, light e dark, `ThemeMode.system`.
+- **Colore dinamico** (`dynamic_color`, default attivo): su Android 12+ il seed è
+  il colore primario dello sfondo, variante `tonalSpot` (come Material You).
+  Senza colore di sistema o con l'interruttore spento: seed indigo
+  `0xFF6366F1` (`AppTheme.primarySeed`), variante `fidelity`. I temi si leggono
+  con `context.read<AppThemes>()` (es. il proiettore usa sempre `dark`).
+- Usa **sempre** i ruoli del `ColorScheme`: `surface*`, `onSurface*`,
+  `outline*`, `primary*`, `secondaryContainer`, `error*`.
+- **Candidati:** `CandidatePalette` (`lib/theme/candidate_palette.dart`), 8 colori
+  HCT tono 52 croma 70, contrasto ≥ 3:1 su entrambe le superfici; bianche
+  `0xFF8B8B8B`, nulle `0xFF6A6A6A`. Testo sopra: `CandidatePalette.onColor`.
+- **Swing:** `TrendColors.of(context)` (ThemeExtension): `positive` verde HCT,
+  `negative` = `colorScheme.error`.
 
-## 2. Forma (border radius)
-
-Material 3 "expressive". I raggi canonici vivono in `AppDimensions`:
-
-| Token | Valore | Uso |
-|:--|:--:|:--|
-| `borderRadiusCircular` | 12 | snackbar, raggio generico |
-| `borderRadiusExport` | 12 | bottoni di esportazione |
-| `borderRadiusButton` | 16 | bottoni |
-| `borderRadiusToggle` | 30 | toggle/segmented |
-| `borderRadiusCard` | 24 | card (Large expressive shape) |
-| Dialog | 28 | dialoghi (Extra-large shape, nel tema) |
-
-Bottoni nel tema usano raggio 20; gli input 16. Mantieni la coerenza: una nuova
-superficie sceglie il token più vicino, non un numero nuovo.
-
-## 3. Spaziatura e dimensioni
-
-Tutto in `AppDimensions`. I principali:
+## 2. Forma (border radius) — `AppShapes`
 
 | Token | Valore | Uso |
 |:--|:--:|:--|
-| `paddingAll` | 16 | padding standard di sezione |
-| `paddingIconText` | 12 | gap icona↔testo |
-| `iconButtonSize` | 36 | bottoni icona (voto +/-) |
-| `iconButtonIconSize` | 18 | icona dentro il bottone |
-| `iconSizeAppBar` | 20 | icone AppBar |
-| `statIconSize` | 24 | icone statistiche |
-| `comparisonBarHeight` | 24 | barra del confronto diretto |
+| `extraSmall` | 4 | barre di avanzamento |
+| `small` | 8 | badge, chip dei grafici |
+| `medium` | 12 | pill del rank, box informativi |
+| `large` | 16 | pulsanti della lettura schede |
+| `largeIncreased` | 20 | indicatore delle tab |
+| `extraLargeCard` | 24 | card, barra delle tab |
+| `extraLarge` | 28 | dialog |
 
-Grafici (`fl_chart`): `chartBarWidth` 24, `chartBarRadius` 4,
-`chartLineBarWidth` 3, `chartPieRadius` 60, `chartPieCenterSpaceRadius` 40.
+## 3. Spaziatura e dimensioni — `AppSpacing`, `AppTouch`
+
+Scala a multipli di 4: `xs` 4 · `s` 8 · `m` 12 · `l` 16 · `lPlus` 20 · `xl` 24 ·
+`xxl` 32 · `xxxl` 48; `bottomBarClearance` 80 in fondo alle liste.
+Area di tocco minima `AppTouch.minTarget` = 48 dp (verificata da
+`androidTapTargetGuideline` nei test). Breakpoint `AppDimensions.compactBreakpoint`
+= 600 dp (NavigationBar sotto, NavigationRail sopra). Le dimensioni dei grafici
+restano in `AppDimensions`.
+
+## 3.1 Accessibilità
+
+- Testo al 200% senza overflow (`test/accessibility_test.dart`): righe con testo
+  variabile in `Expanded`/`Flexible`.
+- Etichette parlate: conteggio voti per candidato, "+"/"−" con il nome, reset
+  come pulsante con azione long press.
+- Edge-to-edge: barre di sistema trasparenti; inset gestiti da AppBar,
+  `SafeArea` e barra dei controlli.
 
 ## 4. Tipografia
 
@@ -73,7 +75,8 @@ SnackBar (floating, `inverseSurface`).
 
 - Nuovo testo visibile → aggiungilo a `lib/l10n/app_en.arb` e `app_it.arb`,
   rigenera con `flutter gen-l10n` e usalo via `context.l10n`.
-- Nuovo padding/raggio ricorrente → aggiungilo a `AppDimensions`, non inline.
+- Nuovo padding/raggio → usa il token più vicino di `AppSpacing`/`AppShapes`;
+  una dimensione specifica (es. altezza di un grafico) va in `AppDimensions`.
 - Nuovo colore → derivalo dal `ColorScheme`; se serve un colore-dato (es. nuova
   categoria di scheda), documenta la scelta qui.
 - Il PDF (`PdfExportService`) replica volutamente la palette indigo del tema con

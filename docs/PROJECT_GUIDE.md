@@ -8,29 +8,30 @@ perché** il codice funziona così. Lo stato dei task vive nel BOARD, non qui.
 App Flutter a singola sorgente di stato, **interamente locale e offline**.
 
 ```
-              ┌─────────────────────────────┐
-   UI         │ HomePage / ProjectorMode /  │  widgets/* (CandidateCard,
-   (widgets)  │ SettingsDialog              │  ChartsSection, ...)
-              └──────────────┬──────────────┘
+   UI         AppShell → HomePage · ArchivePage · BallotReadingScreen ·
+   (screens)  ProjectorMode · SettingsDialog          (+ widgets/*)
                              │ context.watch / read
               ┌──────────────▼──────────────┐
-   Stato      │      ScrutinyProvider       │  (ChangeNotifier)
-              │  _voteLog · _candidates ·   │
-              │  _settings · winner         │
-              └──────────────┬──────────────┘
-                             │ jsonEncode/Decode
-              ┌──────────────▼──────────────┐
-   Persist.   │     shared_preferences      │  keys: candidates, settings, vote_log
-              └─────────────────────────────┘
+   Stato      │      ScrutinyProvider       │  ChangeNotifier: _voteLog,
+              │                             │  _candidates, _settings, archivio
+              └───────┬──────────────┬──────┘
+                      │              │
+              ┌───────▼──────┐ ┌─────▼──────────────┐
+   Dominio    │ScrutinyEngine│ │ ScrutinyRepository │  Dati
+   (puro)     │ tally, rank, │ │ shared_preferences │  scrutinies,
+              │ vincitore    │ │ schema v2          │  current_scrutiny_id
+              └──────────────┘ └────────────────────┘
 
-   Servizi (stateless, statici): PdfExportService · SocialShareService ·
-   ConfigurationService  → consumano lo stato corrente del provider.
+   Servizi (stateless): ExportController → PdfExportService ·
+   SocialShareService · DataExportService · ConfigurationService.
 ```
 
 - **State management:** `provider` (`ChangeNotifierProvider` in `main.dart`).
   La UI legge con `context.watch<ScrutinyProvider>()` e agisce con `read`.
-- **Persistenza:** `shared_preferences`, JSON serializzato. Salvataggio dopo ogni
-  mutazione tramite `_persistState()`.
+- **Persistenza:** `ScrutinyRepository` su `shared_preferences` (ADR-001).
+  Il provider salva l'archivio dopo ogni mutazione con `_persistState()`.
+- **Logica:** `ScrutinyEngine` (funzioni statiche pure). Il provider gli passa
+  tipi, voti, schede attese, regola e quorum e ne copia il risultato.
 - **Niente rete / niente account.** Tutta la portabilità dei dati passa da
   import/export file (CSV, JSON, PDF, PNG).
 
@@ -42,7 +43,8 @@ azzerati e ricostruiti rieseguendo il log in `_recalculateState()`.
 
 **Identità via enum, mai stringhe.** Schede bianche/nulle si riconoscono da
 `Candidate.type` (`CandidateType.normal/blank/spoiled`), non dal nome; lo stato
-del vincitore è `WinnerStatus` (`none/mathematical/elected/tie`), non il
+del vincitore è `WinnerStatus` (`none/mathematical/elected/tie/noMajority/
+noQuorum`), non il
 confronto con una stringa. Questo rende i nomi liberamente localizzabili/
 rinominabili senza rompere la logica (prerequisito per la i18n, FEAT-001).
 
@@ -60,28 +62,38 @@ Implicazioni da rispettare:
 `Candidate.rank` e `previousPercentage` sono proprietà di visualizzazione
 (swing analysis); `rank` è transiente e ricalcolato a ogni `_calculateResults()`.
 
-## 3. Algoritmi chiave (in `ScrutinyProvider`)
+## 3. Algoritmi chiave (in `ScrutinyEngine`, `lib/domain/`)
 
-### 3.1 Calcolo del vincitore — `_calculateResults()`
-1. Crea una lista **ombra** ordinata per voti (mai ordinare `_candidates` in
-   place: farebbe saltare la UI). Assegna `rank`.
-2. Calcola `totalVotesAssigned` e `remainingVotes = totalVoters − assegnati`.
-3. Esclude schede bianche/nulle dai candidati "validi".
-4. **Vittoria matematica anticipata:** se `voteGap(1°, 2°) > remainingVotes`, il
-   primo è già vincitore (vantaggio incolmabile).
-5. **Fine scrutinio** (`remainingVotes <= 0`): vincitore = primo, oppure
-   `WinnerStatus.tie` se i primi due pareggiano con voti > 0.
+### 3.1 Classifica e vincitore — `evaluate()`
+1. `ranking()`: indici ordinati per voti, a parità l'ordine originale
+   (stabile). `_candidates` non viene mai riordinato: la UI non salta.
+2. `totalAssigned` e `remaining = totalVoters − assegnati`.
+3. Solo i candidati `normal` possono vincere; bianche e nulle contano nel totale.
+4. **Maggioranza relativa** (default): vittoria matematica se
+   `voti1° − voti2° > remaining`; a scrutinio chiuso eletto il primo, o `tie`.
+5. **Maggioranza assoluta:** soglia `floor(totalVoters/2) + 1` (bianche e nulle
+   comprese). Raggiunta = `mathematical`/`elected`; a scrutinio chiuso senza
+   soglia = `noMajority` (ballottaggio), anche prima se nessuno può più
+   arrivarci.
+6. **Quorum:** `Settings.quorumReached` (schede attese ≥ aventi diritto × %).
+   Se manca, ogni esito diventa `noQuorum`.
 
-### 3.2 Magic number — `votesUntilMajority`
-Stima i voti che il leader deve ancora prendere per chiudere i giochi contro il
-secondo: `(voti2° + remaining − voti1°) / 2`, arrotondato per difetto + 1,
-clampato a ≥ 0. Con un solo candidato valido usa la soglia di maggioranza
-assoluta (`totalVoters/2 + 1`).
+### 3.2 Magic number — `votesToWin`
+Relativa: `(voti2° + remaining − voti1°) / 2` per difetto + 1, ≥ 0, calcolato fra
+candidati reali. Assoluta o un solo candidato: `soglia − voti1°`.
 
-### 3.3 Grafico storico — `historyPoints`
-Ricostruisce, rieseguendo il log, una mappa `passo → {nome: voti}`. Il punto 0 è
-lo stato iniziale; ogni voto aggiunge uno snapshot. Consumato da
-`ChartsSection` (tab Storico) e dal PDF.
+### 3.3 Grafico storico — `history()`
+Una lista di conteggi per indice dopo ogni scheda valida (punto 0 = tutto a
+zero). Il provider la converte in `historyPoints` (`passo → {nome: voti}`) per
+`HistoryChart` e il PDF.
+
+### 3.4 Archivio — `ScrutinyRepository`
+Chiavi v2: `schema_version` = 2, `scrutinies` (lista JSON di `Scrutiny`),
+`current_scrutiny_id`. Al primo avvio dopo l'aggiornamento i dati v1
+(`settings`, `candidates`, `vote_log`) diventano il primo scrutinio
+dell'archivio; le chiavi v1 non vengono cancellate. Dati senza registro (1.1)
+diventano un registro equivalente. Un archivio illeggibile viene copiato in
+`scrutinies_corrupt_backup`, mai sovrascritto in silenzio.
 
 ## 4. Servizi di output
 
@@ -107,6 +119,11 @@ lo stato iniziale; ogni voto aggiunge uno snapshot. Consumato da
   cache-busting CDN, nessun deploy server. La "release" è una build store
   (`release-android` agent). Per questo gli strati Supabase/Vercel/cache-bust
   del workflow kit originale **non si applicano** qui.
+- **ADR-001 — `shared_preferences` invece di `drift`/SQLite (2026-11-11):**
+  pochi dati (decine di scrutini, registri di migliaia di interi), nessun
+  codegen, nessuna libreria nativa nuova. L'archivio è un'unica stringa JSON
+  riscritta a ogni voto. Da rivedere se servono ricerche o migliaia di scrutini:
+  il repository isola il resto dell'app dal cambio.
 - **Stringhe localizzate (i18n):** la UI usa `AppLocalizations` (ARB IT/EN) via
   `context.l10n`; `AppStrings` resta per i contesti senza `BuildContext` e i
   fallback dati (vedi §6).

@@ -7,11 +7,18 @@
 
 ```
 lib/
-├── main.dart                          # Entry point: Provider + MaterialApp + tema
+├── main.dart                          # Entry point: Provider + DynamicColorBuilder + MaterialApp, edge-to-edge
+│
+├── domain/                            # Logica pura, senza Flutter né persistenza
+│   └── scrutiny_engine.dart           # Tally, classifica, vincitore (regole, quorum), magic number, storico
+│
+├── data/
+│   └── scrutiny_repository.dart       # Archivio su shared_preferences, schema v2, migrazione v1 → v2
 │
 ├── models/                            # Modelli dati puri (+ JSON)
 │   ├── candidate.dart                 # Candidate: name, votes, color, rank, previousPercentage
-│   └── settings.dart                  # Settings: totalVoters, participantsCount, schede bianche/nulle
+│   ├── scrutiny.dart                  # Scrutiny: id, titolo, date, impostazioni, candidati, registro
+│   └── settings.dart                  # Settings: votanti, partecipanti, bianche/nulle, regola, quorum
 │
 ├── l10n/                              # Localizzazione i18n
 │   ├── app_en.arb                     # Stringhe inglese (template)
@@ -22,11 +29,15 @@ lib/
 │   └── export_labels.dart             # Stringhe localizzate per PDF/social (servizi senza context)
 │
 ├── providers/
-│   ├── scrutiny_provider.dart         # ChangeNotifier centrale: vote-log, calcolo vincitore, undo, export
-│   └── locale_provider.dart           # Lingua scelta (persistita); null = segui il sistema
+│   ├── scrutiny_provider.dart         # ChangeNotifier centrale: vote-log, undo/redo, archivio, export
+│   ├── locale_provider.dart           # Lingua scelta (persistita); null = segui il sistema
+│   └── appearance_provider.dart       # Colori di sistema sì/no (persistito)
 │
 ├── screens/
+│   ├── app_shell.dart                 # Navigazione Scrutinio / Archivio (NavigationBar o NavigationRail)
 │   ├── home_page.dart                 # Schermata principale (grafici + controlli, responsive)
+│   ├── archive_page.dart              # Archivio scrutini: nuovo, duplica, riapri, rinomina, elimina
+│   ├── ballot_reading_screen.dart     # Lettura schede: una scheda alla volta
 │   ├── projector_mode_screen.dart     # Modalità proiettore fullscreen
 │   └── settings_dialog.dart           # Dialog di configurazione scrutinio
 │
@@ -53,10 +64,12 @@ lib/
 │   └── social_share_service.dart      # Screenshot di SocialResultsCard → condivisione PNG
 │
 ├── theme/
-│   └── app_theme.dart                 # Tema Material 3, seed indigo, light/dark
+│   ├── app_theme.dart                 # Tema Material 3: colore di sistema o seed indigo, light/dark
+│   ├── candidate_palette.dart         # Colori dei candidati (HCT) e colore del testo sopra
+│   └── trend_colors.dart              # ThemeExtension: verde/rosso dello swing
 │
 └── utils/
-    └── app_constants.dart             # AppStrings (semi-dati non localizzati) + AppDimensions
+    └── app_constants.dart             # AppStrings, AppDimensions, AppSpacing, AppShapes, AppTouch
 ```
 
 ## Cartelle di piattaforma (generate da Flutter)
@@ -72,6 +85,8 @@ La versione canonica dell'app vive in `pubspec.yaml` (`version: X.Y.Z+build`).
 
 ```
 README.md                       # Master Brain Index + AI Guide + Regole Assolute
+CLAUDE.md                       # Comandi, definizione di fatto, trappole note (per Claude)
+specs/                          # Spec delle fasi (fase-1-fondamenta, notte-2026-11-11)
 CHANGELOG.md                    # Storico per versione (Keep a Changelog + semver)
 PRIVACY_POLICY.md               # Informativa privacy (store)
 PLAY_STORE_LISTING.md           # Testi per la scheda Play Store
