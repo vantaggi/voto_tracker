@@ -1,7 +1,5 @@
-import 'dart:convert';
-
 import 'package:material_ui/material_ui.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:voto_tracker/data/scrutiny_repository.dart';
 import 'package:voto_tracker/domain/scrutiny_engine.dart';
 import 'package:voto_tracker/models/candidate.dart';
 import 'package:voto_tracker/models/settings.dart';
@@ -113,69 +111,49 @@ class ScrutinyProvider extends ChangeNotifier {
     }
   }
 
+  ScrutinyRepository? _repository;
+  ScrutinyArchive? _archive;
+
   Future<void> _loadState() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    // Load Settings
-    final String? settingsJson = prefs.getString('settings');
-    if (settingsJson != null) {
-      try {
-        _settings = Settings.fromJson(jsonDecode(settingsJson));
-      } catch (e) {
-        debugPrint("Error loading settings: $e");
-      }
-    }
-
-    // Load Candidates (Legacy or Structure)
-    final String? candidatesJson = prefs.getString('candidates');
-    if (candidatesJson != null) {
-      try {
-        final List<dynamic> decoded = jsonDecode(candidatesJson);
-        _candidates = decoded.map((e) => Candidate.fromJson(e)).toList();
-      } catch (e) {
-        debugPrint("Error loading candidates: $e");
+    final repository = await ScrutinyRepository.open();
+    final archive = await repository.load(
+      createDefault: (settings) {
+        _settings = settings;
         _initializeCandidates();
-      }
-    } else {
-      _initializeCandidates();
-    }
-
-    // Load Vote Log
-    final List<String>? log = prefs.getStringList('vote_log');
-    if (log != null) {
-      _voteLog.clear();
-      _voteLog.addAll(log.map((e) => int.parse(e)));
-      // If we have a log, valid candidates votes are strictly derived from it + base
-      // We assume loaded _candidates votes are the "base" if log exists?
-      // Actually, safer to treat loaded candidates as having "base votes" equal to their current count
-      // IF the log is empty. If log exists, we might need to reconcile.
-      // Simplified approach: Clear candidates votes, and just replay log.
-      // Assuming no "base" votes for now to ensure graph consistency.
-      // If we want to support editing "base", we need a separate store.
-      // For this task: Everything in graph comes from log.
-      for (var c in _candidates) {
-        c.votes = 0;
-      }
-      _recalculateState();
-    } else {
-      // Legacy migration: If no log but we have votes, those are now "base" (invisible to history graph)
-      // OR we try to reverse engineer? No, simpler to just start fresh or treat as base.
-      // Let's treat current votes as Base Votes so they appear in counts but maybe as a starting flat line
-    }
-
-    _calculateResults();
-    _persistState();
+        return _candidates;
+      },
+    );
+    _repository = repository;
+    _archive = archive;
+    _applyCurrent();
     notifyListeners();
   }
 
+  /// Copia lo scrutinio aperto dell'archivio nello stato del provider.
+  void _applyCurrent() {
+    final current = _archive!.current;
+    _settings = current.settings;
+    _candidates = current.candidates;
+    _voteLog
+      ..clear()
+      ..addAll(current.voteLog);
+    _redoStack.clear();
+    _recalculateState();
+  }
+
   Future<void> _persistState() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('candidates', jsonEncode(_candidates));
-    await prefs.setString('settings', jsonEncode(_settings));
-    await prefs.setStringList(
-      'vote_log',
-      _voteLog.map((e) => e.toString()).toList(),
-    );
+    final archive = _archive;
+    final repository = _repository;
+    if (archive == null || repository == null) return; // ancora in caricamento
+    final current = archive.current;
+    current
+      ..settings = _settings
+      ..candidates = _candidates
+      ..updatedAt = repository.now();
+    current.voteLog
+      ..clear()
+      ..addAll(_voteLog);
+    await repository.save(archive);
   }
 
   /// Ricalcola i voti rigiocando il registro delle schede.
