@@ -194,12 +194,6 @@ abstract class AppLocalizations {
   /// **'TOTAL VOTES'**
   String get votesTotal;
 
-  /// No description provided for @waitingForData.
-  ///
-  /// In en, this message translates to:
-  /// **'Waiting for data...'**
-  String get waitingForData;
-
   /// No description provided for @votesToWin.
   ///
   /// In en, this message translates to:
@@ -314,12 +308,6 @@ abstract class AppLocalizations {
   /// **'Percentages'**
   String get percentages;
 
-  /// No description provided for @noDataAvailable.
-  ///
-  /// In en, this message translates to:
-  /// **'No data available'**
-  String get noDataAvailable;
-
   /// No description provided for @noHistoryAvailable.
   ///
   /// In en, this message translates to:
@@ -344,59 +332,11 @@ abstract class AppLocalizations {
   /// **'Redo action'**
   String get redoTooltip;
 
-  /// No description provided for @resetButton.
-  ///
-  /// In en, this message translates to:
-  /// **'HOLD TO RESET'**
-  String get resetButton;
-
-  /// No description provided for @scrutinyConfiguration.
-  ///
-  /// In en, this message translates to:
-  /// **'Scrutiny configuration'**
-  String get scrutinyConfiguration;
-
-  /// No description provided for @totalVotersNumber.
-  ///
-  /// In en, this message translates to:
-  /// **'Total number of voters'**
-  String get totalVotersNumber;
-
-  /// No description provided for @votersHint.
-  ///
-  /// In en, this message translates to:
-  /// **'E.g. 100'**
-  String get votersHint;
-
   /// No description provided for @participantsCount.
   ///
   /// In en, this message translates to:
   /// **'Number of candidates'**
   String get participantsCount;
-
-  /// No description provided for @votingOptions.
-  ///
-  /// In en, this message translates to:
-  /// **'Voting options'**
-  String get votingOptions;
-
-  /// No description provided for @dataManagement.
-  ///
-  /// In en, this message translates to:
-  /// **'Data management'**
-  String get dataManagement;
-
-  /// No description provided for @exportLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Export'**
-  String get exportLabel;
-
-  /// No description provided for @importLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Import'**
-  String get importLabel;
 
   /// No description provided for @configLoaded.
   ///
@@ -560,18 +500,6 @@ abstract class AppLocalizations {
   /// **'Remove a vote from {name}'**
   String removeVoteFor(String name);
 
-  /// No description provided for @candidateVotesSemantics.
-  ///
-  /// In en, this message translates to:
-  /// **'{name}: {votes} votes'**
-  String candidateVotesSemantics(String name, int votes);
-
-  /// No description provided for @resetSemanticsHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Hold to reset the count'**
-  String get resetSemanticsHint;
-
   /// No description provided for @navScrutiny.
   ///
   /// In en, this message translates to:
@@ -625,12 +553,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete'**
   String get archiveDelete;
-
-  /// No description provided for @archiveCurrent.
-  ///
-  /// In en, this message translates to:
-  /// **'Open'**
-  String get archiveCurrent;
 
   /// No description provided for @archiveBallots.
   ///
@@ -751,18 +673,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Ballot {n} of {total}'**
   String ballotNumber(int n, int total);
-
-  /// No description provided for @ballotLast.
-  ///
-  /// In en, this message translates to:
-  /// **'Last: {name}'**
-  String ballotLast(String name);
-
-  /// No description provided for @ballotUndo.
-  ///
-  /// In en, this message translates to:
-  /// **'Undo last'**
-  String get ballotUndo;
 
   /// No description provided for @countingComplete.
   ///

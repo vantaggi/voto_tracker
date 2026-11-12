@@ -39,21 +39,23 @@ lib/
 │   ├── app_shell.dart                 # Navigazione Scrutinio / Archivio (NavigationBar o NavigationRail)
 │   ├── home_page.dart                 # Home: riepilogo, righe, altre schede, grafici, pillola; due colonne da 840 dp
 │   ├── home_actions.dart              # Azioni della Home (impostazioni, lettura schede, proiettore, azzera con conferma)
-│   ├── archive_page.dart              # Archivio: nuovo (anche da lista), duplica, riapri, rinomina, elimina, esporta/importa; due colonne sui tablet
-│   ├── ballot_reading_screen.dart     # Lettura schede: una scheda alla volta
-│   ├── projector_mode_screen.dart     # Modalità proiettore fullscreen (una riga parlata per candidato)
-│   └── settings_dialog.dart           # Dialog di configurazione scrutinio
+│   ├── archive_page.dart              # Archivio: Aperto ora / Altri, ricerca, dettaglio (pagina o pannello), Nuovo vuoto/copia/lista, esporta/importa
+│   ├── ballot_reading_screen.dart     # Lettura schede: tessere che riempiono lo schermo, bianche e nulle in fondo, pillola Annulla
+│   ├── projector_mode_screen.dart     # Proiettore a schermo intero: intestazione, righe animate, bianche e nulle in fondo
+│   ├── settings_page.dart             # Impostazioni dello scrutinio: pagina sul telefono, finestra sul tablet
+│   └── app_settings_page.dart         # Impostazioni dell'app: lingua e aspetto
 │
 ├── widgets/
 │   ├── vote_summary_card.dart         # Riepilogo: barra impilata, schede, chi è in testa, esito
+│   ├── vote_stacked_bar.dart          # Barra impilata dei voti (Home, Archivio, Lettura, Proiettore, Condividi)
 │   ├── candidate_row.dart             # Righe dei candidati e "Altre schede" (bianche, nulle)
-│   ├── edit_candidate_dialog.dart     # Dialog "Modifica nome" (nome e risultato precedente)
+│   ├── edit_candidate_dialog.dart     # Dialog "Modifica candidato" (nome, colore, risultato precedente)
 │   ├── undo_pill.dart                 # Pillola Annulla / Ripeti con il nome dell'ultimo voto
 │   ├── charts_card.dart               # Card apribile Storico / Percentuali
 │   ├── charts/                        # Un file per grafico (fl_chart)
 │   │   ├── history_chart.dart
 │   │   └── percentage_chart.dart
-│   ├── export_sheet.dart              # Bottom sheet delle esportazioni
+│   ├── export_sheet.dart              # Foglio Condividi: Immagine e PDF grandi, CSV e JSON piccoli
 │   ├── keep_screen_on.dart            # Schermo acceso mentre la schermata è aperta
 │   └── social_results_card.dart       # Card renderizzata per l'immagine social
 │

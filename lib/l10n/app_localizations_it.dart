@@ -58,9 +58,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get votesTotal => 'VOTI TOTALI';
 
   @override
-  String get waitingForData => 'In attesa di dati...';
-
-  @override
   String votesToWin(int count) {
     return 'Mancano $count voti per la vittoria';
   }
@@ -120,9 +117,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get percentages => 'Percentuali';
 
   @override
-  String get noDataAvailable => 'Nessun dato disponibile';
-
-  @override
   String get noHistoryAvailable => 'Nessuno storico disponibile';
 
   @override
@@ -135,31 +129,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get redoTooltip => 'Ripristina azione';
 
   @override
-  String get resetButton => 'TIENI PREMUTO PER RESETTARE';
-
-  @override
-  String get scrutinyConfiguration => 'Configurazione Scrutinio';
-
-  @override
-  String get totalVotersNumber => 'Numero Totale Votanti';
-
-  @override
-  String get votersHint => 'Es. 100';
-
-  @override
   String get participantsCount => 'Numero Candidati';
-
-  @override
-  String get votingOptions => 'Opzioni di Voto';
-
-  @override
-  String get dataManagement => 'Gestione Dati';
-
-  @override
-  String get exportLabel => 'Esporta';
-
-  @override
-  String get importLabel => 'Importa';
 
   @override
   String get configLoaded => 'Configurazione caricata con successo';
@@ -248,14 +218,6 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String candidateVotesSemantics(String name, int votes) {
-    return '$name: $votes voti';
-  }
-
-  @override
-  String get resetSemanticsHint => 'Tieni premuto per azzerare lo scrutinio';
-
-  @override
   String get navScrutiny => 'Scrutinio';
 
   @override
@@ -283,9 +245,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get archiveDelete => 'Elimina';
-
-  @override
-  String get archiveCurrent => 'Aperto';
 
   @override
   String archiveBallots(int counted, int total) {
@@ -360,14 +319,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String ballotNumber(int n, int total) {
     return 'Scheda $n di $total';
   }
-
-  @override
-  String ballotLast(String name) {
-    return 'Ultima: $name';
-  }
-
-  @override
-  String get ballotUndo => 'Annulla ultima';
 
   @override
   String get countingComplete => 'Scrutinio completato';

@@ -42,12 +42,31 @@ Le sezioni sono generate dai commit convenzionali (vedi
   dello scrutinio nella barra in alto. Proiettore, impostazioni e "Azzera
   scrutinio" (ora con conferma) sono nel menu ⋮. Sul tablet lista, riepilogo
   e grafico stanno insieme.
+- **Altre schermate ridisegnate:**
+  - Impostazioni a pagina intera sul telefono (finestra sul tablet), in tre
+    gruppi, con − e + per votanti e candidati; lingua e aspetto spostati in
+    "Impostazioni dell'app" (dal menu dell'Archivio).
+  - Archivio con "Aperto ora" in cima, barra dei voti in ogni riga, ricerca
+    oltre 8 scrutini e un dettaglio con Riapri, Duplica ed Esporta; "Nuovo
+    scrutinio" offre vuoto, copia dello scrutinio aperto o una lista.
+  - Lettura schede con tessere che riempiono lo schermo, bianche e nulle in
+    fondo e la pillola "Annulla Rossi".
+  - Proiettore a schermo intero, con intestazione e barra, righe che si
+    riordinano con un'animazione, bianche e nulle fuori classifica.
+  - Foglio Condividi con Immagine e PDF in evidenza; "Modifica candidato"
+    permette di scegliere il colore.
 - Percentuali con la virgola decimale in italiano.
 - Palette dei candidati ridisegnata (HCT) per essere leggibile in light e dark;
   le schede nulle non sono più nere (invisibili nel tema scuro).
 - Spaziature, raggi e testi solo da token e `textTheme`; aree di tocco ≥ 48 dp.
 - Edge-to-edge con barre di sistema trasparenti; etichette per i lettori di
   schermo su voti, +/- e reset; nessun overflow con testo al 200%.
+
+### 🐛 Correzioni
+- Cambiare il numero di candidati (o bianche e nulle) nelle impostazioni non
+  cancella più nomi, colori e risultati precedenti: si azzerano solo i voti,
+  con un avviso e il pulsante "Salva e azzera". Anche "Azzera scrutinio" ora
+  tiene nomi e colori.
 
 ### 🛠️ Refactoring
 - Logica dello scrutinio in `ScrutinyEngine` (puro, testato a parte) e

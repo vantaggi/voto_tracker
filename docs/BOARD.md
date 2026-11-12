@@ -101,14 +101,17 @@ Piano: documento "Voto Tracker — Piano master del refactor (v2.0)", approvato
 | FEAT-008 | **Liste di candidati e impostazioni predefinite** (P10) | ✅ Fatto | 🟡 Media | 🟡 Medio | - | Niente "voto di lista": liste da riusare per nuovi scrutini |
 | TEST-002 | **Test d'integrazione** sul dispositivo (P11) | 🏗️ In corso | 🟡 Media | 🟢 Basso | - | Scritto; da lanciare sul telefono (P13) |
 
-## 🏠 Wave 6 — Ridisegno della Home (12 novembre 2026)
+## 🏠 Wave 6 — Ridisegno della Home e delle altre schermate (12 novembre 2026)
 
 Piano: documento "Voto Tracker — Ridisegno della Home" (50 giri di critica e
-bozze), approvato ("ok tutto ma fallo subito su PR 3") il 12/11.
+bozze), approvato ("ok tutto ma fallo subito su PR 3") il 12/11. Poi
+"Voto Tracker — Ridisegno delle altre schermate", approvato ("ok tutto") il 12/11.
 
 | ID | Task | Status | Priorità | Rischio | Stima | Note |
 |:--|:--|:--:|:--:|:--:|:--:|:--|
 | UI-008 | **Ridisegno della Home** (R1-R7) | 🏗️ In corso | 🔴 Alta | 🟡 Medio | - | Fatto nel cloud, golden guardati; da provare sul telefono insieme a P13 |
+| UI-009 | **Ridisegno delle altre schermate** (S1-S7, decisioni D1-D6) | 🏗️ In corso | 🔴 Alta | 🟡 Medio | - | Impostazioni, Archivio, Lettura schede, Proiettore, Condividi, Modifica candidato. Fatto nel cloud, rese guardate; da provare sul telefono |
+| FIX-012 | **Impostazioni non cancellano più nomi e colori** (S1) | 🏗️ In corso | 🔴 Alta | 🟢 Basso | - | Cambiare il numero di candidati teneva solo i voti a zero ma azzerava anche i nomi; ora restano, con avviso "Salva e azzera" |
 
 Restano con te: P1 (prova PR #3), P2 (merge), P12 (migrazione sui dati veri,
 su una copia), P13 (giro sul telefono), P14 (release 2.0.0).

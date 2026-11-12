@@ -85,6 +85,23 @@ SnackBar (floating, `inverseSurface`).
 - Niente `iconButtonTheme` con `foregroundColor`: renderebbe grigia l'icona
   delle IconButton piene.
 
+## 5.2 Altre schermate (ridisegno S1-S7)
+
+- `VoteStackedBar` è l'unica barra dei voti: 12 dp in Home, 6 dp nelle righe
+  dell'Archivio, 8 dp in Lettura schede e in Condividi, 12 dp nel proiettore.
+  Ordine: classifica, poi bianche e nulle; il resto è `surfaceContainerHighest`.
+- Impostazioni: gruppi con titolo `titleSmall` in `primary`, contatori − / +
+  con `IconButton.outlined` e campo da 88 dp. Pagina intera sotto 600 dp,
+  finestra da 560 dp sopra. Salva pieno; diventa "Salva e azzera" su `error`
+  quando si perderebbero voti.
+- Lettura schede: tessere 88–300 dp, nome `headlineSmall` (`headlineMedium`
+  da 160 dp), voti in un riquadro piccolo nell'angolo; bianche e nulle
+  `OutlinedButton` da 72 dp.
+- Proiettore: tema scuro, righe 56–160 dp su `surfaceContainer` con la quota
+  in colore al 45%; primo posto su `primary`.
+- Colori dei candidati scelti solo da `CandidatePalette.candidates`, cerchi
+  da 36 dp in aree da 48 dp.
+
 ## 6. Regole pratiche
 
 - Nuovo testo visibile → aggiungilo a `lib/l10n/app_en.arb` e `app_it.arb`,

@@ -58,9 +58,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get votesTotal => 'TOTAL VOTES';
 
   @override
-  String get waitingForData => 'Waiting for data...';
-
-  @override
   String votesToWin(int count) {
     return '$count votes left to win';
   }
@@ -120,9 +117,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get percentages => 'Percentages';
 
   @override
-  String get noDataAvailable => 'No data available';
-
-  @override
   String get noHistoryAvailable => 'No history available';
 
   @override
@@ -135,31 +129,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get redoTooltip => 'Redo action';
 
   @override
-  String get resetButton => 'HOLD TO RESET';
-
-  @override
-  String get scrutinyConfiguration => 'Scrutiny configuration';
-
-  @override
-  String get totalVotersNumber => 'Total number of voters';
-
-  @override
-  String get votersHint => 'E.g. 100';
-
-  @override
   String get participantsCount => 'Number of candidates';
-
-  @override
-  String get votingOptions => 'Voting options';
-
-  @override
-  String get dataManagement => 'Data management';
-
-  @override
-  String get exportLabel => 'Export';
-
-  @override
-  String get importLabel => 'Import';
 
   @override
   String get configLoaded => 'Configuration loaded successfully';
@@ -248,14 +218,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String candidateVotesSemantics(String name, int votes) {
-    return '$name: $votes votes';
-  }
-
-  @override
-  String get resetSemanticsHint => 'Hold to reset the count';
-
-  @override
   String get navScrutiny => 'Count';
 
   @override
@@ -283,9 +245,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get archiveDelete => 'Delete';
-
-  @override
-  String get archiveCurrent => 'Open';
 
   @override
   String archiveBallots(int counted, int total) {
@@ -359,14 +318,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String ballotNumber(int n, int total) {
     return 'Ballot $n of $total';
   }
-
-  @override
-  String ballotLast(String name) {
-    return 'Last: $name';
-  }
-
-  @override
-  String get ballotUndo => 'Undo last';
 
   @override
   String get countingComplete => 'Count completed';

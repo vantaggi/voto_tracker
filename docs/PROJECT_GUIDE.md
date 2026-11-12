@@ -9,7 +9,7 @@ App Flutter a singola sorgente di stato, **interamente locale e offline**.
 
 ```
    UI         AppShell → HomePage · ArchivePage · BallotReadingScreen ·
-   (screens)  ProjectorMode · SettingsDialog          (+ widgets/*)
+   (screens)  ProjectorMode · SettingsPage            (+ widgets/*)
                              │ context.watch / read
               ┌──────────────▼──────────────┐
    Stato      │      ScrutinyProvider       │  ChangeNotifier: _voteLog,
