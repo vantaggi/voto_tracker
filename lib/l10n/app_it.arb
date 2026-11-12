@@ -154,5 +154,16 @@
   "archiveImportInvalid": "Questo file non è un archivio di Voto Tracker",
   "archiveImportEmpty": "Il file non contiene scrutini",
   "projectorRowSemantics": "{position}° posto, {name}: {votes} voti, {percent}%",
-  "@projectorRowSemantics": {"placeholders": {"position": {"type": "int"}, "name": {"type": "String"}, "votes": {"type": "int"}, "percent": {"type": "String"}}}
+  "@projectorRowSemantics": {"placeholders": {"position": {"type": "int"}, "name": {"type": "String"}, "votes": {"type": "int"}, "percent": {"type": "String"}}},
+  "useAsDefaults": "Usa anche per i nuovi scrutini",
+  "useAsDefaultsHint": "Votanti, regola e quorum di partenza per ogni nuovo scrutinio",
+  "saveAsList": "Salva i candidati come lista",
+  "listNameLabel": "Nome della lista",
+  "listSaved": "Lista «{name}» salvata",
+  "@listSaved": {"placeholders": {"name": {"type": "String"}}},
+  "newEmptyScrutiny": "Scrutinio vuoto",
+  "listCandidates": "{count} candidati",
+  "@listCandidates": {"placeholders": {"count": {"type": "int"}}},
+  "deleteList": "Elimina la lista {name}",
+  "@deleteList": {"placeholders": {"name": {"type": "String"}}}
 }

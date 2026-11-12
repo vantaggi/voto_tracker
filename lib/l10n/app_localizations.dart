@@ -846,6 +846,54 @@ abstract class AppLocalizations {
     int votes,
     String percent,
   );
+
+  /// No description provided for @useAsDefaults.
+  ///
+  /// In en, this message translates to:
+  /// **'Also use for new counts'**
+  String get useAsDefaults;
+
+  /// No description provided for @useAsDefaultsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting voters, rule and quorum for every new count'**
+  String get useAsDefaultsHint;
+
+  /// No description provided for @saveAsList.
+  ///
+  /// In en, this message translates to:
+  /// **'Save candidates as a list'**
+  String get saveAsList;
+
+  /// No description provided for @listNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'List name'**
+  String get listNameLabel;
+
+  /// No description provided for @listSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'List “{name}” saved'**
+  String listSaved(String name);
+
+  /// No description provided for @newEmptyScrutiny.
+  ///
+  /// In en, this message translates to:
+  /// **'Empty count'**
+  String get newEmptyScrutiny;
+
+  /// No description provided for @listCandidates.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} candidates'**
+  String listCandidates(int count);
+
+  /// No description provided for @deleteList.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete list {name}'**
+  String deleteList(String name);
 }
 
 class _AppLocalizationsDelegate

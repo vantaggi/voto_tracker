@@ -421,4 +421,35 @@ class AppLocalizationsIt extends AppLocalizations {
   ) {
     return '$position° posto, $name: $votes voti, $percent%';
   }
+
+  @override
+  String get useAsDefaults => 'Usa anche per i nuovi scrutini';
+
+  @override
+  String get useAsDefaultsHint =>
+      'Votanti, regola e quorum di partenza per ogni nuovo scrutinio';
+
+  @override
+  String get saveAsList => 'Salva i candidati come lista';
+
+  @override
+  String get listNameLabel => 'Nome della lista';
+
+  @override
+  String listSaved(String name) {
+    return 'Lista «$name» salvata';
+  }
+
+  @override
+  String get newEmptyScrutiny => 'Scrutinio vuoto';
+
+  @override
+  String listCandidates(int count) {
+    return '$count candidati';
+  }
+
+  @override
+  String deleteList(String name) {
+    return 'Elimina la lista $name';
+  }
 }

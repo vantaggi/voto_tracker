@@ -24,11 +24,13 @@ class _SettingsDialogState extends State<SettingsDialog> {
   late bool _quorumOn;
   late TextEditingController _eligibleController;
   late TextEditingController _quorumController;
+  late bool _useAsDefaults;
 
   @override
   void initState() {
     super.initState();
     final settings = context.read<ScrutinyProvider>().settings;
+    _useAsDefaults = context.read<ScrutinyProvider>().defaultSettings != null;
     _totalVotersController = TextEditingController(
       text: settings.totalVoters.toString(),
     );
@@ -159,6 +161,14 @@ class _SettingsDialogState extends State<SettingsDialog> {
 
             const SizedBox(height: AppSpacing.xl),
             _buildRulesSection(context),
+            // P10: queste impostazioni anche per i nuovi scrutini.
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.useAsDefaults),
+              subtitle: Text(l10n.useAsDefaultsHint),
+              value: _useAsDefaults,
+              onChanged: (v) => setState(() => _useAsDefaults = v),
+            ),
 
             const SizedBox(height: AppSpacing.xl),
             Text(
@@ -248,6 +258,16 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 ),
               ],
             ),
+            const SizedBox(height: AppSpacing.s),
+            // P10: lista riusabile per i prossimi scrutini.
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.playlist_add),
+                label: Text(l10n.saveAsList),
+                onPressed: () => _saveAsList(context),
+              ),
+            ),
           ],
         ),
       ),
@@ -275,11 +295,18 @@ class _SettingsDialogState extends State<SettingsDialog> {
             );
 
             final provider = context.read<ScrutinyProvider>();
+            final useAsDefaults = _useAsDefaults;
+            final hadDefaults = provider.defaultSettings != null;
             FocusScope.of(context).unfocus();
             Navigator.pop(context);
             Future.delayed(const Duration(milliseconds: 150), () {
               try {
                 provider.updateSettings(newSettings);
+                if (useAsDefaults) {
+                  provider.setDefaultSettingsFromCurrent();
+                } else if (hadDefaults) {
+                  provider.setDefaultSettingsFromCurrent(clear: true);
+                }
               } catch (e) {
                 debugPrint("Error saving settings: $e");
               }
@@ -288,6 +315,21 @@ class _SettingsDialogState extends State<SettingsDialog> {
           child: Text(l10n.save),
         ),
       ],
+    );
+  }
+
+  Future<void> _saveAsList(BuildContext context) async {
+    final l10n = context.l10n;
+    final provider = context.read<ScrutinyProvider>();
+    final messenger = ScaffoldMessenger.of(context);
+    final name = await showDialog<String>(
+      context: context,
+      builder: (_) => const _ListNameDialog(),
+    );
+    if (name == null || name.trim().isEmpty) return;
+    await provider.saveCandidateList(name);
+    messenger.showSnackBar(
+      SnackBar(content: Text(l10n.listSaved(name.trim()))),
     );
   }
 
@@ -368,4 +410,47 @@ class _SettingsDialogState extends State<SettingsDialog> {
 
   String _localeKey(Locale? locale) =>
       locale == null ? 'system' : locale.languageCode;
+}
+
+/// Nome della lista da salvare. Possiede il proprio controller: viene liberato
+/// solo a fine animazione di chiusura (vedi il crash di Modifica nome).
+class _ListNameDialog extends StatefulWidget {
+  const _ListNameDialog();
+
+  @override
+  State<_ListNameDialog> createState() => _ListNameDialogState();
+}
+
+class _ListNameDialogState extends State<_ListNameDialog> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return AlertDialog(
+      title: Text(l10n.saveAsList),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        decoration: InputDecoration(labelText: l10n.listNameLabel),
+        onSubmitted: (v) => Navigator.pop(context, v),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, _controller.text),
+          child: Text(l10n.save),
+        ),
+      ],
+    );
+  }
 }

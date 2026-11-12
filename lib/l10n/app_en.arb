@@ -154,5 +154,16 @@
   "archiveImportInvalid": "This file is not a Voto Tracker archive",
   "archiveImportEmpty": "The file contains no counts",
   "projectorRowSemantics": "Place {position}, {name}: {votes} votes, {percent}%",
-  "@projectorRowSemantics": {"placeholders": {"position": {"type": "int"}, "name": {"type": "String"}, "votes": {"type": "int"}, "percent": {"type": "String"}}}
+  "@projectorRowSemantics": {"placeholders": {"position": {"type": "int"}, "name": {"type": "String"}, "votes": {"type": "int"}, "percent": {"type": "String"}}},
+  "useAsDefaults": "Also use for new counts",
+  "useAsDefaultsHint": "Starting voters, rule and quorum for every new count",
+  "saveAsList": "Save candidates as a list",
+  "listNameLabel": "List name",
+  "listSaved": "List “{name}” saved",
+  "@listSaved": {"placeholders": {"name": {"type": "String"}}},
+  "newEmptyScrutiny": "Empty count",
+  "listCandidates": "{count} candidates",
+  "@listCandidates": {"placeholders": {"count": {"type": "int"}}},
+  "deleteList": "Delete list {name}",
+  "@deleteList": {"placeholders": {"name": {"type": "String"}}}
 }

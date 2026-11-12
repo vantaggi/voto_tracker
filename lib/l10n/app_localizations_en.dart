@@ -419,4 +419,35 @@ class AppLocalizationsEn extends AppLocalizations {
   ) {
     return 'Place $position, $name: $votes votes, $percent%';
   }
+
+  @override
+  String get useAsDefaults => 'Also use for new counts';
+
+  @override
+  String get useAsDefaultsHint =>
+      'Starting voters, rule and quorum for every new count';
+
+  @override
+  String get saveAsList => 'Save candidates as a list';
+
+  @override
+  String get listNameLabel => 'List name';
+
+  @override
+  String listSaved(String name) {
+    return 'List “$name” saved';
+  }
+
+  @override
+  String get newEmptyScrutiny => 'Empty count';
+
+  @override
+  String listCandidates(int count) {
+    return '$count candidates';
+  }
+
+  @override
+  String deleteList(String name) {
+    return 'Delete list $name';
+  }
 }

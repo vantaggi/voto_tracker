@@ -5,8 +5,10 @@ import 'package:flutter/foundation.dart' show listEquals;
 
 import 'package:material_ui/material_ui.dart';
 import 'package:voto_tracker/data/scrutiny_repository.dart';
+import 'package:voto_tracker/data/templates_repository.dart';
 import 'package:voto_tracker/domain/scrutiny_engine.dart';
 import 'package:voto_tracker/models/candidate.dart';
+import 'package:voto_tracker/models/candidate_list.dart';
 import 'package:voto_tracker/models/scrutiny.dart';
 import 'package:voto_tracker/models/settings.dart';
 import 'package:voto_tracker/theme/candidate_palette.dart';
@@ -111,8 +113,14 @@ class ScrutinyProvider extends ChangeNotifier {
         color: CandidatePalette.forIndex(index),
       ),
     );
+    _candidates.addAll(_technicalCandidates());
+  }
+
+  /// Schede bianche e nulle, se le impostazioni le prevedono.
+  List<Candidate> _technicalCandidates() {
+    final rows = <Candidate>[];
     if (_settings.showBlankVotes) {
-      _candidates.add(
+      rows.add(
         Candidate(
           name: AppStrings.blankVotes,
           votes: 0,
@@ -122,7 +130,7 @@ class ScrutinyProvider extends ChangeNotifier {
       );
     }
     if (_settings.showNullVotes) {
-      _candidates.add(
+      rows.add(
         Candidate(
           name: AppStrings.nullVotes,
           votes: 0,
@@ -131,6 +139,7 @@ class ScrutinyProvider extends ChangeNotifier {
         ),
       );
     }
+    return rows;
   }
 
   ScrutinyRepository? _repository;
@@ -145,6 +154,10 @@ class ScrutinyProvider extends ChangeNotifier {
         return _candidates;
       },
     );
+    final templates = await TemplatesRepository.open();
+    _templates = templates;
+    _lists = templates.loadLists();
+    _defaultSettings = templates.loadDefaultSettings();
     _repository = repository;
     _archive = archive;
     _applyCurrent();
@@ -246,7 +259,8 @@ class ScrutinyProvider extends ChangeNotifier {
     final archive = _archive, repository = _repository;
     if (archive == null || repository == null) return;
     await _persistState();
-    _settings = Settings.fromJson(_settings.toJson());
+    // P10: le impostazioni predefinite, se salvate; se no quelle di ora.
+    _settings = Settings.fromJson((_defaultSettings ?? _settings).toJson());
     _initializeCandidates();
     final t = repository.now();
     final created = Scrutiny(
@@ -276,6 +290,106 @@ class ScrutinyProvider extends ChangeNotifier {
       ..currentId = scrutiny.id;
     _applyCurrent();
     await _repository!.save(_archive!);
+    notifyListeners();
+  }
+
+  // --- Liste di candidati e impostazioni predefinite (FEAT-008, P10) --------
+
+  TemplatesRepository? _templates;
+  List<CandidateList> _lists = [];
+  Settings? _defaultSettings;
+
+  /// Liste salvate, in ordine alfabetico.
+  List<CandidateList> get candidateLists =>
+      List.of(_lists)
+        ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+
+  /// Impostazioni dei nuovi scrutini; `null` = si copiano quelle dell'aperto.
+  Settings? get defaultSettings => _defaultSettings;
+
+  /// Salva candidati (nomi, colori, percentuali precedenti) e impostazioni
+  /// dello scrutinio aperto come lista. Un nome già usato viene sostituito.
+  Future<void> saveCandidateList(String name) async {
+    final templates = _templates, repository = _repository;
+    final trimmed = name.trim();
+    if (templates == null || repository == null || trimmed.isEmpty) return;
+    _lists.removeWhere((l) => l.name.toLowerCase() == trimmed.toLowerCase());
+    _lists.add(
+      CandidateList(
+        id: repository.newId(),
+        name: trimmed,
+        candidates: [
+          for (final c in _candidates)
+            if (c.type == CandidateType.normal)
+              Candidate(
+                name: c.name,
+                votes: 0,
+                color: c.color,
+                previousPercentage: c.previousPercentage,
+              ),
+        ],
+        settings: Settings.fromJson(_settings.toJson()),
+      ),
+    );
+    await templates.saveLists(_lists);
+    notifyListeners();
+  }
+
+  Future<void> deleteCandidateList(String id) async {
+    final templates = _templates;
+    if (templates == null) return;
+    _lists.removeWhere((l) => l.id == id);
+    await templates.saveLists(_lists);
+    notifyListeners();
+  }
+
+  /// Nuovo scrutinio con candidati e impostazioni della lista [id].
+  Future<void> newScrutinyFromList(String id) async {
+    final archive = _archive, repository = _repository;
+    if (archive == null || repository == null) return;
+    final list = _lists.where((l) => l.id == id).firstOrNull;
+    if (list == null) return;
+    await _persistState();
+    final s = list.settings;
+    _settings = Settings(
+      totalVoters: s.totalVoters,
+      participantsCount: list.candidates.length,
+      showBlankVotes: s.showBlankVotes,
+      showNullVotes: s.showNullVotes,
+      victoryRule: s.victoryRule,
+      eligibleVoters: s.eligibleVoters,
+      quorumPercent: s.quorumPercent,
+    );
+    _candidates = [
+      for (final c in list.candidates)
+        Candidate(
+          name: c.name,
+          votes: 0,
+          color: c.color,
+          previousPercentage: c.previousPercentage,
+        ),
+      ..._technicalCandidates(),
+    ];
+    final t = repository.now();
+    await _openNew(
+      Scrutiny(
+        id: repository.newId(),
+        title: list.name,
+        createdAt: t,
+        updatedAt: t,
+        settings: _settings,
+        candidates: _candidates,
+      ),
+    );
+  }
+
+  /// Le impostazioni dello scrutinio aperto diventano quelle dei nuovi
+  /// scrutini; con [clear] si torna a copiare quelle dell'aperto.
+  Future<void> setDefaultSettingsFromCurrent({bool clear = false}) async {
+    final templates = _templates;
+    if (templates == null) return;
+    _defaultSettings = clear ? null : Settings.fromJson(_settings.toJson());
+    await templates.saveDefaultSettings(_defaultSettings);
     notifyListeners();
   }
 

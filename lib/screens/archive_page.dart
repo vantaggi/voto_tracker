@@ -72,6 +72,15 @@ class _ArchivePageState extends State<ArchivePage> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
+          // P10: con liste salvate si sceglie da quale partire.
+          if (provider.candidateLists.isNotEmpty) {
+            final started = await showModalBottomSheet<bool>(
+              context: context,
+              builder: (_) => const _NewScrutinySheet(),
+            );
+            if (started == true) onOpened?.call();
+            return;
+          }
           await provider.newScrutiny();
           onOpened?.call();
         },
@@ -487,6 +496,61 @@ class _ArchiveDetail extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+/// Scelta del punto di partenza di un nuovo scrutinio (P10): vuoto oppure
+/// da una lista salvata. Una lista si può anche eliminare da qui.
+class _NewScrutinySheet extends StatelessWidget {
+  const _NewScrutinySheet();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final provider = context.watch<ScrutinyProvider>();
+    final lists = provider.candidateLists;
+    return SafeArea(
+      child: ListView(
+        shrinkWrap: true,
+        children: [
+          ListTile(
+            title: Text(
+              l10n.newScrutiny,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.add),
+            title: Text(l10n.newEmptyScrutiny),
+            onTap: () async {
+              final navigator = Navigator.of(context);
+              await provider.newScrutiny();
+              navigator.pop(true);
+            },
+          ),
+          for (final list in lists)
+            ListTile(
+              leading: const Icon(Icons.list_alt),
+              title: Text(list.name),
+              subtitle: Text(l10n.listCandidates(list.candidates.length)),
+              onTap: () async {
+                final navigator = Navigator.of(context);
+                await provider.newScrutinyFromList(list.id);
+                navigator.pop(true);
+              },
+              trailing: IconButton(
+                icon: const Icon(Icons.delete_outline),
+                tooltip: l10n.deleteList(list.name),
+                onPressed: () async {
+                  final navigator = Navigator.of(context);
+                  await provider.deleteCandidateList(list.id);
+                  if (provider.candidateLists.isEmpty) navigator.pop(false);
+                },
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
