@@ -523,7 +523,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get resetConfirmBody =>
-      'Tutti i voti di questo scrutinio tornano a zero e non si possono più annullare.';
+      'Tutti i voti tornano a zero e i candidati riprendono i nomi predefiniti. Non si può annullare.';
 
   @override
   String get resetConfirm => 'Azzera';

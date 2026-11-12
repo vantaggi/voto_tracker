@@ -191,6 +191,6 @@
   "moreActions": "Altre azioni",
   "resetScrutiny": "Azzera scrutinio",
   "resetConfirmTitle": "Azzerare lo scrutinio?",
-  "resetConfirmBody": "Tutti i voti di questo scrutinio tornano a zero e non si possono più annullare.",
+  "resetConfirmBody": "Tutti i voti tornano a zero e i candidati riprendono i nomi predefiniti. Non si può annullare.",
   "resetConfirm": "Azzera"
 }

@@ -1006,7 +1006,7 @@ abstract class AppLocalizations {
   /// No description provided for @resetConfirmBody.
   ///
   /// In en, this message translates to:
-  /// **'All votes in this count go back to zero and can no longer be undone.'**
+  /// **'All votes go back to zero and candidates get their default names back. This can\'t be undone.'**
   String get resetConfirmBody;
 
   /// No description provided for @resetConfirm.
