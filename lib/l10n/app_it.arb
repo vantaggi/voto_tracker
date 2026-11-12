@@ -152,5 +152,7 @@
   "archiveImported": "Scrutini aggiunti: {added}. Già presenti: {skipped}.",
   "@archiveImported": {"placeholders": {"added": {"type": "int"}, "skipped": {"type": "int"}}},
   "archiveImportInvalid": "Questo file non è un archivio di Voto Tracker",
-  "archiveImportEmpty": "Il file non contiene scrutini"
+  "archiveImportEmpty": "Il file non contiene scrutini",
+  "projectorRowSemantics": "{position}° posto, {name}: {votes} voti, {percent}%",
+  "@projectorRowSemantics": {"placeholders": {"position": {"type": "int"}, "name": {"type": "String"}, "votes": {"type": "int"}, "percent": {"type": "String"}}}
 }

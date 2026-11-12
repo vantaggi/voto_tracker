@@ -411,4 +411,14 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get archiveImportEmpty => 'Il file non contiene scrutini';
+
+  @override
+  String projectorRowSemantics(
+    int position,
+    String name,
+    int votes,
+    String percent,
+  ) {
+    return '$position° posto, $name: $votes voti, $percent%';
+  }
 }

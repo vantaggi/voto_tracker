@@ -409,4 +409,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get archiveImportEmpty => 'The file contains no counts';
+
+  @override
+  String projectorRowSemantics(
+    int position,
+    String name,
+    int votes,
+    String percent,
+  ) {
+    return 'Place $position, $name: $votes votes, $percent%';
+  }
 }

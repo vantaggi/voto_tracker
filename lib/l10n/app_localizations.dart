@@ -835,6 +835,17 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The file contains no counts'**
   String get archiveImportEmpty;
+
+  /// No description provided for @projectorRowSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Place {position}, {name}: {votes} votes, {percent}%'**
+  String projectorRowSemantics(
+    int position,
+    String name,
+    int votes,
+    String percent,
+  );
 }
 
 class _AppLocalizationsDelegate

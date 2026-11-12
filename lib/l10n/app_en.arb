@@ -152,5 +152,7 @@
   "archiveImported": "Counts added: {added}. Already present: {skipped}.",
   "@archiveImported": {"placeholders": {"added": {"type": "int"}, "skipped": {"type": "int"}}},
   "archiveImportInvalid": "This file is not a Voto Tracker archive",
-  "archiveImportEmpty": "The file contains no counts"
+  "archiveImportEmpty": "The file contains no counts",
+  "projectorRowSemantics": "Place {position}, {name}: {votes} votes, {percent}%",
+  "@projectorRowSemantics": {"placeholders": {"position": {"type": "int"}, "name": {"type": "String"}, "votes": {"type": "int"}, "percent": {"type": "String"}}}
 }
