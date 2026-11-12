@@ -374,4 +374,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get ballotHint => 'Tocca il nome scritto sulla scheda';
+
+  @override
+  String defaultCandidateName(int number) {
+    return 'Candidato $number';
+  }
 }

@@ -139,5 +139,7 @@
   "@ballotLast": {"placeholders": {"name": {"type": "String"}}},
   "ballotUndo": "Annulla ultima",
   "countingComplete": "Scrutinio completato",
-  "ballotHint": "Tocca il nome scritto sulla scheda"
+  "ballotHint": "Tocca il nome scritto sulla scheda",
+  "defaultCandidateName": "Candidato {number}",
+  "@defaultCandidateName": {"placeholders": {"number": {"type": "int"}}}
 }

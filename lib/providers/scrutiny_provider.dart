@@ -86,6 +86,48 @@ class ScrutinyProvider extends ChangeNotifier {
   int? get votesUntilMajority => _votesToWin;
   int? _votesToWin;
 
+  /// Nome dei candidati nuovi, nella lingua dell'app (P4). Lo imposta
+  /// `MaterialApp.builder` con [setDefaultCandidateNamer]: il provider non ha
+  /// un `BuildContext`.
+  String Function(int number) get defaultCandidateName => _namer;
+  String Function(int number) _namer = _italianDefaultName;
+  String? _namerLocale = 'it';
+
+  static String _italianDefaultName(int number) =>
+      '${AppStrings.candidatePrefix} $number';
+
+  /// Lingua dei nomi predefiniti in uso (codice come `AppLocalizations.localeName`).
+  String? get defaultNamesLocale => _namerLocale;
+
+  /// Cambia la lingua dei nomi predefiniti. Se lo scrutinio aperto non ha
+  /// ancora schede, i candidati che portano ancora il nome predefinito
+  /// vengono rinominati nella nuova lingua; i nomi scelti dall'utente e gli
+  /// scrutini con voti non cambiano mai.
+  void setDefaultCandidateNamer(
+    String localeName,
+    String Function(int number) namer,
+  ) {
+    if (localeName == _namerLocale) return;
+    final old = _namer;
+    _namer = namer;
+    _namerLocale = localeName;
+    if (_archive == null || _voteLog.isNotEmpty) return;
+    var changed = false;
+    var n = 0;
+    for (final c in _candidates) {
+      if (c.type != CandidateType.normal) continue;
+      n++;
+      if (c.name == old(n) && c.name != namer(n)) {
+        c.name = namer(n);
+        changed = true;
+      }
+    }
+    if (changed) {
+      _scheduleSave();
+      notifyListeners();
+    }
+  }
+
   ScrutinyProvider() {
     _loadState();
   }
@@ -95,7 +137,7 @@ class ScrutinyProvider extends ChangeNotifier {
     _candidates = List.generate(
       _settings.participantsCount,
       (index) => Candidate(
-        name: '${AppStrings.candidatePrefix} ${index + 1}',
+        name: _namer(index + 1),
         votes: 0,
         color: CandidatePalette.forIndex(index),
       ),

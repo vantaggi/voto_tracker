@@ -56,6 +56,21 @@ class VotoTrackerApp extends StatelessWidget {
                   locale: localeProvider.locale,
                   localizationsDelegates: appLocalizationsDelegates,
                   supportedLocales: AppLocalizations.supportedLocales,
+                  // Nomi predefiniti dei candidati nella lingua dell'app
+                  // (P4). Dopo il frame: non si notifica durante il build.
+                  builder: (context, child) {
+                    final l10n = AppLocalizations.of(context);
+                    final scrutiny = context.read<ScrutinyProvider>();
+                    if (scrutiny.defaultNamesLocale != l10n.localeName) {
+                      WidgetsBinding.instance.addPostFrameCallback(
+                        (_) => scrutiny.setDefaultCandidateNamer(
+                          l10n.localeName,
+                          l10n.defaultCandidateName,
+                        ),
+                      );
+                    }
+                    return child!;
+                  },
                   home: const AppShell(),
                 ),
               );

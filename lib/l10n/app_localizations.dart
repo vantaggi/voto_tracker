@@ -775,6 +775,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap the name written on the ballot'**
   String get ballotHint;
+
+  /// No description provided for @defaultCandidateName.
+  ///
+  /// In en, this message translates to:
+  /// **'Candidate {number}'**
+  String defaultCandidateName(int number);
 }
 
 class _AppLocalizationsDelegate

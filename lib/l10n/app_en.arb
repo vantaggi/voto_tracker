@@ -139,5 +139,7 @@
   "@ballotLast": {"placeholders": {"name": {"type": "String"}}},
   "ballotUndo": "Undo last",
   "countingComplete": "Count completed",
-  "ballotHint": "Tap the name written on the ballot"
+  "ballotHint": "Tap the name written on the ballot",
+  "defaultCandidateName": "Candidate {number}",
+  "@defaultCandidateName": {"placeholders": {"number": {"type": "int"}}}
 }
