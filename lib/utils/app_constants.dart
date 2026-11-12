@@ -43,6 +43,13 @@ class AppDimensions {
 
   /// Sotto questa larghezza: NavigationBar; sopra: NavigationRail (M3).
   static const double compactBreakpoint = 600.0;
+
+  /// Larghezza dell'archivio da cui elenco e dettaglio stanno affiancati
+  /// (P8). Più del breakpoint compatto: a fianco c'è già il NavigationRail.
+  static const double archiveTwoPaneBreakpoint = 720.0;
+
+  /// Larghezza dell'elenco nell'archivio a due colonne.
+  static const double archiveListPaneWidth = 360.0;
 }
 
 /// Scala di spaziatura (multipli di 4, griglia M3). Padding, margini e gap nei

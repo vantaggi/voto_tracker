@@ -15,10 +15,23 @@ enum _ArchiveMenu { export, import }
 /// Archivio degli scrutini (FEAT-004): elenco, nuovo, duplica come modello,
 /// riapri, rinomina, elimina con conferma. [onOpened] viene chiamato quando
 /// si apre o crea uno scrutinio, per tornare alla schermata di conteggio.
-class ArchivePage extends StatelessWidget {
+///
+/// Sopra [AppDimensions.archiveTwoPaneBreakpoint] (tablet) elenco e dettaglio
+/// stanno affiancati (P8): toccare uno scrutinio lo mostra a destra, il
+/// pulsante Apri lo riapre per il conteggio.
+class ArchivePage extends StatefulWidget {
   const ArchivePage({super.key, this.onOpened});
 
   final VoidCallback? onOpened;
+
+  @override
+  State<ArchivePage> createState() => _ArchivePageState();
+}
+
+class _ArchivePageState extends State<ArchivePage> {
+  String? _selectedId;
+
+  VoidCallback? get onOpened => widget.onOpened;
 
   @override
   Widget build(BuildContext context) {
@@ -67,21 +80,70 @@ class ArchivePage extends StatelessWidget {
       ),
       body: SafeArea(
         top: false,
-        child: ListView.separated(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.l,
-            AppSpacing.s,
-            AppSpacing.l,
-            AppSpacing.bottomBarClearance,
-          ),
-          itemCount: items.length,
-          separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s),
-          itemBuilder: (context, i) => _ArchiveTile(
-            scrutiny: items[i],
-            isCurrent: items[i].id == provider.currentScrutinyId,
-            onOpened: onOpened,
-          ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < AppDimensions.archiveTwoPaneBreakpoint) {
+              return _list(items, provider, twoPane: false);
+            }
+            final selected =
+                items.where((s) => s.id == _selectedId).firstOrNull ??
+                items
+                    .where((s) => s.id == provider.currentScrutinyId)
+                    .firstOrNull;
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(
+                  width: AppDimensions.archiveListPaneWidth,
+                  child: _list(
+                    items,
+                    provider,
+                    twoPane: true,
+                    selected: selected,
+                  ),
+                ),
+                const VerticalDivider(width: 1),
+                Expanded(
+                  child: selected == null
+                      ? const SizedBox.shrink()
+                      : _ArchiveDetail(
+                          key: ValueKey(selected.id),
+                          scrutiny: selected,
+                          isCurrent: selected.id == provider.currentScrutinyId,
+                          onOpened: onOpened,
+                        ),
+                ),
+              ],
+            );
+          },
         ),
+      ),
+    );
+  }
+
+  Widget _list(
+    List<Scrutiny> items,
+    ScrutinyProvider provider, {
+    required bool twoPane,
+    Scrutiny? selected,
+  }) {
+    return ListView.separated(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.l,
+        AppSpacing.s,
+        AppSpacing.l,
+        AppSpacing.bottomBarClearance,
+      ),
+      itemCount: items.length,
+      separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.s),
+      itemBuilder: (context, i) => _ArchiveTile(
+        scrutiny: items[i],
+        isCurrent: items[i].id == provider.currentScrutinyId,
+        isSelected: twoPane && items[i].id == selected?.id,
+        onOpened: onOpened,
+        onSelect: twoPane
+            ? () => setState(() => _selectedId = items[i].id)
+            : null,
       ),
     );
   }
@@ -159,12 +221,20 @@ class _ArchiveTile extends StatelessWidget {
   const _ArchiveTile({
     required this.scrutiny,
     required this.isCurrent,
+    this.isSelected = false,
     this.onOpened,
+    this.onSelect,
   });
 
   final Scrutiny scrutiny;
   final bool isCurrent;
+
+  /// Mostrato nel pannello di dettaglio (solo a due colonne).
+  final bool isSelected;
   final VoidCallback? onOpened;
+
+  /// A due colonne il tocco seleziona invece di aprire.
+  final VoidCallback? onSelect;
 
   @override
   Widget build(BuildContext context) {
@@ -209,7 +279,8 @@ class _ArchiveTile extends StatelessWidget {
         subtitle: Text(
           isCurrent ? '${l10n.archiveCurrent} · $subtitle' : subtitle,
         ),
-        onTap: () => _open(context),
+        selected: isSelected,
+        onTap: onSelect ?? () => _open(context),
         trailing: PopupMenuButton<_ArchiveAction>(
           tooltip: l10n.archiveActions(title),
           onSelected: (action) => _onAction(context, action, title),
@@ -240,16 +311,8 @@ class _ArchiveTile extends StatelessWidget {
     );
   }
 
-  Future<void> _open(BuildContext context) async {
-    final provider = context.read<ScrutinyProvider>();
-    final messenger = ScaffoldMessenger.maybeOf(context);
-    final message = context.l10n.archiveOpened(
-      scrutinyDisplayTitle(context, scrutiny),
-    );
-    await provider.openScrutiny(scrutiny.id);
-    messenger?.showSnackBar(SnackBar(content: Text(message)));
-    onOpened?.call();
-  }
+  Future<void> _open(BuildContext context) =>
+      _openScrutiny(context, scrutiny, onOpened);
 
   Future<void> _onAction(
     BuildContext context,
@@ -305,6 +368,126 @@ class _ArchiveTile extends StatelessWidget {
       ),
     );
     return ok ?? false;
+  }
+}
+
+/// Riapre [scrutiny] per il conteggio e torna alla schermata Scrutinio.
+Future<void> _openScrutiny(
+  BuildContext context,
+  Scrutiny scrutiny,
+  VoidCallback? onOpened,
+) async {
+  final provider = context.read<ScrutinyProvider>();
+  final messenger = ScaffoldMessenger.maybeOf(context);
+  final message = context.l10n.archiveOpened(
+    scrutinyDisplayTitle(context, scrutiny),
+  );
+  await provider.openScrutiny(scrutiny.id);
+  messenger?.showSnackBar(SnackBar(content: Text(message)));
+  onOpened?.call();
+}
+
+/// Dettaglio a destra nell'archivio a due colonne (P8): esito e classifica,
+/// letti dal registro delle schede con lo stesso motore del conteggio.
+class _ArchiveDetail extends StatelessWidget {
+  const _ArchiveDetail({
+    super.key,
+    required this.scrutiny,
+    required this.isCurrent,
+    this.onOpened,
+  });
+
+  final Scrutiny scrutiny;
+  final bool isCurrent;
+  final VoidCallback? onOpened;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final candidates = scrutiny.candidates;
+    final votes = ScrutinyEngine.tally(candidates.length, scrutiny.voteLog);
+    final settings = scrutiny.settings;
+    final outcome = ScrutinyEngine.evaluate(
+      types: [for (final c in candidates) c.type],
+      votes: votes,
+      totalVoters: settings.totalVoters,
+      rule: settings.victoryRule,
+      quorumReached: settings.quorumReached,
+    );
+    final winnerName = outcome.winnerIndex == null
+        ? null
+        : localizedCandidateName(l10n, candidates[outcome.winnerIndex!]);
+    final label = localizedWinnerLabel(l10n, outcome.status);
+    final headline = localizedOutcomeHeadline(l10n, outcome.status, winnerName);
+    final total = outcome.totalAssigned;
+
+    return ListView(
+      padding: const EdgeInsets.all(AppSpacing.xl),
+      children: [
+        Text(
+          scrutinyDisplayTitle(context, scrutiny),
+          style: theme.textTheme.headlineSmall,
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          l10n.archiveBallots(scrutiny.ballotsCounted, settings.totalVoters),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
+        if (label != null) ...[
+          const SizedBox(height: AppSpacing.l),
+          Card(
+            color: outcome.status.isInconclusive
+                ? colorScheme.secondaryContainer
+                : colorScheme.tertiaryContainer,
+            child: ListTile(
+              title: Text(label),
+              subtitle: Text(headline, style: theme.textTheme.titleMedium),
+            ),
+          ),
+        ],
+        const SizedBox(height: AppSpacing.l),
+        for (final i in ScrutinyEngine.ranking(votes))
+          ListTile(
+            dense: true,
+            leading: CircleAvatar(
+              radius: AppSpacing.s,
+              backgroundColor: candidates[i].color,
+            ),
+            title: Text(localizedCandidateName(l10n, candidates[i])),
+            trailing: Text(
+              '${votes[i]} · ${(total > 0 ? votes[i] / total * 100 : 0).toStringAsFixed(1)}%',
+              style: theme.textTheme.bodyMedium,
+            ),
+          ),
+        const SizedBox(height: AppSpacing.l),
+        Wrap(
+          spacing: AppSpacing.s,
+          runSpacing: AppSpacing.s,
+          children: [
+            if (!isCurrent)
+              FilledButton.icon(
+                onPressed: () => _openScrutiny(context, scrutiny, onOpened),
+                icon: const Icon(Icons.open_in_new),
+                label: Text(l10n.archiveOpen),
+              ),
+            OutlinedButton.icon(
+              onPressed: () async {
+                await context.read<ScrutinyProvider>().duplicateAsTemplate(
+                  scrutiny.id,
+                );
+                onOpened?.call();
+              },
+              icon: const Icon(Icons.copy),
+              label: Text(l10n.archiveDuplicate),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }
 

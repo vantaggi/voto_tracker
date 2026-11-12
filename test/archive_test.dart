@@ -161,4 +161,47 @@ void main() {
     expect(again.currentScrutinyId, p.currentScrutinyId);
     expect(again.candidates[0].votes, 1);
   });
+
+  group('archivio a due colonne (P8)', () {
+    testWidgets('sul tablet elenco e dettaglio affiancati', (tester) async {
+      final p = await pumpApp(tester, const Size(1200, 800));
+      p.vote(0);
+      p.vote(0);
+      await p.newScrutiny();
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Archivio').first);
+      await tester.pumpAndSettle();
+      final current = p.currentScrutinyId;
+
+      // All'inizio il dettaglio mostra lo scrutinio aperto: niente "Apri".
+      expect(find.byType(VerticalDivider), findsWidgets);
+      expect(find.widgetWithText(FilledButton, 'Apri'), findsNothing);
+
+      // Tocco sull'altro: lo mostra a destra, senza aprirlo.
+      await tester.tap(find.textContaining('2 su').first);
+      await tester.pumpAndSettle();
+      expect(p.currentScrutinyId, current);
+      expect(find.widgetWithText(FilledButton, 'Apri'), findsOneWidget);
+      expect(find.textContaining('2 · 100.0%'), findsOneWidget);
+
+      await tester.tap(find.widgetWithText(FilledButton, 'Apri'));
+      await tester.pumpAndSettle();
+      expect(p.currentScrutinyId, isNot(current));
+      expect(p.candidates[0].votes, 2);
+    });
+
+    testWidgets('sul telefono il tocco apre subito', (tester) async {
+      final p = await pumpApp(tester, const Size(420, 900));
+      p.vote(1);
+      await p.newScrutiny();
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Archivio'));
+      await tester.pumpAndSettle();
+      final current = p.currentScrutinyId;
+      await tester.tap(find.textContaining('1 su').first);
+      await tester.pumpAndSettle();
+      expect(p.currentScrutinyId, isNot(current));
+      expect(find.widgetWithText(FilledButton, 'Apri'), findsNothing);
+    });
+  });
 }
