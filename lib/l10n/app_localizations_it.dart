@@ -379,4 +379,36 @@ class AppLocalizationsIt extends AppLocalizations {
   String defaultCandidateName(int number) {
     return 'Candidato $number';
   }
+
+  @override
+  String get archiveMoreActions => 'Altre azioni dell\'archivio';
+
+  @override
+  String get archiveExport => 'Esporta archivio';
+
+  @override
+  String get archiveImport => 'Importa da file';
+
+  @override
+  String get archiveImportTitle => 'Importa scrutini';
+
+  @override
+  String archiveImportBody(int count) {
+    return 'Nel file ci sono $count scrutini. Verranno aggiunti all\'archivio: quelli già presenti non vengono toccati.';
+  }
+
+  @override
+  String get archiveImportConfirm => 'Aggiungi';
+
+  @override
+  String archiveImported(int added, int skipped) {
+    return 'Scrutini aggiunti: $added. Già presenti: $skipped.';
+  }
+
+  @override
+  String get archiveImportInvalid =>
+      'Questo file non è un archivio di Voto Tracker';
+
+  @override
+  String get archiveImportEmpty => 'Il file non contiene scrutini';
 }

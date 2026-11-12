@@ -781,6 +781,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Candidate {number}'**
   String defaultCandidateName(int number);
+
+  /// No description provided for @archiveMoreActions.
+  ///
+  /// In en, this message translates to:
+  /// **'More archive actions'**
+  String get archiveMoreActions;
+
+  /// No description provided for @archiveExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Export archive'**
+  String get archiveExport;
+
+  /// No description provided for @archiveImport.
+  ///
+  /// In en, this message translates to:
+  /// **'Import from file'**
+  String get archiveImport;
+
+  /// No description provided for @archiveImportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import counts'**
+  String get archiveImportTitle;
+
+  /// No description provided for @archiveImportBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The file contains {count} counts. They will be added to the archive; the ones already there are left untouched.'**
+  String archiveImportBody(int count);
+
+  /// No description provided for @archiveImportConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get archiveImportConfirm;
+
+  /// No description provided for @archiveImported.
+  ///
+  /// In en, this message translates to:
+  /// **'Counts added: {added}. Already present: {skipped}.'**
+  String archiveImported(int added, int skipped);
+
+  /// No description provided for @archiveImportInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'This file is not a Voto Tracker archive'**
+  String get archiveImportInvalid;
+
+  /// No description provided for @archiveImportEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'The file contains no counts'**
+  String get archiveImportEmpty;
 }
 
 class _AppLocalizationsDelegate

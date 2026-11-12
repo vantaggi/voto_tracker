@@ -5,9 +5,12 @@ import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/models/candidate.dart';
 import 'package:voto_tracker/models/scrutiny.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
+import 'package:voto_tracker/services/archive_transfer_service.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
 
 enum _ArchiveAction { open, duplicate, rename, delete }
+
+enum _ArchiveMenu { export, import }
 
 /// Archivio degli scrutini (FEAT-004): elenco, nuovo, duplica come modello,
 /// riapri, rinomina, elimina con conferma. [onOpened] viene chiamato quando
@@ -24,7 +27,36 @@ class ArchivePage extends StatelessWidget {
     final items = provider.archive;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.archiveTitle)),
+      appBar: AppBar(
+        title: Text(l10n.archiveTitle),
+        actions: [
+          PopupMenuButton<_ArchiveMenu>(
+            tooltip: l10n.archiveMoreActions,
+            onSelected: (choice) => switch (choice) {
+              _ArchiveMenu.export => _export(context),
+              _ArchiveMenu.import => _import(context),
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: _ArchiveMenu.export,
+                child: ListTile(
+                  leading: const Icon(Icons.upload_file),
+                  title: Text(l10n.archiveExport),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              PopupMenuItem(
+                value: _ArchiveMenu.import,
+                child: ListTile(
+                  leading: const Icon(Icons.download),
+                  title: Text(l10n.archiveImport),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           await provider.newScrutiny();
@@ -54,6 +86,74 @@ class ArchivePage extends StatelessWidget {
     );
   }
 }
+
+/// Esporta tutto l'archivio in un file JSON e apre il menu Condividi (P7).
+Future<void> _export(BuildContext context) async {
+  final provider = context.read<ScrutinyProvider>();
+  final messenger = ScaffoldMessenger.of(context);
+  final error = context.l10n.exportError;
+  await provider.flushPendingSave();
+  final ok = await ArchiveTransferService.share(provider.archive);
+  if (!ok) messenger.showSnackBar(SnackBar(content: Text(error)));
+}
+
+/// Sceglie un file, chiede conferma e aggiunge gli scrutini (P7).
+Future<void> _import(
+  BuildContext context, {
+  Future<List<Scrutiny>?> Function() pick = ArchiveTransferService.pick,
+}) async {
+  final l10n = context.l10n;
+  final provider = context.read<ScrutinyProvider>();
+  final messenger = ScaffoldMessenger.of(context);
+  void say(String text) => messenger
+    ..hideCurrentSnackBar()
+    ..showSnackBar(SnackBar(content: Text(text)));
+
+  final List<Scrutiny>? items;
+  try {
+    items = await pick();
+  } on ArchiveFormatException {
+    say(l10n.archiveImportInvalid);
+    return;
+  } catch (_) {
+    say(l10n.archiveImportInvalid);
+    return;
+  }
+  if (items == null) return; // annullato
+  if (items.isEmpty) {
+    say(l10n.archiveImportEmpty);
+    return;
+  }
+  if (!context.mounted) return;
+  final ok = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      icon: const Icon(Icons.download),
+      title: Text(l10n.archiveImportTitle),
+      content: Text(l10n.archiveImportBody(items!.length)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, true),
+          child: Text(l10n.archiveImportConfirm),
+        ),
+      ],
+    ),
+  );
+  if (ok != true) return;
+  final (added, skipped) = await provider.importScrutinies(items);
+  say(l10n.archiveImported(added, skipped));
+}
+
+/// Solo per i test: import con un file finto al posto del selettore.
+@visibleForTesting
+Future<void> importArchiveForTest(
+  BuildContext context,
+  Future<List<Scrutiny>?> Function() pick,
+) => _import(context, pick: pick);
 
 class _ArchiveTile extends StatelessWidget {
   const _ArchiveTile({

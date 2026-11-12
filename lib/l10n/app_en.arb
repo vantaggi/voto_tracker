@@ -141,5 +141,16 @@
   "countingComplete": "Count completed",
   "ballotHint": "Tap the name written on the ballot",
   "defaultCandidateName": "Candidate {number}",
-  "@defaultCandidateName": {"placeholders": {"number": {"type": "int"}}}
+  "@defaultCandidateName": {"placeholders": {"number": {"type": "int"}}},
+  "archiveMoreActions": "More archive actions",
+  "archiveExport": "Export archive",
+  "archiveImport": "Import from file",
+  "archiveImportTitle": "Import counts",
+  "archiveImportBody": "The file contains {count} counts. They will be added to the archive; the ones already there are left untouched.",
+  "@archiveImportBody": {"placeholders": {"count": {"type": "int"}}},
+  "archiveImportConfirm": "Add",
+  "archiveImported": "Counts added: {added}. Already present: {skipped}.",
+  "@archiveImported": {"placeholders": {"added": {"type": "int"}, "skipped": {"type": "int"}}},
+  "archiveImportInvalid": "This file is not a Voto Tracker archive",
+  "archiveImportEmpty": "The file contains no counts"
 }

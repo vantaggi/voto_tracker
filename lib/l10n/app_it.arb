@@ -141,5 +141,16 @@
   "countingComplete": "Scrutinio completato",
   "ballotHint": "Tocca il nome scritto sulla scheda",
   "defaultCandidateName": "Candidato {number}",
-  "@defaultCandidateName": {"placeholders": {"number": {"type": "int"}}}
+  "@defaultCandidateName": {"placeholders": {"number": {"type": "int"}}},
+  "archiveMoreActions": "Altre azioni dell'archivio",
+  "archiveExport": "Esporta archivio",
+  "archiveImport": "Importa da file",
+  "archiveImportTitle": "Importa scrutini",
+  "archiveImportBody": "Nel file ci sono {count} scrutini. Verranno aggiunti all'archivio: quelli già presenti non vengono toccati.",
+  "@archiveImportBody": {"placeholders": {"count": {"type": "int"}}},
+  "archiveImportConfirm": "Aggiungi",
+  "archiveImported": "Scrutini aggiunti: {added}. Già presenti: {skipped}.",
+  "@archiveImported": {"placeholders": {"added": {"type": "int"}, "skipped": {"type": "int"}}},
+  "archiveImportInvalid": "Questo file non è un archivio di Voto Tracker",
+  "archiveImportEmpty": "Il file non contiene scrutini"
 }

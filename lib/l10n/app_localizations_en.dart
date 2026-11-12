@@ -378,4 +378,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String defaultCandidateName(int number) {
     return 'Candidate $number';
   }
+
+  @override
+  String get archiveMoreActions => 'More archive actions';
+
+  @override
+  String get archiveExport => 'Export archive';
+
+  @override
+  String get archiveImport => 'Import from file';
+
+  @override
+  String get archiveImportTitle => 'Import counts';
+
+  @override
+  String archiveImportBody(int count) {
+    return 'The file contains $count counts. They will be added to the archive; the ones already there are left untouched.';
+  }
+
+  @override
+  String get archiveImportConfirm => 'Add';
+
+  @override
+  String archiveImported(int added, int skipped) {
+    return 'Counts added: $added. Already present: $skipped.';
+  }
+
+  @override
+  String get archiveImportInvalid => 'This file is not a Voto Tracker archive';
+
+  @override
+  String get archiveImportEmpty => 'The file contains no counts';
 }

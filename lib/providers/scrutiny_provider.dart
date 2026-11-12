@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart' show listEquals;
 
 import 'package:material_ui/material_ui.dart';
 import 'package:voto_tracker/data/scrutiny_repository.dart';
@@ -321,6 +324,50 @@ class ScrutinyProvider extends ChangeNotifier {
     await _repository!.save(archive);
     notifyListeners();
   }
+
+  /// Aggiunge all'archivio gli scrutini letti da un file (P7). Non sovrascrive
+  /// mai: uno scrutinio già presente identico (stesso id, stessi candidati e
+  /// stesse schede) viene saltato; uno con lo stesso id ma diverso entra con
+  /// un id nuovo. Lo scrutinio aperto non cambia.
+  /// Restituisce (aggiunti, saltati).
+  Future<(int, int)> importScrutinies(List<Scrutiny> incoming) async {
+    final archive = _archive, repository = _repository;
+    if (archive == null || repository == null) return (0, 0);
+    await _persistState();
+    var added = 0, skipped = 0;
+    for (final s in incoming) {
+      final same = archive.items.where((e) => e.id == s.id).firstOrNull;
+      if (same == null) {
+        archive.items.add(s);
+        added++;
+      } else if (_sameContent(same, s)) {
+        skipped++;
+      } else {
+        archive.items.add(
+          Scrutiny(
+            id: repository.newId(),
+            title: s.title,
+            createdAt: s.createdAt,
+            updatedAt: s.updatedAt,
+            settings: s.settings,
+            candidates: s.candidates,
+            voteLog: s.voteLog,
+          ),
+        );
+        added++;
+      }
+    }
+    if (added > 0) {
+      await repository.save(archive);
+      notifyListeners();
+    }
+    return (added, skipped);
+  }
+
+  static bool _sameContent(Scrutiny a, Scrutiny b) =>
+      listEquals(a.voteLog, b.voteLog) &&
+      jsonEncode([for (final c in a.candidates) c.toJson()]) ==
+          jsonEncode([for (final c in b.candidates) c.toJson()]);
 
   /// Ricalcola i voti rigiocando il registro delle schede.
   void _recalculateState() {
