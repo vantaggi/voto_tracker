@@ -118,6 +118,7 @@ tutto") il 12/11.
 | UI-010 | **Condivisioni e grafici** (C1-C6, decisioni D1-D6) | 🏗️ In corso | 🔴 Alta | 🟡 Medio | - | Immagine 4:5, PDF "Verbale dei risultati", CSV per Excel italiano, JSON reimportabile, grafici Andamento e Confronto. Rese guardate; da provare sul telefono (condividere, stampare, aprire in Excel) |
 | UI-011 | **Icona "Stanghette" e splash screen** (I1-I5, decisioni D1-D5) | ✅ Fatto | 🟡 Media | 🟢 Basso | - | Icona adaptive con livello a tema, debug con banda "DEBUG" e nome "Voto Tracker debug", splash Android 12+ e precedenti in chiaro e scuro, icone web/iOS/Play Store. Build di debug provata sul telefono il 12/11: icona con banda e splash scuro giusti |
 | FIX-013 | **Andamento: candidati con lo stesso nome** (C5) | 🏗️ In corso | 🟡 Media | 🟢 Basso | - | La storia era per nome e due omonimi diventavano una linea; ora è per posizione |
+| FIX-014 | **Home: i + saltavano al primo voto** | ✅ Fatto | 🔴 Alta | 🟢 Basso | - | Trovato sul telefono il 12/11: lista su di ~60 dp al primo voto, 19 tocchi su 20 persi. Riepilogo ora di altezza fissa; test `al primo voto i + non si spostano` |
 
 P1 e P2 fatti: PR #3 unita il 2026-11-12. P12 saltato: non ci sono ancora dati
 veri da migrare. Restano P13 (giro sul telefono) e P14 (release 2.0.0: versione

@@ -679,17 +679,11 @@ abstract class AppLocalizations {
   /// **'No ballots yet'**
   String get summaryEmptyTitle;
 
-  /// No description provided for @summaryEmptyBody.
+  /// No description provided for @summaryEmptyHint.
   ///
   /// In en, this message translates to:
-  /// **'{candidates} candidates, {total} ballots expected. Check the names, then start.'**
-  String summaryEmptyBody(int candidates, int total);
-
-  /// No description provided for @summarySetup.
-  ///
-  /// In en, this message translates to:
-  /// **'Set up'**
-  String get summarySetup;
+  /// **'Tap + to count the first ballot.'**
+  String get summaryEmptyHint;
 
   /// No description provided for @shareResults.
   ///

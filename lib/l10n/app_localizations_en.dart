@@ -348,12 +348,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get summaryEmptyTitle => 'No ballots yet';
 
   @override
-  String summaryEmptyBody(int candidates, int total) {
-    return '$candidates candidates, $total ballots expected. Check the names, then start.';
-  }
-
-  @override
-  String get summarySetup => 'Set up';
+  String get summaryEmptyHint => 'Tap + to count the first ballot.';
 
   @override
   String get shareResults => 'Share results';
