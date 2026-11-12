@@ -67,6 +67,10 @@ Le sezioni sono generate dai commit convenzionali (vedi
     decimale, accenti), senza righe di totale e protetto dalle formule.
   - JSON nel formato dell'Archivio: si reimporta da "Importa da file".
   - File con il nome dello scrutinio e la data.
+- **Icona e splash nuovi:** icona "Stanghette" (quattro stanghette e la barra
+  che le chiude) adaptive, con la versione per le icone a tema di Android 13+;
+  splash chiaro o scuro come il telefono, con la schermata di avvio di Android
+  12+. La build di debug ha la banda "DEBUG" e si chiama "Voto Tracker debug".
 - **Grafici della Home:** "Andamento" con linee a gradini, chip con nome e voti
   per accendere e spegnere le linee e lettura a una scheda col dito;
   "Confronto" con barre e il risultato precedente al posto della ciambella.

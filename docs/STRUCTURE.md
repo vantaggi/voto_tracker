@@ -89,6 +89,10 @@ android/   ios/   linux/   macos/   windows/   web/   test/
 (`flutter test integration_test -d ID_TELEFONO`, build di debug, dati finti).
 
 Non modificare a mano i file generati salvo necessità (icone, manifest, versione).
+Icona e splash Android: `res/mipmap-anydpi-v26/ic_launcher.xml` (adaptive),
+`res/drawable/ic_launcher_*.xml`, temi `values*/styles.xml` (splash 12+ in
+`values-v31`), colori in `values*/colors.xml`; la debug cambia icona e nome in
+`android/app/src/debug/res/`. I disegni si rigenerano con `scripts/make_icons.py`.
 La versione canonica dell'app vive in `pubspec.yaml` (`version: X.Y.Z+build`).
 
 ## Documentazione (`docs/` + root)
@@ -120,6 +124,8 @@ docs/
 └── release-android.md          # Build release, versioning, scheda Play Store
 
 scripts/
-└── bump_version.py             # Bump MANUALE di pubspec.yaml + rigenera CHANGELOG (alla release)
+├── bump_version.py             # Bump MANUALE di pubspec.yaml + rigenera CHANGELOG (alla release)
+└── make_icons.py               # Icona e splash: genera vettoriali Android e PNG (Android, web, iOS, Play Store)
+assets/icon/                    # SVG dell'icona (release e debug) e PNG 512 per il Play Store (non nel bundle)
 l10n.yaml                       # Config gen-l10n (arb-dir, classe, output)
 ```

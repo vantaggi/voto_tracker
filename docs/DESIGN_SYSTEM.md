@@ -116,6 +116,18 @@ SnackBar (floating, `inverseSurface`).
 - Grafici: linee a gradini (mai curve), tacche intere con passo 1/2/5,
   `FilterChip` come legenda; Confronto a barre con tacca sul precedente.
 
+## 5.4 Icona e splash (I1-I5)
+
+- Icona "Stanghette": quattro stanghette bianche e la diagonale corallo
+  `#FF8F80` su indaco `#4648D4` (primary chiaro), nel quadro da 108 dp con
+  tutto dentro la zona sicura (raggio 33). Livello monocromatico per le icone a
+  tema. Geometria e colori solo in `scripts/make_icons.py`.
+- Debug: banda ambra `#FFC857` con "DEBUG" in basso.
+- Splash: fondo `surface` (`#FCF8FF` / `#13131B`), disegno su cerchio
+  `primary` (indaco in chiaro, lilla `#C0C1FF` con stanghette `#1000A9` in
+  scuro). Niente animazione né logo in basso; la finestra dietro Flutter ha lo
+  stesso fondo.
+
 ## 6. Regole pratiche
 
 - Nuovo testo visibile → aggiungilo a `lib/l10n/app_en.arb` e `app_it.arb`,
