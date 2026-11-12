@@ -24,6 +24,15 @@ Le sezioni sono generate dai commit convenzionali (vedi
   annulla sempre visibile e protezione dai doppi tocchi.
 - **Colore dinamico (Material You):** su Android 12+ l'app prende i colori dello
   sfondo; si può disattivare in Impostazioni → Aspetto.
+- **Esporta e importa l'archivio:** tutti gli scrutini in un file JSON da
+  condividere (backup, cambio telefono); l'import aggiunge senza sovrascrivere.
+- **Liste di candidati:** salva i candidati come lista e parti da lì per un
+  nuovo scrutinio; le impostazioni si possono usare anche per i nuovi.
+- **Archivio a due colonne sui tablet:** elenco a sinistra, esito e classifica
+  dello scrutinio scelto a destra.
+- I nomi predefiniti dei candidati seguono la lingua dell'app.
+- Il PDF usa i colori dell'app (anche quelli dinamici) e mostra pareggio,
+  ballottaggio e quorum non raggiunto con colori neutri.
 
 ### 🎨 Interfaccia & Design
 - Palette dei candidati ridisegnata (HCT) per essere leggibile in light e dark;
@@ -43,6 +52,11 @@ Le sezioni sono generate dai commit convenzionali (vedi
   `wakelock_plus` 1.8, `fl_chart` 1.3 e minori.
 - Lo schermo resta acceso solo mentre Home o proiettore sono aperti (prima il
   wakelock veniva riattivato a ogni rebuild e mai spento).
+- I voti si salvano a gruppi (al massimo uno ogni 300 ms) e sempre quando
+  l'app va in background: meno scritture a ogni tocco.
+- Rimossi i getter `winner`/`winnerLabel` del provider: l'esito passa solo da
+  `winnerStatus` e `winnerName`.
+- Test d'integrazione in `integration_test/` da lanciare sul telefono.
 - Esportazioni riunite in `ExportController`; widget grandi divisi in file più
   piccoli. Aggiunti test sul controller, sul menu export e golden della Home.
 
@@ -52,6 +66,8 @@ Le sezioni sono generate dai commit convenzionali (vedi
   nomi ruotati e illeggibili.
 
 ### 🐞 Bug Fix
+- Modalità proiettore: sul telefono con testo grande le righe uscivano dallo
+  schermo; ora sono leggibili anche da TalkBack (una riga per candidato).
 - Chiudere il dialog "Modifica nome" (Salva, Annulla o tocco fuori) mandava
   l'app in errore (schermo rosso): i campi di testo venivano liberati mentre
   l'animazione di chiusura li usava ancora.

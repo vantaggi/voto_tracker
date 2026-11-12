@@ -13,10 +13,12 @@ lib/
 │   └── scrutiny_engine.dart           # Tally, classifica, vincitore (regole, quorum), magic number, storico
 │
 ├── data/
-│   └── scrutiny_repository.dart       # Archivio su shared_preferences, schema v2, migrazione v1 → v2
+│   ├── scrutiny_repository.dart       # Archivio su shared_preferences, schema v2, migrazione v1 → v2
+│   └── templates_repository.dart      # Liste di candidati e impostazioni predefinite (FEAT-008)
 │
 ├── models/                            # Modelli dati puri (+ JSON)
 │   ├── candidate.dart                 # Candidate: name, votes, color, rank, previousPercentage
+│   ├── candidate_list.dart            # CandidateList: lista salvata di candidati + impostazioni
 │   ├── scrutiny.dart                  # Scrutiny: id, titolo, date, impostazioni, candidati, registro
 │   └── settings.dart                  # Settings: votanti, partecipanti, bianche/nulle, regola, quorum
 │
@@ -36,9 +38,9 @@ lib/
 ├── screens/
 │   ├── app_shell.dart                 # Navigazione Scrutinio / Archivio (NavigationBar o NavigationRail)
 │   ├── home_page.dart                 # Schermata principale (grafici + controlli, responsive)
-│   ├── archive_page.dart              # Archivio scrutini: nuovo, duplica, riapri, rinomina, elimina
+│   ├── archive_page.dart              # Archivio: nuovo (anche da lista), duplica, riapri, rinomina, elimina, esporta/importa; due colonne sui tablet
 │   ├── ballot_reading_screen.dart     # Lettura schede: una scheda alla volta
-│   ├── projector_mode_screen.dart     # Modalità proiettore fullscreen
+│   ├── projector_mode_screen.dart     # Modalità proiettore fullscreen (una riga parlata per candidato)
 │   └── settings_dialog.dart           # Dialog di configurazione scrutinio
 │
 ├── widgets/
@@ -57,6 +59,8 @@ lib/
 │
 ├── services/
 │   ├── export_controller.dart         # Prepara lo stato per PNG/PDF/CSV/JSON (un solo punto)
+│   ├── archive_transfer_service.dart  # Esporta/importa l'archivio in un file JSON (backup, cambio telefono)
+│   ├── pdf_palette.dart               # Colori del PDF dallo schema chiaro dell'app
 │   ├── wakelock_service.dart          # Wakelock con conteggio delle richieste
 │   ├── configuration_service.dart     # Import/export configurazione candidati (JSON via file_picker)
 │   ├── data_export_service.dart       # Export risultati grezzi CSV/JSON (condivisione file)
@@ -77,6 +81,9 @@ lib/
 ```
 android/   ios/   linux/   macos/   windows/   web/   test/
 ```
+
+`integration_test/app_flow_test.dart`: flusso completo da lanciare sul telefono
+(`flutter test integration_test -d ID_TELEFONO`, build di debug, dati finti).
 
 Non modificare a mano i file generati salvo necessità (icone, manifest, versione).
 La versione canonica dell'app vive in `pubspec.yaml` (`version: X.Y.Z+build`).

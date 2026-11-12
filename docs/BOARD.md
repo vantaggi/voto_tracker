@@ -81,9 +81,28 @@ telefono resta da fare (vedi PR).
 | FEAT-005 | **Regole**: relativa, assoluta, quorum di affluenza | ✅ Fatto | 🟡 Media | 🟡 Medio | - | Esiti Ballottaggio / Quorum non raggiunto |
 | FEAT-006 | **Lettura scheda** | ✅ Fatto | 🟡 Media | 🟢 Basso | - | Protezione dai doppi tocchi (350 ms) |
 | DOC-006 | **Docs allineate** alla Wave 4 | ✅ Fatto | 🟢 Bassa | 🟢 Basso | - | |
-| FEAT-007 | **Widget home screen / Quick Settings tile** | 📅 Pianificato | 🟢 Bassa | 🟡 Medio | - | Codice nativo, rimandato (piano, Fase 4) |
-| FEAT-008 | **Liste e preferenze** (voto di lista) | 📅 Pianificato | 🟢 Bassa | 🔴 Alto | - | Cambia il modello dati, serve una spec |
+| FEAT-007 | **Widget home screen / Quick Settings tile** | 📅 Pianificato | 🟢 Bassa | 🟡 Medio | - | Codice nativo: rimandato alla 2.1 (piano master, decisione D1) |
 | FIX-006 | **Dialog modifica candidato:** controller liberati prima della fine dell'animazione | ✅ Fatto | 🔴 Alta | 🟢 Basso | - | Schermo rosso sul telefono alla prima prova; riprodotto e coperto da `test/edit_candidate_dialog_test.dart` |
+
+## 🧭 Wave 5 — Piano master v2.0, passi P3-P11 (12 novembre 2026)
+
+Piano: documento "Voto Tracker — Piano master del refactor (v2.0)", approvato
+("Ok tutto") il 12/11. Fatto nel cloud; la prova sul telefono è il passo P13.
+
+| ID | Task | Status | Priorità | Rischio | Stima | Note |
+|:--|:--|:--:|:--:|:--:|:--:|:--|
+| PERF-002 | **Salvataggi raggruppati** (P3) | ✅ Fatto | 🟡 Media | 🟡 Medio | - | 300 ms; salvataggio forzato quando l'app esce dal primo piano |
+| FEAT-009 | **Nomi predefiniti localizzati** (P4) | ✅ Fatto | 🟢 Bassa | 🟢 Basso | - | Rinomina i predefiniti solo se lo scrutinio non ha schede |
+| REFACTOR-007 | **Via `winner`/`winnerLabel`** dal provider (P5) | ✅ Fatto | 🟢 Bassa | 🟢 Basso | - | L'esito passa solo da `winnerStatus` + `winnerName` |
+| FEAT-010 | **PDF con esito e colori del tema** (P6) | 🏗️ In corso | 🟡 Media | 🟢 Basso | - | `PdfPalette`; da guardare un PDF vero sul telefono |
+| FEAT-011 | **Esporta / importa archivio** (P7) | 🏗️ In corso | 🔴 Alta | 🟡 Medio | - | JSON via Condividi; da provare il giro completo sul telefono |
+| UI-006 | **Archivio a due colonne** sui tablet (P8) | ✅ Fatto | 🟢 Bassa | 🟢 Basso | - | Da 720 dp |
+| UI-007 | **Proiettore accessibile** (P9) | ✅ Fatto | 🟡 Media | 🟢 Basso | - | Corretto overflow a 360 dp con testo grande |
+| FEAT-008 | **Liste di candidati e impostazioni predefinite** (P10) | ✅ Fatto | 🟡 Media | 🟡 Medio | - | Niente "voto di lista": liste da riusare per nuovi scrutini |
+| TEST-002 | **Test d'integrazione** sul dispositivo (P11) | 🏗️ In corso | 🟡 Media | 🟢 Basso | - | Scritto; da lanciare sul telefono (P13) |
+
+Restano con te: P1 (prova PR #3), P2 (merge), P12 (migrazione sui dati veri,
+su una copia), P13 (giro sul telefono), P14 (release 2.0.0).
 
 ## Convenzioni ID
 
