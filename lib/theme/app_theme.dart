@@ -123,11 +123,10 @@ class AppTheme {
           side: BorderSide(color: colorScheme.outline),
         ),
       ),
-      iconButtonTheme: IconButtonThemeData(
-        style: IconButton.styleFrom(
-          foregroundColor: colorScheme.onSurfaceVariant,
-        ),
-      ),
+      // Niente iconButtonTheme: un foregroundColor globale vincerebbe anche
+      // sulle varianti piene (IconButton.filled), dando un'icona grigia sul
+      // primary. Il default M3 è già onSurfaceVariant per le IconButton
+      // standard e onPrimary per quelle piene.
 
       // Inputs
       inputDecorationTheme: InputDecorationTheme(
