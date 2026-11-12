@@ -67,5 +67,28 @@ elezioni, scrutinio, voti, politica, rappresentante di lista, conteggio, statist
 ## Note per la Pubblicazione
 
 1. La versione è in `pubspec.yaml` (`2.0.0+6`: il numero dopo `+` è il `versionCode`, deve crescere a ogni caricamento). Build: `flutter build appbundle --release` con `android/key.properties`.
-2. Generare il Keystore di upload se non presente.
+2. La chiave di upload esiste già: vedi "Chiave di firma" qui sotto. Non generarne un'altra.
 3. Compilare la scheda "Sicurezza dei dati" nella Console Google Play indicando che l'app non raccoglie dati.
+4. Alla prima pubblicazione scegliere la **firma dell'app gestita da Google** (Play App Signing): se la chiave di upload si perde, si chiede a Google di sostituirla.
+
+## Chiave di firma
+
+La chiave **non è nel repository** (`android/.gitignore` esclude `key.properties` e `*.jks`).
+È salvata sul PC di Cioti, in OneDrive:
+
+```
+C:\Users\cioti\OneDrive\Documenti\Key-ANDROID\VotoTracker\
+├── upload-keystore.jks   chiave di upload
+├── key.properties        alias e password (copia di quello in android/)
+└── LEGGIMI.txt           cosa sono e come si usano
+```
+
+- Alias `upload`, creata il 21/12/2025, RSA 2048, valida fino al 2053.
+- Certificato SHA-256: `98:94:A3:44:A4:67:BF:40:B2:4D:A4:42:EC:2F:A3:BE:D7:54:50:D2:58:6A:C3:C8:04:06:24:36:98:25:89:84`.
+- È la stessa chiave della 1.1.0 installata a mano sul telefono, quindi la 2.0.0 si installa sopra senza disinstallare.
+- Per firmare su un PC nuovo: copiare `key.properties` da OneDrive in `android/` del progetto. La riga
+  `storeFile` punta già al `.jks` in OneDrive; se il percorso cambia, aggiornare solo quella riga.
+- Le password sono solo in `key.properties`: **mai** scriverle nel repository, in chat o nei commit.
+
+Gli screenshot per la scheda stanno sul PC in `store_screenshots/` del clone (escluso da git con
+`.git/info/exclude`).
