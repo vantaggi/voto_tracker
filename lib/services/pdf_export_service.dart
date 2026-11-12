@@ -1,375 +1,548 @@
+import 'dart:math' as math;
+import 'dart:typed_data';
+
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'package:voto_tracker/l10n/export_labels.dart';
-import 'package:voto_tracker/models/candidate.dart';
+import 'package:voto_tracker/domain/scrutiny_engine.dart';
+import 'package:voto_tracker/l10n/app_localizations.dart';
+import 'package:voto_tracker/l10n/export_format.dart';
+import 'package:voto_tracker/l10n/l10n_ext.dart';
+import 'package:voto_tracker/models/settings.dart';
+import 'package:voto_tracker/services/pdf_palette.dart';
+import 'package:voto_tracker/services/results_snapshot.dart';
 
+/// "Verbale dei risultati" (C3): A4 verticale, più pagine se servono.
+/// Intestazione con titolo e data, esito, numeri chiave, una sola tabella
+/// dei risultati con barre, andamento a gradini e, a scrutinio completo,
+/// le righe per le firme.
 class PdfExportService {
-  static Future<void> exportToPdf({
-    required List<Candidate> candidates,
-    required int totalVotesAssigned,
-    required int totalVoters,
-    required int remainingVotes,
-    required Map<int, Map<String, int>> historyPoints,
-    required ExportLabels labels,
-    String? winner,
-    String? winnerLabel,
+  const PdfExportService._();
+
+  /// Linee dell'andamento al massimo (le altre restano nella tabella).
+  static const int maxTrendLines = 8;
+
+  /// Crea il PDF e apre il menu Condividi.
+  static Future<bool> share({
+    required ResultsSnapshot snapshot,
+    required AppLocalizations l10n,
+    required ExportFormat format,
+    PdfPalette? palette,
   }) async {
-    final doc = pw.Document();
-    final font = await PdfGoogleFonts.robotoRegular();
-    final fontBold = await PdfGoogleFonts.robotoBold();
+    final bytes = await build(
+      snapshot: snapshot,
+      l10n: l10n,
+      format: format,
+      palette: palette,
+      base: await PdfGoogleFonts.robotoRegular(),
+      bold: await PdfGoogleFonts.robotoBold(),
+    );
+    return Printing.sharePdf(
+      bytes: bytes,
+      filename: ExportFormat.fileName(snapshot.title, snapshot.at, 'pdf'),
+    );
+  }
 
+  /// Il documento. Separato da [share] per i test (caratteri locali).
+  static Future<Uint8List> build({
+    required ResultsSnapshot snapshot,
+    required AppLocalizations l10n,
+    required ExportFormat format,
+    PdfPalette? palette,
+    pw.Font? base,
+    pw.Font? bold,
+  }) {
+    final p = palette ?? PdfPalette.brand;
+    final s = snapshot;
+    final doc = pw.Document(title: s.title, creator: 'Voto Tracker');
+    final small = pw.TextStyle(fontSize: 8, color: p.textVariant);
     doc.addPage(
-      pw.Page( // Single Page constraint (MultiPage would paginate)
+      pw.MultiPage(
         pageTheme: pw.PageTheme(
-          theme: pw.ThemeData.withFont(base: font, bold: fontBold),
-          margin: const pw.EdgeInsets.all(32),
+          pageFormat: PdfPageFormat.a4,
+          margin: const pw.EdgeInsets.fromLTRB(40, 36, 40, 32),
+          theme: base == null
+              ? null
+              : pw.ThemeData.withFont(base: base, bold: bold ?? base),
         ),
-        build: (pw.Context context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+        footer: (ctx) => pw.Padding(
+          padding: const pw.EdgeInsets.only(top: 12),
+          child: pw.Row(
             children: [
-              _buildModernHeader(winner, winnerLabel, labels),
-              pw.SizedBox(height: 24),
-              _buildStatsStrip(totalVotesAssigned, totalVoters, remainingVotes, labels),
-              pw.SizedBox(height: 24),
-
-              pw.Row(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
-                   pw.Expanded(
-                       flex: 4,
-                       child: pw.Column(
-                           children: [
-                               _buildBarChart(candidates, totalVotesAssigned, labels),
-                               pw.SizedBox(height: 24),
-                               _buildDonutChart(candidates, totalVotesAssigned, totalVoters, labels),
-                           ]
-                       )
-                   ),
-                   pw.SizedBox(width: 24),
-                   pw.Expanded(
-                       flex: 6,
-                       child: _buildHistoryChart(historyPoints, candidates, labels)
-                   ),
-                ]
+              pw.Expanded(
+                child: pw.Text(
+                  '${s.title} · ${format.dateTime(s.at)}',
+                  style: small,
+                  maxLines: 1,
+                ),
               ),
-
-              pw.Spacer(),
-
-              _buildCompactTable(candidates, totalVotesAssigned, labels),
-
-              pw.SizedBox(height: 16),
-              _buildFooter(labels),
+              pw.Text(
+                '${l10n.exportFooterApp} · '
+                '${l10n.pdfPage('${ctx.pageNumber}', '${ctx.pagesCount}')}',
+                style: small,
+              ),
             ],
-          );
-        },
+          ),
+        ),
+        build: (ctx) => [
+          ..._header(s, l10n, format, p),
+          pw.SizedBox(height: 16),
+          _outcome(s, l10n, format, p),
+          pw.SizedBox(height: 16),
+          _keyNumbers(s, l10n, format, p),
+          pw.SizedBox(height: 18),
+          pw.Text(
+            l10n.pdfResults,
+            style: pw.TextStyle(
+              fontSize: 13,
+              fontWeight: pw.FontWeight.bold,
+              color: p.text,
+            ),
+          ),
+          pw.SizedBox(height: 6),
+          _table(s, l10n, format, p),
+          pw.SizedBox(height: 4),
+          pw.Text(
+            [l10n.pdfNote, if (s.hasPrevious) l10n.pdfNoteChange].join(' '),
+            style: small,
+          ),
+          if (s.counted >= 2) ...[
+            pw.SizedBox(height: 18),
+            ..._trend(s, l10n, p),
+          ],
+          if (s.isComplete) ...[pw.SizedBox(height: 36), _signatures(l10n, p)],
+        ],
       ),
     );
-
-    await Printing.sharePdf(
-        bytes: await doc.save(), filename: 'scrutinio_report.pdf');
+    return doc.save();
   }
 
-  static pw.Widget _buildModernHeader(String? winner, String? winnerLabel, ExportLabels labels) {
-      return pw.Row(
-          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: pw.CrossAxisAlignment.center,
-          children: [
-              pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                      pw.Text(labels.appTitlePro.toUpperCase(),
-                          style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold, color: PdfColors.indigo900, letterSpacing: 1.2)
-                      ),
-                      pw.Text(labels.reportSubtitle, style: const pw.TextStyle(fontSize: 10, color: PdfColors.indigo500, letterSpacing: 2)),
-                  ]
-              ),
-              if (winner != null)
-              pw.Container(
-                  padding: const pw.EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: pw.BoxDecoration(
-                      color: PdfColors.amber,
-                      borderRadius: pw.BorderRadius.circular(16), // M3 Medium Shape
-                  ),
-                  child: pw.Text("${winnerLabel ?? labels.winnerFallback}: $winner",
-                      style: pw.TextStyle(color: PdfColors.black, fontWeight: pw.FontWeight.bold))
-              ),
-              pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.end,
-                children: [
-                  pw.Text(
-                      DateTime.now().toString().substring(0, 10),
-                      style: const pw.TextStyle(fontSize: 12, color: PdfColors.grey700)
-                  ),
-                   pw.Text(
-                      DateTime.now().toString().substring(11, 16),
-                      style: pw.TextStyle(fontSize: 12, color: PdfColors.grey700, fontWeight: pw.FontWeight.bold)
-                  ),
-                ]
-              )
-          ]
-      );
-  }
+  static List<pw.Widget> _header(
+    ResultsSnapshot s,
+    AppLocalizations l10n,
+    ExportFormat f,
+    PdfPalette p,
+  ) => [
+    pw.Text(
+      l10n.pdfTitle,
+      style: pw.TextStyle(
+        fontSize: 9,
+        letterSpacing: 1.5,
+        color: p.accent,
+        fontWeight: pw.FontWeight.bold,
+      ),
+    ),
+    pw.SizedBox(height: 4),
+    pw.Text(
+      s.title,
+      style: pw.TextStyle(
+        fontSize: 24,
+        fontWeight: pw.FontWeight.bold,
+        color: p.text,
+      ),
+    ),
+    pw.Text(
+      [
+        f.dateTime(s.at),
+        s.rule == VictoryRule.plurality
+            ? l10n.rulePlurality
+            : l10n.ruleAbsoluteMajority,
+        l10n.pdfExpectedVoters('${s.totalVoters}'),
+      ].join(' · '),
+      style: pw.TextStyle(fontSize: 10, color: p.textVariant),
+    ),
+  ];
 
-  static pw.Widget _buildStatsStrip(int totalVotesAssigned, int totalVoters, int remainingVotes, ExportLabels labels) {
-      return pw.Container(
-          padding: const pw.EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-          decoration: pw.BoxDecoration(
-              color: PdfColors.indigo50, // Surface Container High equivalent
-              borderRadius: pw.BorderRadius.circular(16) // M3 Medium Shape
-          ),
-          child: pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-              children: [
-                  _buildCompactStat(labels.countedVotes.toUpperCase(), "$totalVotesAssigned / $totalVoters"),
-                  pw.Container(width: 1, height: 24, color: PdfColors.indigo100),
-                  _buildCompactStat(labels.remaining.toUpperCase(), "$remainingVotes"),
-                  pw.Container(width: 1, height: 24, color: PdfColors.indigo100),
-                  _buildCompactStat(labels.completion, "${(totalVoters > 0 ? (totalVotesAssigned / totalVoters * 100) : 0).toStringAsFixed(1)}%"),
-              ]
-          )
-      );
-  }
-
-  static pw.Widget _buildCompactStat(String label, String value) {
-      return pw.Column(
-          children: [
-              pw.Text(value, style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.indigo900)),
-              pw.SizedBox(height: 2),
-              pw.Text(label, style: const pw.TextStyle(fontSize: 8, color: PdfColors.indigo400, letterSpacing: 1)),
-          ]
-      );
-  }
-
-  static pw.Widget _buildBarChart(List<Candidate> candidates, int totalVotes, ExportLabels labels) {
-    if (candidates.isEmpty) return pw.Container();
-    final maxVotes = candidates.isEmpty ? 10 : candidates.map((c) => c.votes).reduce((a, b) => a > b ? a : b);
-    final scale = maxVotes > 0 ? 100.0 / maxVotes : 0.0; 
-
-    return pw.Container(
-        decoration: pw.BoxDecoration(
-            border: pw.Border.all(color: PdfColors.grey200),
-            borderRadius: pw.BorderRadius.circular(16)
-        ),
-        padding: const pw.EdgeInsets.all(16),
-        child: pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text(labels.ranking, style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: PdfColors.grey600)),
-            pw.SizedBox(height: 12),
-            ...candidates.map((c) {
-              final barWidth = c.votes * scale;
-              return pw.Padding(
-                padding: const pw.EdgeInsets.only(bottom: 8),
-                child: pw.Row(
-                  children: [
-                    pw.Expanded(
-                      flex: 4,
-                      child: pw.Text(labels.nameOf(c), style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey800), maxLines: 2, overflow: pw.TextOverflow.clip),
-                    ),
-                    pw.Expanded(
-                        flex: 6,
-                        child: pw.Row(
-                            children: [
-                                pw.Container(
-                                  width: barWidth > 0 ? barWidth : 1, 
-                                  height: 10, // Thicker bars
-                                  decoration: pw.BoxDecoration(
-                                    color: PdfColor.fromInt(c.color.toARGB32()),
-                                    borderRadius: pw.BorderRadius.circular(4)
-                                  ),
-                                ),
-                                pw.SizedBox(width: 6),
-                                pw.Text('${c.votes}', style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: PdfColors.grey800)),
-                            ]
-                        )
-                    )
-                  ],
-                ),
-              );
-            }),
-          ],
-        )
+  static pw.Widget _outcome(
+    ResultsSnapshot s,
+    AppLocalizations l10n,
+    ExportFormat f,
+    PdfPalette p,
+  ) {
+    final (bg, fg) = p.outcomeColors(
+      s.status == WinnerStatus.none || s.leader == null
+          ? WinnerStatus.none
+          : s.status,
     );
-  }
-
-  static pw.Widget _buildHistoryChart(
-      Map<int, Map<String, int>> historyPoints, List<Candidate> candidates, ExportLabels labels) {
-    if (historyPoints.length < 2) return pw.Container(height: 200, child: pw.Center(child: pw.Text(labels.insufficientData)));
-
-    final sortedKeys = historyPoints.keys.toList()..sort();
-    
-    final validCandidates = candidates.where((c) => !c.isTechnical);
-    
-    final datasets = <pw.Dataset>[];
-    for(var c in validCandidates) {
-         final data = <pw.PointChartValue>[];
-         for(var x in sortedKeys) {
-             final y = historyPoints[x]?[c.name] ?? 0;
-             data.add(pw.PointChartValue(x.toDouble(), y.toDouble()));
-         }
-         datasets.add(pw.LineDataSet(
-             data: data,
-             color: PdfColor.fromInt(c.color.toARGB32()),
-             pointSize: 0, // No dots for cleaner look
-             isCurved: true, 
-             lineWidth: 2,
-         ));
-    }
-    
-     // Calculate max Y for scaling
-    double maxY = 0;
-    for (var c in validCandidates) {
-      if (c.votes > maxY) maxY = c.votes.toDouble();
-    }
-    maxY = (maxY * 1.1).ceilToDouble();
-    if (maxY < 10) maxY = 10;
-    
-    final double step = maxY / 5;
-    final yAxisSteps = List.generate(6, (i) => (i * step).round());
-
-    final int xStep = (sortedKeys.length / 8).ceil();
-    final xAxisLabels = <int>[];
-    for (int i = 0; i < sortedKeys.length; i += xStep) {
-        xAxisLabels.add(sortedKeys[i]);
-    }
-    if (xAxisLabels.isEmpty || xAxisLabels.last != sortedKeys.last) {
-        xAxisLabels.add(sortedKeys.last);
-    }
-
-    return pw.Container(
-        decoration: pw.BoxDecoration(
-            border: pw.Border.all(color: PdfColors.grey200),
-            borderRadius: pw.BorderRadius.circular(16)
-        ),
-        padding: const pw.EdgeInsets.all(16),
-        height: 280, 
-        child: pw.Column(
+    final leader = s.leader;
+    final pw.Widget child;
+    if (s.winnerName != null && leader != null) {
+      child = pw.Row(
+        children: [
+          pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-                pw.Text(labels.trend, style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: PdfColors.grey600)),
-                pw.SizedBox(height: 12),
-                pw.Expanded(
-                    child: pw.Chart(
-                        grid: pw.CartesianGrid(
-                            xAxis: pw.FixedAxis(xAxisLabels, textStyle: const pw.TextStyle(fontSize: 8, color: PdfColors.grey600)),
-                            yAxis: pw.FixedAxis(yAxisSteps, textStyle: const pw.TextStyle(fontSize: 8, color: PdfColors.grey600)),
-                        ),
-                        datasets: datasets,
-                    )
-                )
-            ]
-        )
-    );
-  }
-  
-  static pw.Widget _buildDonutChart(List<Candidate> candidates, int totalVotes, int totalVoters, ExportLabels labels) {
-       if (totalVotes == 0) return pw.Container();
-       final validCandidates = candidates.where((c) => c.votes > 0).toList();
-       
-       return pw.Container(
-           child: pw.Row(
-               children: [
-                   pw.Expanded(
-                       child: pw.Stack(
-                           alignment: pw.Alignment.center,
-                           children: [
-                               pw.Chart(
-                                   grid: pw.PieGrid(),
-                                   datasets: validCandidates.map((c) {
-                                       return pw.PieDataSet(
-                                           value: c.votes.toDouble(),
-                                           color: PdfColor.fromInt(c.color.toARGB32()),
-                                           innerRadius: 30, // DONUT EFFECT
-                                           legend: null 
-                                       );
-                                   }).toList()
-                               ),
-                               pw.Column(
-                                   mainAxisSize: pw.MainAxisSize.min,
-                                   children: [
-                                       pw.Text("${(totalVotes / (totalVoters > 0 ? totalVoters : 1) * 100).toInt()}%", style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: PdfColors.indigo900)),
-                                       pw.Text(labels.completionShort, style: const pw.TextStyle(fontSize: 6, color: PdfColors.indigo300))
-                                   ]
-                               )
-                           ]
-                       )
-                   ),
-                   pw.SizedBox(width: 10),
-                   pw.Column(
-                       mainAxisAlignment: pw.MainAxisAlignment.center,
-                       crossAxisAlignment: pw.CrossAxisAlignment.start,
-                       children: validCandidates.take(5).map((c) => 
-                           pw.Padding(
-                               padding: const pw.EdgeInsets.only(bottom: 2),
-                               child: pw.Row(
-                                   children: [
-                                       pw.Container(width: 8, height: 8, decoration: pw.BoxDecoration(color: PdfColor.fromInt(c.color.toARGB32()), borderRadius: pw.BorderRadius.circular(2))),
-                                       pw.SizedBox(width: 4),
-                                       pw.Text("${c.getPercentage(totalVotes).toStringAsFixed(1)}%", style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700))
-                                   ]
-                               )
-                           )
-                       ).toList()
-                   )
-               ]
-           )
-       );
-  }
-
-  static pw.Widget _buildCompactTable(List<Candidate> candidates, int totalVotes, ExportLabels labels) {
+              pw.Text(
+                localizedWinnerLabel(l10n, s.status) ?? '',
+                style: pw.TextStyle(
+                  fontSize: 9,
+                  letterSpacing: 1.5,
+                  color: fg,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+              pw.Text(
+                s.winnerName!,
+                style: pw.TextStyle(
+                  fontSize: 22,
+                  fontWeight: pw.FontWeight.bold,
+                  color: fg,
+                ),
+              ),
+            ],
+          ),
+          pw.Spacer(),
+          pw.Text(
+            l10n.pdfWinnerDetail(
+              '${leader.votes}',
+              '${s.counted}',
+              f.percent(leader.percent),
+            ),
+            style: pw.TextStyle(fontSize: 11, color: fg),
+          ),
+        ],
+      );
+    } else if (s.status.isInconclusive) {
+      child = pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(
+            localizedWinnerLabel(l10n, s.status) ?? '',
+            style: pw.TextStyle(
+              fontSize: 9,
+              letterSpacing: 1.5,
+              color: fg,
+              fontWeight: pw.FontWeight.bold,
+            ),
+          ),
+          pw.Text(
+            localizedOutcomeHeadline(l10n, s.status, null),
+            style: pw.TextStyle(
+              fontSize: 22,
+              fontWeight: pw.FontWeight.bold,
+              color: fg,
+            ),
+          ),
+        ],
+      );
+    } else {
+      child = pw.Text(
+        l10n.pdfProvisional('${s.counted}', '${s.totalVoters}'),
+        style: pw.TextStyle(fontSize: 11, color: fg),
+      );
+    }
     return pw.Container(
+      padding: const pw.EdgeInsets.all(14),
       decoration: pw.BoxDecoration(
-        border: pw.Border.all(color: PdfColors.grey300),
-        borderRadius: pw.BorderRadius.circular(12)
+        color: bg,
+        borderRadius: pw.BorderRadius.circular(8),
       ),
-      child: pw.ClipRRect(
-        verticalRadius: 12,
-        horizontalRadius: 12,
-        child: pw.TableHelper.fromTextArray(
-          headers: [labels.colPosition, labels.colCandidate, labels.colVotes.toUpperCase(), '%', labels.colStatus],
-          data: candidates.asMap().entries.map((entry) {
-            final c = entry.value;
-            final index = entry.key + 1;
-            return [
-              '$index',
-              labels.nameOf(c),
-              '${c.votes}',
-              '${c.getPercentage(totalVotes).toStringAsFixed(1)}%',
-              (index == 1) ? labels.leader : ''
-            ];
-          }).toList(),
-          headerStyle: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: PdfColors.white),
-          headerDecoration: const pw.BoxDecoration(color: PdfColors.indigo600), // Matching app Primary
-          cellStyle: const pw.TextStyle(fontSize: 9),
-          cellHeight: 24,
-          cellAlignments: {
-            0: pw.Alignment.centerLeft,
-            1: pw.Alignment.centerLeft,
-            2: pw.Alignment.centerRight,
-            3: pw.Alignment.centerRight,
-            4: pw.Alignment.center,
-          },
-          oddRowDecoration: const pw.BoxDecoration(color: PdfColors.indigo50), // Subtle stripe
-        )
-      )
+      child: child,
     );
   }
 
-  static pw.Widget _buildFooter(ExportLabels labels) {
-    return pw.Container(
-        padding: const pw.EdgeInsets.only(top: 10),
-        decoration: const pw.BoxDecoration(
-            border: pw.Border(top: pw.BorderSide(color: PdfColors.grey200))
+  static pw.Widget _keyNumbers(
+    ResultsSnapshot s,
+    AppLocalizations l10n,
+    ExportFormat f,
+    PdfPalette p,
+  ) {
+    pw.Widget item(String value, String label) => pw.Expanded(
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(
+            value,
+            style: pw.TextStyle(
+              fontSize: 16,
+              fontWeight: pw.FontWeight.bold,
+              color: p.text,
+            ),
+          ),
+          pw.Text(
+            label,
+            style: pw.TextStyle(fontSize: 8, color: p.textVariant),
+          ),
+        ],
+      ),
+    );
+    final turnout = s.turnout;
+    return pw.Row(
+      children: [
+        item(
+          l10n.pdfCountedOf('${s.counted}', '${s.totalVoters}'),
+          l10n.pdfKeyCounted,
         ),
-        child: pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-            children: [
-                pw.Text(labels.generatedWithPro, style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey500)),
-                pw.Text(labels.pageFooter, style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey500)),
-            ]
-        )
+        item('${math.max(0, s.remaining)}', l10n.pdfKeyRemaining),
+        item('${s.validVotes}', l10n.pdfKeyValid),
+        if (s.technical.isNotEmpty)
+          item(
+            s.technical.map((r) => '${r.votes}').join(' · '),
+            l10n.pdfKeyBlankSpoiled,
+          ),
+        if (turnout != null) item(f.percent(turnout), l10n.pdfKeyTurnout),
+      ],
     );
   }
+
+  static pw.Widget _table(
+    ResultsSnapshot s,
+    AppLocalizations l10n,
+    ExportFormat f,
+    PdfPalette p,
+  ) {
+    const cell = pw.EdgeInsets.symmetric(vertical: 6);
+    pw.Widget text(
+      String t, {
+      bool right = false,
+      bool strong = false,
+      bool muted = false,
+      double size = 10,
+    }) => pw.Padding(
+      padding: cell,
+      child: pw.Text(
+        t,
+        textAlign: right ? pw.TextAlign.right : pw.TextAlign.left,
+        style: pw.TextStyle(
+          fontSize: size,
+          color: muted ? p.textVariant : p.text,
+          fontWeight: strong ? pw.FontWeight.bold : pw.FontWeight.normal,
+        ),
+      ),
+    );
+    pw.Widget head(String t, {bool right = false}) => pw.Padding(
+      padding: const pw.EdgeInsets.symmetric(vertical: 5),
+      child: pw.Text(
+        t,
+        textAlign: right ? pw.TextAlign.right : pw.TextAlign.left,
+        style: pw.TextStyle(
+          fontSize: 8,
+          color: p.textVariant,
+          fontWeight: pw.FontWeight.bold,
+        ),
+      ),
+    );
+    final change = s.hasPrevious;
+    final firstTechnical = s.rows.indexWhere((r) => r.isTechnical);
+    final rows = <pw.TableRow>[
+      pw.TableRow(
+        repeat: true,
+        children: [
+          head(''),
+          head(l10n.pdfColCandidate),
+          head(''),
+          head(l10n.pdfColVotes, right: true),
+          head('%', right: true),
+          if (change) head(l10n.pdfColChange, right: true),
+        ],
+      ),
+      for (final (i, r) in s.rows.indexed)
+        pw.TableRow(
+          verticalAlignment: pw.TableCellVerticalAlignment.middle,
+          decoration: i == firstTechnical
+              ? pw.BoxDecoration(
+                  border: pw.Border(
+                    top: pw.BorderSide(color: p.text, width: 0.8),
+                  ),
+                )
+              : null,
+          children: [
+            text(r.rank?.toString() ?? '', muted: true),
+            pw.Padding(
+              padding: cell,
+              child: pw.Row(
+                children: [
+                  pw.Container(
+                    width: 8,
+                    height: 8,
+                    decoration: pw.BoxDecoration(
+                      color: PdfPalette.of(r.color),
+                      shape: pw.BoxShape.circle,
+                    ),
+                  ),
+                  pw.SizedBox(width: 6),
+                  pw.Flexible(
+                    child: pw.Text(
+                      r.name,
+                      style: pw.TextStyle(
+                        fontSize: 11,
+                        color: r.isTechnical ? p.textVariant : p.text,
+                        fontWeight: r.rank == 1 && r.votes > 0
+                            ? pw.FontWeight.bold
+                            : pw.FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            pw.Padding(
+              padding: const pw.EdgeInsets.only(right: 8),
+              child: pw.LayoutBuilder(
+                builder: (ctx, box) => pw.Container(
+                  height: 6,
+                  alignment: pw.Alignment.centerLeft,
+                  child: pw.Container(
+                    width: math.max(
+                      0.0,
+                      (box?.maxWidth ?? 0) * (r.percent / 100).clamp(0, 1),
+                    ),
+                    height: 6,
+                    decoration: pw.BoxDecoration(
+                      color: PdfPalette.of(r.color),
+                      borderRadius: pw.BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            text('${r.votes}', right: true, strong: true, size: 11),
+            text(f.percent(r.percent), right: true),
+            if (change)
+              text(
+                r.change == null ? '' : f.signedPoints(r.change!),
+                right: true,
+                muted: true,
+              ),
+          ],
+        ),
+      pw.TableRow(
+        verticalAlignment: pw.TableCellVerticalAlignment.middle,
+        decoration: pw.BoxDecoration(
+          border: pw.Border(top: pw.BorderSide(color: p.text, width: 0.8)),
+        ),
+        children: [
+          pw.SizedBox(),
+          text(l10n.pdfTotal, strong: true, size: 11),
+          pw.SizedBox(),
+          text('${s.counted}', right: true, strong: true, size: 11),
+          text(f.percent(s.counted == 0 ? 0 : 100), right: true),
+          if (change) pw.SizedBox(),
+        ],
+      ),
+    ];
+    return pw.Table(
+      columnWidths: {
+        0: const pw.FixedColumnWidth(24),
+        1: const pw.FlexColumnWidth(3),
+        2: const pw.FlexColumnWidth(3),
+        3: const pw.FixedColumnWidth(40),
+        4: const pw.FixedColumnWidth(48),
+        if (change) 5: const pw.FixedColumnWidth(70),
+      },
+      border: pw.TableBorder(
+        horizontalInside: pw.BorderSide(color: p.line, width: 0.5),
+        bottom: pw.BorderSide(color: p.line, width: 0.5),
+      ),
+      children: rows,
+    );
+  }
+
+  /// Andamento a gradini dei primi [maxTrendLines] candidati reali.
+  static List<pw.Widget> _trend(
+    ResultsSnapshot s,
+    AppLocalizations l10n,
+    PdfPalette p,
+  ) {
+    final lines = s.candidates.take(maxTrendLines).toList();
+    final h = s.history;
+    final maxX = h.length - 1;
+    final top = lines.fold<int>(0, (m, r) => math.max(m, r.votes));
+    final yStep = niceAxisStep(math.max(1, top));
+    final maxY = math.max(yStep, (top / yStep).ceil() * yStep);
+    final xStep = niceAxisStep(maxX, maxTicks: 6);
+    final small = pw.TextStyle(fontSize: 8, color: p.textVariant);
+    return [
+      pw.Text(
+        l10n.pdfTrend,
+        style: pw.TextStyle(
+          fontSize: 13,
+          fontWeight: pw.FontWeight.bold,
+          color: p.text,
+        ),
+      ),
+      pw.SizedBox(height: 6),
+      pw.SizedBox(
+        height: 170,
+        child: pw.Chart(
+          grid: pw.CartesianGrid(
+            xAxis: pw.FixedAxis(
+              [for (var x = 0; x < maxX; x += xStep) x, maxX],
+              textStyle: small,
+              divisions: false,
+            ),
+            yAxis: pw.FixedAxis(
+              [for (var y = 0; y <= maxY; y += yStep) y],
+              textStyle: small,
+              divisions: true,
+              divisionsColor: p.line,
+            ),
+          ),
+          datasets: [
+            for (final r in lines)
+              pw.LineDataSet(
+                drawPoints: false,
+                isCurved: false,
+                lineWidth: 2,
+                color: PdfPalette.of(r.color),
+                data: [
+                  for (var k = 0; k < h.length; k++) ...[
+                    if (k > 0)
+                      pw.PointChartValue(
+                        k.toDouble(),
+                        h[k - 1][r.index].toDouble(),
+                      ),
+                    pw.PointChartValue(k.toDouble(), h[k][r.index].toDouble()),
+                  ],
+                ],
+              ),
+          ],
+        ),
+      ),
+      pw.SizedBox(height: 4),
+      pw.Wrap(
+        spacing: 12,
+        runSpacing: 4,
+        children: [
+          for (final r in lines)
+            pw.Row(
+              mainAxisSize: pw.MainAxisSize.min,
+              children: [
+                pw.Container(
+                  width: 10,
+                  height: 3,
+                  color: PdfPalette.of(r.color),
+                ),
+                pw.SizedBox(width: 4),
+                pw.Text(r.name, style: small),
+              ],
+            ),
+          pw.Text(l10n.pdfTrendAxes, style: small),
+        ],
+      ),
+    ];
+  }
+
+  static pw.Widget _signatures(AppLocalizations l10n, PdfPalette p) => pw.Row(
+    children: [
+      for (final role in [l10n.pdfSignPresident, l10n.pdfSignTellers])
+        pw.Expanded(
+          child: pw.Padding(
+            padding: const pw.EdgeInsets.only(right: 24),
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.SizedBox(height: 28),
+                pw.Container(height: 0.6, color: p.text),
+                pw.SizedBox(height: 4),
+                pw.Text(
+                  role,
+                  style: pw.TextStyle(fontSize: 9, color: p.textVariant),
+                ),
+              ],
+            ),
+          ),
+        ),
+    ],
+  );
 }

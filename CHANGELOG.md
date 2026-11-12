@@ -13,7 +13,86 @@ Le sezioni sono generate dai commit convenzionali (vedi
 
 ## [Unreleased]
 
+### 🚀 Nuove Funzionalità
+- **Archivio scrutini:** più scrutini salvati, con nuovo, duplica come modello
+  (stessi candidati, nessuna scheda), riapri, rinomina ed elimina con conferma.
+- **Navigazione Scrutinio / Archivio:** barra in basso sul telefono, barra
+  laterale su tablet e desktop.
+- **Regole di vittoria:** maggioranza relativa (come prima) o assoluta, e quorum
+  di affluenza; nuovi esiti "Ballottaggio" e "Quorum non raggiunto".
+- **Lettura schede:** una scheda alla volta con pulsanti grandi, "Scheda N di M",
+  annulla sempre visibile e protezione dai doppi tocchi.
+- **Colore dinamico (Material You):** su Android 12+ l'app prende i colori dello
+  sfondo; si può disattivare in Impostazioni → Aspetto.
+- **Esporta e importa l'archivio:** tutti gli scrutini in un file JSON da
+  condividere (backup, cambio telefono); l'import aggiunge senza sovrascrivere.
+- **Liste di candidati:** salva i candidati come lista e parti da lì per un
+  nuovo scrutinio; le impostazioni si possono usare anche per i nuovi.
+- **Archivio a due colonne sui tablet:** elenco a sinistra, esito e classifica
+  dello scrutinio scelto a destra.
+- I nomi predefiniti dei candidati seguono la lingua dell'app.
+- Il PDF usa i colori dell'app (anche quelli dinamici) e mostra pareggio,
+  ballottaggio e quorum non raggiunto con colori neutri.
+
+### 🎨 Interfaccia & Design
+- **Home ridisegnata:** tutti i + nella prima schermata (righe da 84 dp al
+  posto delle card), riepilogo in cima con chi è in testa e quanti voti
+  mancano, pillola "Annulla Rossi" sempre a portata, grafici Storico e
+  Percentuali in una card apribile (il grafico "Corrente" non c'è più), titolo
+  dello scrutinio nella barra in alto. Proiettore, impostazioni e "Azzera
+  scrutinio" (ora con conferma) sono nel menu ⋮. Sul tablet lista, riepilogo
+  e grafico stanno insieme.
+- **Altre schermate ridisegnate:**
+  - Impostazioni a pagina intera sul telefono (finestra sul tablet), in tre
+    gruppi, con − e + per votanti e candidati; lingua e aspetto spostati in
+    "Impostazioni dell'app" (dal menu dell'Archivio).
+  - Archivio con "Aperto ora" in cima, barra dei voti in ogni riga, ricerca
+    oltre 8 scrutini e un dettaglio con Riapri, Duplica ed Esporta; "Nuovo
+    scrutinio" offre vuoto, copia dello scrutinio aperto o una lista.
+  - Lettura schede con tessere che riempiono lo schermo, bianche e nulle in
+    fondo e la pillola "Annulla Rossi".
+  - Proiettore a schermo intero, con intestazione e barra, righe che si
+    riordinano con un'animazione, bianche e nulle fuori classifica.
+  - Foglio Condividi con Immagine e PDF in evidenza; "Modifica candidato"
+    permette di scegliere il colore.
+- **Condivisioni ridisegnate:**
+  - Immagine 4:5 (1080 × 1350) con titolo, data, stato, esito, barra dei voti
+    e una riga con barra per ogni candidato (fino a 8, poi "+N altri"); non
+    esce più dai bordi quando c'è un vincitore.
+  - PDF "Verbale dei risultati": titolo dello scrutinio, data in italiano,
+    esito, numeri chiave, una sola tabella con barre e "Rispetto a prima",
+    andamento a gradini con legenda, firme a scrutinio completo, più pagine
+    se servono.
+  - CSV che si apre bene in Excel italiano (punto e virgola, virgola
+    decimale, accenti), senza righe di totale e protetto dalle formule.
+  - JSON nel formato dell'Archivio: si reimporta da "Importa da file".
+  - File con il nome dello scrutinio e la data.
+- **Icona e splash nuovi:** icona "Stanghette" (quattro stanghette e la barra
+  che le chiude) adaptive, con la versione per le icone a tema di Android 13+;
+  splash chiaro o scuro come il telefono, con la schermata di avvio di Android
+  12+. La build di debug ha la banda "DEBUG" e si chiama "Voto Tracker debug".
+- **Grafici della Home:** "Andamento" con linee a gradini, chip con nome e voti
+  per accendere e spegnere le linee e lettura a una scheda col dito;
+  "Confronto" con barre e il risultato precedente al posto della ciambella.
+- Percentuali con la virgola decimale in italiano.
+- Palette dei candidati ridisegnata (HCT) per essere leggibile in light e dark;
+  le schede nulle non sono più nere (invisibili nel tema scuro).
+- Spaziature, raggi e testi solo da token e `textTheme`; aree di tocco ≥ 48 dp.
+- Edge-to-edge con barre di sistema trasparenti; etichette per i lettori di
+  schermo su voti, +/- e reset; nessun overflow con testo al 200%.
+
+### 🐛 Correzioni
+- Cambiare il numero di candidati (o bianche e nulle) nelle impostazioni non
+  cancella più nomi, colori e risultati precedenti: si azzerano solo i voti,
+  con un avviso e il pulsante "Salva e azzera". Anche "Azzera scrutinio" ora
+  tiene nomi e colori.
+- Nel grafico dell'andamento due candidati con lo stesso nome finivano su
+  una sola linea: ora la storia è per posizione.
+
 ### 🛠️ Refactoring
+- Logica dello scrutinio in `ScrutinyEngine` (puro, testato a parte) e
+  persistenza in `ScrutinyRepository` con schema v2. I dati della 1.x vengono
+  migrati al primo avvio; le vecchie chiavi restano come copia di sicurezza.
 - Migrazione a Flutter 3.50 e ai package `material_ui` / `cupertino_ui` (Material
   e Cupertino sono usciti dal framework in Flutter 3.47). Corretto un problema
   che con il nuovo Material faceva ignorare la lingua italiana.
@@ -21,6 +100,11 @@ Le sezioni sono generate dai commit convenzionali (vedi
   `wakelock_plus` 1.8, `fl_chart` 1.3 e minori.
 - Lo schermo resta acceso solo mentre Home o proiettore sono aperti (prima il
   wakelock veniva riattivato a ogni rebuild e mai spento).
+- I voti si salvano a gruppi (al massimo uno ogni 300 ms) e sempre quando
+  l'app va in background: meno scritture a ogni tocco.
+- Rimossi i getter `winner`/`winnerLabel` del provider: l'esito passa solo da
+  `winnerStatus` e `winnerName`.
+- Test d'integrazione in `integration_test/` da lanciare sul telefono.
 - Esportazioni riunite in `ExportController`; widget grandi divisi in file più
   piccoli. Aggiunti test sul controller, sul menu export e golden della Home.
 
@@ -30,6 +114,13 @@ Le sezioni sono generate dai commit convenzionali (vedi
   nomi ruotati e illeggibili.
 
 ### 🐞 Bug Fix
+- Modalità proiettore: sul telefono con testo grande le righe uscivano dallo
+  schermo; ora sono leggibili anche da TalkBack (una riga per candidato).
+- Chiudere il dialog "Modifica nome" (Salva, Annulla o tocco fuori) mandava
+  l'app in errore (schermo rosso): i campi di testo venivano liberati mentre
+  l'animazione di chiusura li usava ancora.
+- "Mancano N voti per la vittoria" non considera più bianche e nulle come
+  leader; a parità di voti la classifica non cambia più ordine a caso.
 - Corretto l'overflow della barra dei controlli quando la label del reset è più
   lunga (es. in italiano "Tieni premuto per resettare"): il bottone ora si
   comprime con ellissi. Aggiunto `navigatorKey` stabile e test di interazione

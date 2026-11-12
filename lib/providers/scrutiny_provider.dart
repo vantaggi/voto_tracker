@@ -1,14 +1,21 @@
+import 'dart:async';
 import 'dart:convert';
+
+import 'package:flutter/foundation.dart' show listEquals;
+
 import 'package:material_ui/material_ui.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:voto_tracker/data/scrutiny_repository.dart';
+import 'package:voto_tracker/data/templates_repository.dart';
+import 'package:voto_tracker/domain/scrutiny_engine.dart';
 import 'package:voto_tracker/models/candidate.dart';
+import 'package:voto_tracker/models/candidate_list.dart';
+import 'package:voto_tracker/models/scrutiny.dart';
 import 'package:voto_tracker/models/settings.dart';
+import 'package:voto_tracker/theme/candidate_palette.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
 
-/// Stato del vincitore. Identità stabile (non basata su stringhe):
-/// `mathematical` = vantaggio incolmabile a scrutinio aperto,
-/// `elected` = primo a scrutinio chiuso, `tie` = pareggio finale.
-enum WinnerStatus { none, mathematical, elected, tie }
+export 'package:voto_tracker/domain/scrutiny_engine.dart'
+    show WinnerStatus, WinnerStatusX;
 
 class ScrutinyProvider extends ChangeNotifier {
   List<Candidate> _candidates = [];
@@ -22,6 +29,9 @@ class ScrutinyProvider extends ChangeNotifier {
 
   bool get canUndo => _voteLog.isNotEmpty;
   bool get canRedo => _redoStack.isNotEmpty;
+
+  /// Candidato dell'ultimo voto annullabile (per "Annulla Rossi"), o null.
+  int? get lastVotedIndex => _voteLog.isEmpty ? null : _voteLog.last;
 
   // Calculated values - RESTORED
   int _totalVotesAssigned = 0;
@@ -40,57 +50,56 @@ class ScrutinyProvider extends ChangeNotifier {
   WinnerStatus get winnerStatus => _winnerStatus;
   bool get hasWinner => _winnerStatus != WinnerStatus.none;
   bool get isTie => _winnerStatus == WinnerStatus.tie;
+
+  /// Esito senza vincitore (pareggio, maggioranza o quorum non raggiunti).
+  bool get isInconclusive => _winnerStatus.isInconclusive;
   String? get winnerName => _winnerName;
 
-  // Stringa di visualizzazione retro-compatibile: nome del vincitore, oppure
-  // l'etichetta di pareggio in caso di parità.
-  String? get winner {
-    switch (_winnerStatus) {
-      case WinnerStatus.none:
-        return null;
-      case WinnerStatus.tie:
-        return AppStrings.tie;
-      case WinnerStatus.elected:
-      case WinnerStatus.mathematical:
-        return _winnerName;
-    }
-  }
+  /// Magic number: voti che mancano al primo per un vantaggio incolmabile
+  /// sul secondo (vedi [ScrutinyEngine.evaluate]).
+  int? get votesUntilMajority => _votesToWin;
+  int? _votesToWin;
 
-  // Etichetta coerente dello stato del vincitore (usata da UI, PDF e share).
-  // Il vincitore è dichiarato per vantaggio matematicamente incolmabile, non per
-  // maggioranza assoluta: l'etichetta riflette questa distinzione.
-  String? get winnerLabel {
-    switch (_winnerStatus) {
-      case WinnerStatus.none:
-        return null;
-      case WinnerStatus.tie:
-        return AppStrings.finalResult;
-      case WinnerStatus.elected:
-        return AppStrings.winnerElected;
-      case WinnerStatus.mathematical:
-        return AppStrings.winnerMathematical;
-    }
-  }
+  /// Nome dei candidati nuovi, nella lingua dell'app (P4). Lo imposta
+  /// `MaterialApp.builder` con [setDefaultCandidateNamer]: il provider non ha
+  /// un `BuildContext`.
+  String Function(int number) get defaultCandidateName => _namer;
+  String Function(int number) _namer = _italianDefaultName;
+  String? _namerLocale = 'it';
 
-  // Magic Number calculation (Votes needed to guarantee win vs 2nd place)
-  int? get votesUntilMajority {
-      if (_candidates.isEmpty) return null;
-      
-      // Use sorted copy to find actual leader and runner-up
-      final sorted = sortedCandidates;
-      if (sorted.length < 2) {
-           final majorityThreshold = (_settings.totalVoters / 2).floor() + 1;
-           if (sorted[0].votes >= majorityThreshold) return 0;
-           return majorityThreshold - sorted[0].votes;
+  static String _italianDefaultName(int number) =>
+      '${AppStrings.candidatePrefix} $number';
+
+  /// Lingua dei nomi predefiniti in uso (codice come `AppLocalizations.localeName`).
+  String? get defaultNamesLocale => _namerLocale;
+
+  /// Cambia la lingua dei nomi predefiniti. Se lo scrutinio aperto non ha
+  /// ancora schede, i candidati che portano ancora il nome predefinito
+  /// vengono rinominati nella nuova lingua; i nomi scelti dall'utente e gli
+  /// scrutini con voti non cambiano mai.
+  void setDefaultCandidateNamer(
+    String localeName,
+    String Function(int number) namer,
+  ) {
+    if (localeName == _namerLocale) return;
+    final old = _namer;
+    _namer = namer;
+    _namerLocale = localeName;
+    if (_archive == null || _voteLog.isNotEmpty) return;
+    var changed = false;
+    var n = 0;
+    for (final c in _candidates) {
+      if (c.type != CandidateType.normal) continue;
+      n++;
+      if (c.name == old(n) && c.name != namer(n)) {
+        c.name = namer(n);
+        changed = true;
       }
-      
-      final leader = sorted[0];
-      final second = sorted[1];
-      
-      double val = (second.votes + _remainingVotes - leader.votes) / 2;
-      int needed = val.floor() + 1;
-      
-      return needed < 0 ? 0 : needed;
+    }
+    if (changed) {
+      _scheduleSave();
+      notifyListeners();
+    }
   }
 
   ScrutinyProvider() {
@@ -101,221 +110,535 @@ class ScrutinyProvider extends ChangeNotifier {
   void _initializeCandidates() {
     _candidates = List.generate(
       _settings.participantsCount,
-      (index) {
-          final List<Color> distinctColors = [
-              Colors.red, Colors.blue, Colors.green, Colors.orange, 
-              Colors.purple, Colors.teal, Colors.pink, Colors.brown,
-              Colors.lime, Colors.indigo, Colors.cyan, Colors.deepOrange,
-              Colors.lightGreen, Colors.blueGrey, Colors.amberAccent
-          ];
-          return Candidate(
-            name: '${AppStrings.candidatePrefix} ${index + 1}',
-            votes: 0,
-            color: distinctColors[index % distinctColors.length],
-          );
-      },
+      (index) => Candidate(
+        name: _namer(index + 1),
+        votes: 0,
+        color: CandidatePalette.forIndex(index),
+      ),
     );
-    if (_settings.showBlankVotes) {
-      _candidates.add(Candidate(
-          name: AppStrings.blankVotes,
-          votes: 0,
-          color: Colors.grey,
-          type: CandidateType.blank));
-    }
-    if (_settings.showNullVotes) {
-      _candidates.add(Candidate(
-          name: AppStrings.nullVotes,
-          votes: 0,
-          color: Colors.black,
-          type: CandidateType.spoiled));
-    }
+    _candidates.addAll(_technicalCandidates());
   }
 
+  /// Schede bianche e nulle, se le impostazioni le prevedono.
+  List<Candidate> _technicalCandidates() {
+    final rows = <Candidate>[];
+    if (_settings.showBlankVotes) {
+      rows.add(
+        Candidate(
+          name: AppStrings.blankVotes,
+          votes: 0,
+          color: CandidatePalette.blank,
+          type: CandidateType.blank,
+        ),
+      );
+    }
+    if (_settings.showNullVotes) {
+      rows.add(
+        Candidate(
+          name: AppStrings.nullVotes,
+          votes: 0,
+          color: CandidatePalette.spoiled,
+          type: CandidateType.spoiled,
+        ),
+      );
+    }
+    return rows;
+  }
+
+  ScrutinyRepository? _repository;
+  ScrutinyArchive? _archive;
+
   Future<void> _loadState() async {
-    final prefs = await SharedPreferences.getInstance();
-    
-    // Load Settings
-    final String? settingsJson = prefs.getString('settings');
-    if (settingsJson != null) {
-      try {
-        _settings = Settings.fromJson(jsonDecode(settingsJson));
-      } catch (e) {
-        debugPrint("Error loading settings: $e");
-      }
-    }
-
-    // Load Candidates (Legacy or Structure)
-    final String? candidatesJson = prefs.getString('candidates');
-    if (candidatesJson != null) {
-      try {
-        final List<dynamic> decoded = jsonDecode(candidatesJson);
-        _candidates = decoded.map((e) => Candidate.fromJson(e)).toList();
-      } catch (e) {
-        debugPrint("Error loading candidates: $e");
+    final repository = await ScrutinyRepository.open();
+    final archive = await repository.load(
+      createDefault: (settings) {
+        _settings = settings;
         _initializeCandidates();
-      }
-    } else {
-      _initializeCandidates();
-    }
-    
-    // Load Vote Log
-    final List<String>? log = prefs.getStringList('vote_log');
-    if (log != null) {
-        _voteLog.clear();
-        _voteLog.addAll(log.map((e) => int.parse(e)));
-        // If we have a log, valid candidates votes are strictly derived from it + base
-        // We assume loaded _candidates votes are the "base" if log exists? 
-        // Actually, safer to treat loaded candidates as having "base votes" equal to their current count 
-        // IF the log is empty. If log exists, we might need to reconcile.
-        // Simplified approach: Clear candidates votes, and just replay log.
-        // Assuming no "base" votes for now to ensure graph consistency.
-        // If we want to support editing "base", we need a separate store.
-        // For this task: Everything in graph comes from log.
-        for (var c in _candidates) {
-          c.votes = 0;
-        }
-        _recalculateState();
-    } else {
-        // Legacy migration: If no log but we have votes, those are now "base" (invisible to history graph) 
-        // OR we try to reverse engineer? No, simpler to just start fresh or treat as base.
-        // Let's treat current votes as Base Votes so they appear in counts but maybe as a starting flat line
-    }
-
-    _calculateResults();
-    _persistState();
+        return _candidates;
+      },
+    );
+    final templates = await TemplatesRepository.open();
+    _templates = templates;
+    _lists = templates.loadLists();
+    _defaultSettings = templates.loadDefaultSettings();
+    _repository = repository;
+    _archive = archive;
+    _applyCurrent();
     notifyListeners();
   }
 
-  Future<void> _persistState() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('candidates', jsonEncode(_candidates));
-    await prefs.setString('settings', jsonEncode(_settings));
-    await prefs.setStringList('vote_log', _voteLog.map((e) => e.toString()).toList());
+  /// Copia lo scrutinio aperto dell'archivio nello stato del provider.
+  void _applyCurrent() {
+    final current = _archive!.current;
+    _settings = current.settings;
+    _candidates = current.candidates;
+    _voteLog
+      ..clear()
+      ..addAll(current.voteLog);
+    _redoStack.clear();
+    _recalculateState();
   }
 
-  // NOTE: Replaces old _saveHistory
-  void _recalculateState() {
-      // 1. Reset votes to 0
-      for (var c in _candidates) {
-        c.votes = 0;
-      }
+  // --- Salvataggio (P3) -------------------------------------------------------
 
-      // 2. Replay Log
-      for (int candidateIndex in _voteLog) {
-          if (candidateIndex >= 0 && candidateIndex < _candidates.length) {
-              _candidates[candidateIndex].votes++;
-          }
+  /// Ritardo con cui si raggruppano i salvataggi dei voti: una raffica di
+  /// tocchi produce una sola scrittura dell'archivio.
+  static const Duration saveDelay = Duration(milliseconds: 300);
+  Timer? _saveTimer;
+  bool _disposed = false;
+
+  /// C'è un salvataggio in attesa del timer.
+  bool get hasPendingSave => _saveTimer?.isActive ?? false;
+
+  /// Pianifica un salvataggio raggruppato (voti, annulla, rinomina…).
+  void _scheduleSave() {
+    _saveTimer?.cancel();
+    _saveTimer = Timer(saveDelay, () {
+      _saveTimer = null;
+      _persistState();
+    });
+  }
+
+  /// Salva subito se c'è un salvataggio in attesa. Chiamato quando l'app va
+  /// in background o viene chiusa, e prima di ogni azione sull'archivio.
+  Future<void> flushPendingSave() async {
+    if (!hasPendingSave) return;
+    _saveTimer!.cancel();
+    _saveTimer = null;
+    await _persistState();
+  }
+
+  @override
+  void dispose() {
+    if (hasPendingSave) {
+      _saveTimer!.cancel();
+      _saveTimer = null;
+      _persistState(); // ultima scrittura, senza attendere
+    }
+    _disposed = true;
+    super.dispose();
+  }
+
+  @override
+  void notifyListeners() {
+    if (!_disposed) super.notifyListeners();
+  }
+
+  Future<void> _persistState() async {
+    final archive = _archive;
+    final repository = _repository;
+    if (archive == null || repository == null) return; // ancora in caricamento
+    _saveTimer?.cancel();
+    _saveTimer = null;
+    final current = archive.current;
+    current
+      ..settings = _settings
+      ..candidates = _candidates
+      ..updatedAt = repository.now();
+    current.voteLog
+      ..clear()
+      ..addAll(_voteLog);
+    await repository.save(archive);
+  }
+
+  // --- Archivio (FEAT-004) ---------------------------------------------------
+
+  /// Scrutini salvati, dal più recente. Vuoto finché il caricamento non è
+  /// finito.
+  List<Scrutiny> get archive {
+    final items = List<Scrutiny>.of(_archive?.items ?? const []);
+    items.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    return items;
+  }
+
+  /// Id dello scrutinio aperto (`null` durante il caricamento).
+  String? get currentScrutinyId => _archive?.currentId;
+
+  /// Scrutinio aperto (`null` durante il caricamento).
+  Scrutiny? get currentScrutiny => _archive?.current;
+
+  /// Nuovo scrutinio vuoto con le impostazioni di quello aperto.
+  Future<void> newScrutiny() async {
+    final archive = _archive, repository = _repository;
+    if (archive == null || repository == null) return;
+    await _persistState();
+    // P10: le impostazioni predefinite, se salvate; se no quelle di ora.
+    _settings = Settings.fromJson((_defaultSettings ?? _settings).toJson());
+    _initializeCandidates();
+    final t = repository.now();
+    final created = Scrutiny(
+      id: repository.newId(),
+      createdAt: t,
+      updatedAt: t,
+      settings: _settings,
+      candidates: _candidates,
+    );
+    await _openNew(created);
+  }
+
+  /// Nuovo scrutinio con candidati e impostazioni di [id], senza schede.
+  Future<void> duplicateAsTemplate(String id) async {
+    final archive = _archive, repository = _repository;
+    if (archive == null || repository == null) return;
+    await _persistState();
+    final source = archive.items.firstWhere((s) => s.id == id);
+    await _openNew(
+      source.asTemplate(id: repository.newId(), now: repository.now()),
+    );
+  }
+
+  Future<void> _openNew(Scrutiny scrutiny) async {
+    _archive!
+      ..items.add(scrutiny)
+      ..currentId = scrutiny.id;
+    _applyCurrent();
+    await _repository!.save(_archive!);
+    notifyListeners();
+  }
+
+  // --- Liste di candidati e impostazioni predefinite (FEAT-008, P10) --------
+
+  TemplatesRepository? _templates;
+  List<CandidateList> _lists = [];
+  Settings? _defaultSettings;
+
+  /// Liste salvate, in ordine alfabetico.
+  List<CandidateList> get candidateLists =>
+      List.of(_lists)
+        ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+
+  /// Impostazioni dei nuovi scrutini; `null` = si copiano quelle dell'aperto.
+  Settings? get defaultSettings => _defaultSettings;
+
+  /// Salva candidati (nomi, colori, percentuali precedenti) e impostazioni
+  /// dello scrutinio aperto come lista. Un nome già usato viene sostituito.
+  Future<void> saveCandidateList(String name) async {
+    final templates = _templates, repository = _repository;
+    final trimmed = name.trim();
+    if (templates == null || repository == null || trimmed.isEmpty) return;
+    _lists.removeWhere((l) => l.name.toLowerCase() == trimmed.toLowerCase());
+    _lists.add(
+      CandidateList(
+        id: repository.newId(),
+        name: trimmed,
+        candidates: [
+          for (final c in _candidates)
+            if (c.type == CandidateType.normal)
+              Candidate(
+                name: c.name,
+                votes: 0,
+                color: c.color,
+                previousPercentage: c.previousPercentage,
+              ),
+        ],
+        settings: Settings.fromJson(_settings.toJson()),
+      ),
+    );
+    await templates.saveLists(_lists);
+    notifyListeners();
+  }
+
+  Future<void> deleteCandidateList(String id) async {
+    final templates = _templates;
+    if (templates == null) return;
+    _lists.removeWhere((l) => l.id == id);
+    await templates.saveLists(_lists);
+    notifyListeners();
+  }
+
+  /// Nuovo scrutinio con candidati e impostazioni della lista [id].
+  Future<void> newScrutinyFromList(String id) async {
+    final archive = _archive, repository = _repository;
+    if (archive == null || repository == null) return;
+    final list = _lists.where((l) => l.id == id).firstOrNull;
+    if (list == null) return;
+    await _persistState();
+    final s = list.settings;
+    _settings = Settings(
+      totalVoters: s.totalVoters,
+      participantsCount: list.candidates.length,
+      showBlankVotes: s.showBlankVotes,
+      showNullVotes: s.showNullVotes,
+      victoryRule: s.victoryRule,
+      eligibleVoters: s.eligibleVoters,
+      quorumPercent: s.quorumPercent,
+    );
+    _candidates = [
+      for (final c in list.candidates)
+        Candidate(
+          name: c.name,
+          votes: 0,
+          color: c.color,
+          previousPercentage: c.previousPercentage,
+        ),
+      ..._technicalCandidates(),
+    ];
+    final t = repository.now();
+    await _openNew(
+      Scrutiny(
+        id: repository.newId(),
+        title: list.name,
+        createdAt: t,
+        updatedAt: t,
+        settings: _settings,
+        candidates: _candidates,
+      ),
+    );
+  }
+
+  /// Le impostazioni dello scrutinio aperto diventano quelle dei nuovi
+  /// scrutini; con [clear] si torna a copiare quelle dell'aperto.
+  Future<void> setDefaultSettingsFromCurrent({bool clear = false}) async {
+    final templates = _templates;
+    if (templates == null) return;
+    _defaultSettings = clear ? null : Settings.fromJson(_settings.toJson());
+    await templates.saveDefaultSettings(_defaultSettings);
+    notifyListeners();
+  }
+
+  /// Riapre uno scrutinio dell'archivio.
+  Future<void> openScrutiny(String id) async {
+    final archive = _archive;
+    if (archive == null || archive.currentId == id) return;
+    if (!archive.items.any((s) => s.id == id)) return;
+    await _persistState();
+    archive.currentId = id;
+    _applyCurrent();
+    await _repository!.save(archive);
+    notifyListeners();
+  }
+
+  /// Cambia il titolo; `null` o vuoto torna al titolo predefinito.
+  Future<void> renameScrutiny(String id, String? title) async {
+    final archive = _archive;
+    if (archive == null) return;
+    final trimmed = title?.trim();
+    archive.items.firstWhere((s) => s.id == id).title =
+        (trimmed == null || trimmed.isEmpty) ? null : trimmed;
+    await _repository!.save(archive);
+    notifyListeners();
+  }
+
+  /// Elimina uno scrutinio. Se era quello aperto si apre il più recente fra
+  /// i rimasti; se non ne resta nessuno se ne crea uno nuovo.
+  Future<void> deleteScrutiny(String id) async {
+    final archive = _archive;
+    if (archive == null) return;
+    final wasCurrent = archive.currentId == id;
+    if (wasCurrent && archive.items.length == 1) {
+      await newScrutiny();
+    } else if (!wasCurrent) {
+      await _persistState();
+    }
+    archive.items.removeWhere((s) => s.id == id);
+    if (wasCurrent && archive.currentId == id) {
+      final latest = archive.items.reduce(
+        (a, b) => a.updatedAt.isAfter(b.updatedAt) ? a : b,
+      );
+      archive.currentId = latest.id;
+      _applyCurrent();
+    }
+    await _repository!.save(archive);
+    notifyListeners();
+  }
+
+  /// Aggiunge all'archivio gli scrutini letti da un file (P7). Non sovrascrive
+  /// mai: uno scrutinio già presente identico (stesso id, stessi candidati e
+  /// stesse schede) viene saltato; uno con lo stesso id ma diverso entra con
+  /// un id nuovo. Lo scrutinio aperto non cambia.
+  /// Restituisce (aggiunti, saltati).
+  Future<(int, int)> importScrutinies(List<Scrutiny> incoming) async {
+    final archive = _archive, repository = _repository;
+    if (archive == null || repository == null) return (0, 0);
+    await _persistState();
+    var added = 0, skipped = 0;
+    for (final s in incoming) {
+      final same = archive.items.where((e) => e.id == s.id).firstOrNull;
+      if (same == null) {
+        archive.items.add(s);
+        added++;
+      } else if (_sameContent(same, s)) {
+        skipped++;
+      } else {
+        archive.items.add(
+          Scrutiny(
+            id: repository.newId(),
+            title: s.title,
+            createdAt: s.createdAt,
+            updatedAt: s.updatedAt,
+            settings: s.settings,
+            candidates: s.candidates,
+            voteLog: s.voteLog,
+          ),
+        );
+        added++;
       }
-      
-      _calculateResults();
+    }
+    if (added > 0) {
+      await repository.save(archive);
+      notifyListeners();
+    }
+    return (added, skipped);
+  }
+
+  static bool _sameContent(Scrutiny a, Scrutiny b) =>
+      listEquals(a.voteLog, b.voteLog) &&
+      jsonEncode([for (final c in a.candidates) c.toJson()]) ==
+          jsonEncode([for (final c in b.candidates) c.toJson()]);
+
+  /// Ricalcola i voti rigiocando il registro delle schede.
+  void _recalculateState() {
+    final votes = ScrutinyEngine.tally(_candidates.length, _voteLog);
+    for (var i = 0; i < _candidates.length; i++) {
+      _candidates[i].votes = votes[i];
+    }
+    _calculateResults();
   }
 
   void vote(int index, {bool increment = true}) {
     if (index < 0 || index >= _candidates.length) return;
 
     if (increment) {
-        if (_remainingVotes <= 0) return;
-        _voteLog.add(index);
-        _candidates[index].votes++;
+      if (_remainingVotes <= 0) return;
+      _voteLog.add(index);
+      _candidates[index].votes++;
     } else {
-        // Rimuove l'ultima occorrenza di questo candidato dal log
-        int lastIndex = _voteLog.lastIndexOf(index);
-        if (lastIndex == -1) return; // niente da rimuovere
-        _voteLog.removeAt(lastIndex);
-        _candidates[index].votes--;
+      // Rimuove l'ultima occorrenza di questo candidato dal log
+      int lastIndex = _voteLog.lastIndexOf(index);
+      if (lastIndex == -1) return; // niente da rimuovere
+      _voteLog.removeAt(lastIndex);
+      _candidates[index].votes--;
     }
 
     _redoStack.clear(); // una nuova azione invalida il redo
     // Aggiornamento incrementale: ogni voto cambia un solo candidato di ±1,
     // quindi non serve rigiocare l'intero log (vedi PERF-001).
     _calculateResults();
-    _persistState();
+    _scheduleSave();
     notifyListeners();
   }
 
   void undo() {
     if (_voteLog.isEmpty) return;
-    final removed = _voteLog.removeLast(); // sposta l'ultima azione sul redo-stack
+    final removed = _voteLog
+        .removeLast(); // sposta l'ultima azione sul redo-stack
     _redoStack.add(removed);
     if (removed >= 0 && removed < _candidates.length) {
       _candidates[removed].votes--;
     }
     _calculateResults();
-    _persistState();
+    _scheduleSave();
     notifyListeners();
   }
 
   void redo() {
     if (_redoStack.isEmpty) return;
-    final restored = _redoStack.removeLast(); // riapplica l'ultima azione annullata
+    final restored = _redoStack
+        .removeLast(); // riapplica l'ultima azione annullata
     _voteLog.add(restored);
     if (restored >= 0 && restored < _candidates.length) {
       _candidates[restored].votes++;
     }
     _calculateResults();
-    _persistState();
+    _scheduleSave();
     notifyListeners();
   }
 
+  /// Azzera i voti (D2): nomi, colori e percentuali precedenti restano.
   void reset() {
-    _initializeCandidates();
     _voteLog.clear();
     _redoStack.clear();
     _recalculateState();
-    _persistState();
+    _scheduleSave();
     notifyListeners();
   }
-  
-  void loadConfiguration(List<Candidate> newCandidates) {
-      _candidates = newCandidates;
-      // Ensure votes are 0 if it's just a config load
-      for (var c in _candidates) {
-          c.votes = 0;
-      }
-      
-      // Update settings participant count if needed
-      final validCount = _candidates.where((c) => c.type == CandidateType.normal).length;
-      if (validCount != _settings.participantsCount) {
-          _settings = Settings(
-              totalVoters: _settings.totalVoters,
-              participantsCount: validCount,
-              showBlankVotes: _candidates.any((c) => c.type == CandidateType.blank),
-              showNullVotes: _candidates.any((c) => c.type == CandidateType.spoiled)
-          );
-      }
 
-      _voteLog.clear();
-      _redoStack.clear();
-      _recalculateState();
-      _persistState();
-      notifyListeners();
+  void loadConfiguration(List<Candidate> newCandidates) {
+    _candidates = newCandidates;
+    // Ensure votes are 0 if it's just a config load
+    for (var c in _candidates) {
+      c.votes = 0;
+    }
+
+    // Update settings participant count if needed
+    final validCount = _candidates
+        .where((c) => c.type == CandidateType.normal)
+        .length;
+    if (validCount != _settings.participantsCount) {
+      _settings = Settings(
+        totalVoters: _settings.totalVoters,
+        participantsCount: validCount,
+        showBlankVotes: _candidates.any((c) => c.type == CandidateType.blank),
+        showNullVotes: _candidates.any((c) => c.type == CandidateType.spoiled),
+        victoryRule: _settings.victoryRule,
+        eligibleVoters: _settings.eligibleVoters,
+        quorumPercent: _settings.quorumPercent,
+      );
+    }
+
+    _voteLog.clear();
+    _redoStack.clear();
+    _recalculateState();
+    _scheduleSave();
+    notifyListeners();
   }
 
+  /// Le impostazioni [next] cambiano le righe dello scrutinio (numero di
+  /// candidati, bianche o nulle): salvarle azzera i voti.
+  bool _changesRows(Settings next) {
+    final real = _candidates.where((c) => !c.isTechnical).length;
+    final blank = _candidates.any((c) => c.type == CandidateType.blank);
+    final spoiled = _candidates.any((c) => c.type == CandidateType.spoiled);
+    return real != next.participantsCount ||
+        blank != next.showBlankVotes ||
+        spoiled != next.showNullVotes;
+  }
+
+  /// Schede contate che si perderebbero salvando [next] (0 se i voti restano).
+  int ballotsLostWith(Settings next) =>
+      _changesRows(next) ? totalVotesAssigned : 0;
+
+  /// Applica le impostazioni. Se cambiano le righe, i voti si azzerano ma i
+  /// primi candidati tengono nome, colore e percentuale precedente (D1).
   void updateSettings(Settings newSettings) {
+    final changesRows = _changesRows(newSettings);
     _settings = newSettings;
-    // When settings change (e.g. number of candidates), we usually reset.
-    // Ideally we should prompt user, but for now we follow simple logic:
-    // If participants count changed, reset.
-    // If just total voters changed, recalculate.
-    
-    // We can try to be smart:
-    bool needsReset = _candidates.length != 
-        (newSettings.participantsCount + (newSettings.showBlankVotes ? 1 : 0) + (newSettings.showNullVotes ? 1 : 0));
-        
-    if (needsReset) {
-        reset();
-    } else {
-        _calculateResults();
-        _persistState();
-        notifyListeners();
+    if (!changesRows) {
+      _calculateResults();
+      _scheduleSave();
+      notifyListeners();
+      return;
     }
+    final kept = _candidates.where((c) => !c.isTechnical).toList();
+    _initializeCandidates();
+    final real = _candidates.where((c) => !c.isTechnical).toList();
+    for (var i = 0; i < real.length && i < kept.length; i++) {
+      real[i]
+        ..name = kept[i].name
+        ..color = kept[i].color
+        ..previousPercentage = kept[i].previousPercentage;
+    }
+    _voteLog.clear();
+    _redoStack.clear();
+    _recalculateState();
+    _scheduleSave();
+    notifyListeners();
   }
 
   void renameCandidate(int index, String newName) {
     if (index >= 0 && index < _candidates.length) {
       _candidates[index].name = newName;
       // History is based on index, so renaming is fine, no log rewriting needed
-      _persistState();
+      _scheduleSave();
+      notifyListeners();
+    }
+  }
+
+  /// Colore scelto per il candidato [index] (S6).
+  void setCandidateColor(int index, Color color) {
+    if (index >= 0 && index < _candidates.length) {
+      _candidates[index].color = color;
+      _scheduleSave();
       notifyListeners();
     }
   }
@@ -323,112 +646,64 @@ class ScrutinyProvider extends ChangeNotifier {
   void setCandidatePreviousPercentage(int index, double? value) {
     if (index >= 0 && index < _candidates.length) {
       _candidates[index].previousPercentage = value;
-      _persistState();
+      _scheduleSave();
       notifyListeners();
     }
   }
 
   void _calculateResults() {
-    // DO NOT sort _candidates in place to prevent UI jumping
-    // Create a shadow list for ranking logic
-    final sortedList = List<Candidate>.from(_candidates);
-    sortedList.sort((a, b) => b.votes.compareTo(a.votes));
-
-    // Assign ranks
-    for (int i = 0; i < sortedList.length; i++) {
-        sortedList[i].rank = i + 1;
+    // L'ordine di _candidates non cambia mai (la UI non deve "saltare"):
+    // la classifica è nel campo rank.
+    final outcome = ScrutinyEngine.evaluate(
+      types: [for (final c in _candidates) c.type],
+      votes: [for (final c in _candidates) c.votes],
+      totalVoters: _settings.totalVoters,
+      rule: _settings.victoryRule,
+      quorumReached: _settings.quorumReached,
+    );
+    for (var i = 0; i < _candidates.length; i++) {
+      _candidates[i].rank = outcome.ranks[i];
     }
-
-    _totalVotesAssigned = _candidates.fold(0, (sum, c) => sum + c.votes);
-    _remainingVotes = _settings.totalVoters - _totalVotesAssigned;
-
-    _winnerName = null;
-    _winnerStatus = WinnerStatus.none;
-
-    final validCandidates =
-        sortedList.where((c) => c.type == CandidateType.normal).toList();
-
-    if (validCandidates.isEmpty) return;
-
-    // Winner Calculation Logic (same as before)
-    if (validCandidates.length >= 2) {
-      final firstPlace = validCandidates[0];
-      final secondPlace = validCandidates[1];
-      final voteGap = firstPlace.votes - secondPlace.votes;
-
-      if (_remainingVotes >= 0 && voteGap > _remainingVotes) {
-        _winnerName = firstPlace.name;
-        _winnerStatus = WinnerStatus.mathematical;
-        // Don't return early, we need to ensure stats are consistent
-      }
-    }
-
-    if (_remainingVotes <= 0 && _totalVotesAssigned > 0) {
-      if (validCandidates.length >= 2 &&
-          validCandidates[0].votes == validCandidates[1].votes &&
-          validCandidates[0].votes > 0) {
-        _winnerName = null;
-        _winnerStatus = WinnerStatus.tie;
-      } else {
-        _winnerName = validCandidates.first.name;
-        _winnerStatus = WinnerStatus.elected;
-      }
-    }
+    _totalVotesAssigned = outcome.totalAssigned;
+    _remainingVotes = outcome.remaining;
+    _winnerStatus = outcome.status;
+    _winnerName = outcome.winnerIndex == null
+        ? null
+        : _candidates[outcome.winnerIndex!].name;
+    _votesToWin = outcome.votesToWin;
   }
 
-  // Getter for sorted candidates (for charts/export)
-  List<Candidate> get sortedCandidates {
-      final list = List<Candidate>.from(_candidates);
-      list.sort((a, b) => b.votes.compareTo(a.votes));
-      return list;
-  }
+  /// Candidati in ordine di classifica (per grafici ed export).
+  List<Candidate> get sortedCandidates => [
+    for (final i in ScrutinyEngine.ranking([
+      for (final c in _candidates) c.votes,
+    ]))
+      _candidates[i],
+  ];
 
-  Map<int, Map<String, int>> get historyPoints {
-    Map<int, Map<String, int>> points = {};
-    
-    // Simulate replay to build graph
-    // Initial state (0 votes or Base if implemented)
-    Map<String, int> currentVotes = {for (var c in _candidates) c.name: 0};
-    int currentTotal = 0;
-    
-    // Point 0
-    points[0] = Map.from(currentVotes);
+  /// Andamento per grafici ed export: l'elemento `k` ha i voti di ogni
+  /// candidato (per posizione, mai per nome) dopo le prime `k` schede.
+  List<List<int>> get history =>
+      ScrutinyEngine.history(_candidates.length, _voteLog);
 
-    for (int candidateIndex in _voteLog) {
-        if (candidateIndex >= 0 && candidateIndex < _candidates.length) {
-             String name = _candidates[candidateIndex].name;
-             currentVotes[name] = (currentVotes[name] ?? 0) + 1;
-             currentTotal++;
-             
-             // Snapshot at this step
-             points[currentTotal] = Map.from(currentVotes);
-        }
-    }
-    return points;
-  }
+  /// Registro delle schede (indici dei candidati), dalla prima.
+  List<int> get voteLog => List.unmodifiable(_voteLog);
 
-  // Export Data Helper
-  String exportToCsv() {
-    final buffer = StringBuffer();
-    buffer.writeln('Candidato,Voti,Percentuale');
-    for (var c in _candidates) {
-      buffer.writeln('${c.name},${c.votes},${c.getPercentage(_totalVotesAssigned).toStringAsFixed(2)}%');
-    }
-    buffer.writeln('Totale Voti,$_totalVotesAssigned,');
-    buffer.writeln('Votanti Previsti,${_settings.totalVoters},');
-    return buffer.toString();
-  }
-  
-  Map<String, dynamic> exportToJson() {
-      return {
-          'candidates': _candidates.map((c) => c.toJson()).toList(),
-          'settings': _settings.toJson(),
-          'stats': {
-              'totalVotes': _totalVotesAssigned,
-              'totalVoters': _settings.totalVoters,
-              'winner': winner,
-              'winnerStatus': _winnerStatus.name
-          }
-      };
+  /// Copia dello scrutinio aperto con lo stato di adesso (anche se il
+  /// salvataggio è ancora in attesa), per gli export. `null` in caricamento.
+  Scrutiny? liveScrutiny(DateTime now) {
+    final current = _archive?.current;
+    if (current == null) return null;
+    return Scrutiny.fromJson(
+      Scrutiny(
+        id: current.id,
+        title: current.title,
+        createdAt: current.createdAt,
+        updatedAt: now,
+        settings: _settings,
+        candidates: _candidates,
+        voteLog: List.of(_voteLog),
+      ).toJson(),
+    );
   }
 }

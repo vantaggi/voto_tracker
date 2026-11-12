@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- surface e primary scuri dell'app -->
+    <color name="splash_background">#13131B</color>
+    <color name="splash_icon_background">#C0C1FF</color>
+</resources>

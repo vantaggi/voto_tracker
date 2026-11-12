@@ -1,11 +1,11 @@
 {
-    "name": "voto_tracker",
-    "short_name": "voto_tracker",
+    "name": "Voto Tracker",
+    "short_name": "Voto Tracker",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "Application to track the votes during an election",
+    "background_color": "#FCF8FF",
+    "theme_color": "#4648D4",
+    "description": "Conteggio dei voti durante uno scrutinio",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

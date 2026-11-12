@@ -20,6 +20,7 @@ Leggi questi file in QUEST'ORDINE prima di iniziare un task:
 | 4️⃣ | `docs/PROJECT_GUIDE.md` | Architettura, algoritmi, decisioni |
 | 5️⃣ | `docs/DESIGN_SYSTEM.md` | Token UI Material 3 + regole di stile |
 | 6️⃣ | `CHANGELOG.md` | Storico modifiche per versione |
+| ➕ | `CLAUDE.md` | Comandi, definizione di "fatto" e trappole note (per Claude Code) |
 
 ### Regole Assolute
 
@@ -59,7 +60,7 @@ Leggi questi file in QUEST'ORDINE prima di iniziare un task:
 | `lib/models/settings.dart` | Configurazione scrutinio (votanti, candidati, schede) |
 | `lib/screens/home_page.dart` | Schermata principale (grafici + controlli) |
 | `lib/screens/projector_mode_screen.dart` | Modalità proiettore a schermo intero |
-| `lib/screens/settings_dialog.dart` | Dialog di configurazione |
+| `lib/screens/settings_page.dart` | Impostazioni dello scrutinio (pagina o finestra) |
 | `lib/widgets/*` | Card candidato, sezioni grafici, card social |
 | `lib/services/pdf_export_service.dart` | Report PDF |
 | `lib/services/social_share_service.dart` | Immagine condivisibile |

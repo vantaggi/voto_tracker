@@ -3,7 +3,10 @@ import 'dart:io';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import 'package:voto_tracker/main.dart';
+import 'package:voto_tracker/providers/scrutiny_provider.dart';
+import 'package:voto_tracker/screens/home_page.dart';
 
 /// Golden della Home con alcuni voti, per accorgersi di modifiche visive non
 /// volute durante i refactoring. I PNG sono generati su Linux (cloud): su altri
@@ -25,8 +28,13 @@ void main() {
 
         await tester.pumpWidget(const VotoTrackerApp());
         await tester.pumpAndSettle();
-        for (final i in [0, 0, 1, 0, 2]) {
-          await tester.tap(find.byIcon(Icons.add).at(i));
+        // Voti su più candidati (anche bianche e nulle) per vedere la palette.
+        final provider = Provider.of<ScrutinyProvider>(
+          tester.element(find.byType(HomePage)),
+          listen: false,
+        );
+        for (final i in [0, 0, 1, 0, 2, 3, 1, 4, 5, 0]) {
+          provider.vote(i);
           await tester.pump();
         }
         await tester.pumpAndSettle();

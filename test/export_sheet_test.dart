@@ -21,6 +21,7 @@ void main() {
     ]) {
       expect(find.byIcon(icon), findsOneWidget);
     }
+    expect(find.textContaining('Share “'), findsOneWidget);
 
     await tester.tapAt(const Offset(10, 10)); // fuori dal sheet
     await tester.pumpAndSettle();

@@ -1,54 +1,86 @@
+import 'package:material_ui/material_ui.dart';
 import 'package:voto_tracker/l10n/app_localizations.dart';
-import 'package:voto_tracker/l10n/export_labels.dart';
-import 'package:voto_tracker/l10n/l10n_ext.dart';
+import 'package:voto_tracker/l10n/export_format.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/services/data_export_service.dart';
 import 'package:voto_tracker/services/pdf_export_service.dart';
+import 'package:voto_tracker/services/pdf_palette.dart';
+import 'package:voto_tracker/services/results_snapshot.dart';
 import 'package:voto_tracker/services/social_share_service.dart';
+import 'package:voto_tracker/theme/app_theme.dart';
 
 /// Unico punto che prepara lo stato corrente per gli export (PNG, PDF, CSV,
-/// JSON). I servizi girano fuori dall'albero dei widget: qui si risolvono una
-/// volta sola le stringhe localizzate e il vincitore da mostrare.
+/// JSON): una sola [ResultsSnapshot] con testi e formati della lingua.
 class ExportController {
-  ExportController(this._provider, this._l10n)
-    : labels = ExportLabels.of(_l10n);
+  ExportController(
+    this._provider,
+    this._l10n, {
+    PdfPalette? palette,
+    AppThemes? themes,
+    DateTime Function()? clock,
+  }) : palette = palette ?? PdfPalette.brand,
+       _themes = themes ?? AppThemes.brand,
+       _clock = clock ?? DateTime.now;
 
   final ScrutinyProvider _provider;
   final AppLocalizations _l10n;
-  final ExportLabels labels;
+  final AppThemes _themes;
+  final DateTime Function() _clock;
 
-  /// Nome mostrato come vincitore: la label di pareggio in caso di parità.
-  String? get winnerName => _provider.isTie ? _l10n.tie : _provider.winnerName;
+  /// Colori del PDF: lo schema chiaro dell'app (colore dinamico compreso).
+  final PdfPalette palette;
 
-  String? get winnerLabel =>
-      localizedWinnerLabel(_l10n, _provider.winnerStatus);
+  Future<(ResultsSnapshot, ExportFormat)> snapshot() async {
+    final format = await ExportFormat.load(_l10n.localeName);
+    return (
+      ResultsSnapshot.fromProvider(_provider, _l10n, format, at: _clock()),
+      format,
+    );
+  }
 
-  Future<void> shareImage() => SocialShareService.shareResults(
-    candidates: _provider.sortedCandidates,
-    totalVotes: _provider.totalVotesAssigned,
-    totalVoters: _provider.settings.totalVoters,
-    remainingVotes: _provider.remainingVotes,
-    labels: labels,
-    winner: winnerName,
-    winnerLabel: winnerLabel,
-  );
+  /// `false` se la condivisione è fallita (vale per tutti i metodi).
+  Future<bool> shareImage() async {
+    final (s, f) = await snapshot();
+    return SocialShareService.shareResults(
+      snapshot: s,
+      l10n: _l10n,
+      format: f,
+      theme: _themes.dark,
+    );
+  }
 
-  Future<void> exportPdf() => PdfExportService.exportToPdf(
-    candidates: _provider.sortedCandidates,
-    totalVotesAssigned: _provider.totalVotesAssigned,
-    totalVoters: _provider.settings.totalVoters,
-    remainingVotes: _provider.remainingVotes,
-    historyPoints: _provider.historyPoints,
-    labels: labels,
-    winner: winnerName,
-    winnerLabel: winnerLabel,
-  );
+  Future<bool> exportPdf() async {
+    final (s, f) = await snapshot();
+    try {
+      return await PdfExportService.share(
+        snapshot: s,
+        l10n: _l10n,
+        format: f,
+        palette: palette,
+      );
+    } catch (e) {
+      debugPrint('Errore PDF: $e');
+      return false;
+    }
+  }
 
-  /// `false` se la condivisione è fallita.
-  Future<bool> shareCsv() =>
-      DataExportService.shareCsv(_provider.exportToCsv());
+  Future<bool> shareCsv() async {
+    final (s, f) = await snapshot();
+    return DataExportService.share(
+      content: DataExportService.csv(s, _l10n, f),
+      fileName: ExportFormat.fileName(s.title, s.at, 'csv'),
+      mimeType: 'text/csv',
+      text: _l10n.exportShareText(s.title),
+    );
+  }
 
-  /// `false` se la condivisione è fallita.
-  Future<bool> shareJson() =>
-      DataExportService.shareJson(_provider.exportToJson());
+  Future<bool> shareJson() async {
+    final (s, _) = await snapshot();
+    return DataExportService.share(
+      content: DataExportService.json(s, s.at),
+      fileName: ExportFormat.fileName(s.title, s.at, 'json'),
+      mimeType: 'application/json',
+      text: _l10n.exportShareText(s.title),
+    );
+  }
 }
