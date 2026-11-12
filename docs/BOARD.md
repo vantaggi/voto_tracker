@@ -4,9 +4,9 @@ Source of Truth per task, idee e avanzamento. Leggibile da umani e IA.
 Se un'informazione può stare qui, **non creare un nuovo `.md`**: il BOARD è
 l'unico posto dove vive lo stato dei task.
 
-## 🚀 Stato Corrente: v1.2.0
+## 🚀 Stato Corrente: v2.0.0 (in preparazione)
 
-**Branch attivo:** claude/project-thread-0j7sox (Fasi 2-4, PR in bozza) · **Ultimo aggiornamento:** 2026-11-12
+**Branch attivo:** claude/project-thread-0j7sox (versione 2.0.0; PR #3 unita il 2026-11-12) · **Ultimo aggiornamento:** 2026-11-12
 
 L'app è funzionante e pubblicabile. Backlog Wave 1/1.1/2 completato: kit
 documentale, audit & bugfix, test, redo, performance e i18n IT/EN.
@@ -116,11 +116,12 @@ tutto") il 12/11.
 | UI-009 | **Ridisegno delle altre schermate** (S1-S7, decisioni D1-D6) | 🏗️ In corso | 🔴 Alta | 🟡 Medio | - | Impostazioni, Archivio, Lettura schede, Proiettore, Condividi, Modifica candidato. Fatto nel cloud, rese guardate; da provare sul telefono |
 | FIX-012 | **Impostazioni non cancellano più nomi e colori** (S1) | 🏗️ In corso | 🔴 Alta | 🟢 Basso | - | Cambiare il numero di candidati teneva solo i voti a zero ma azzerava anche i nomi; ora restano, con avviso "Salva e azzera" |
 | UI-010 | **Condivisioni e grafici** (C1-C6, decisioni D1-D6) | 🏗️ In corso | 🔴 Alta | 🟡 Medio | - | Immagine 4:5, PDF "Verbale dei risultati", CSV per Excel italiano, JSON reimportabile, grafici Andamento e Confronto. Rese guardate; da provare sul telefono (condividere, stampare, aprire in Excel) |
-| UI-011 | **Icona "Stanghette" e splash screen** (I1-I5, decisioni D1-D5) | 🏗️ In corso | 🟡 Media | 🟢 Basso | - | Icona adaptive con livello a tema, debug con banda "DEBUG" e nome "Voto Tracker debug", splash Android 12+ e precedenti in chiaro e scuro, icone web/iOS/Play Store. Nel cloud manca l'Android SDK: build e splash da guardare sul telefono |
+| UI-011 | **Icona "Stanghette" e splash screen** (I1-I5, decisioni D1-D5) | ✅ Fatto | 🟡 Media | 🟢 Basso | - | Icona adaptive con livello a tema, debug con banda "DEBUG" e nome "Voto Tracker debug", splash Android 12+ e precedenti in chiaro e scuro, icone web/iOS/Play Store. Build di debug provata sul telefono il 12/11: icona con banda e splash scuro giusti |
 | FIX-013 | **Andamento: candidati con lo stesso nome** (C5) | 🏗️ In corso | 🟡 Media | 🟢 Basso | - | La storia era per nome e due omonimi diventavano una linea; ora è per posizione |
 
-Restano con te: P1 (prova PR #3), P2 (merge), P12 (migrazione sui dati veri,
-su una copia), P13 (giro sul telefono), P14 (release 2.0.0).
+P1 e P2 fatti: PR #3 unita il 2026-11-12. P12 saltato: non ci sono ancora dati
+veri da migrare. Restano P13 (giro sul telefono) e P14 (release 2.0.0: versione
+`2.0.0+6` pronta, build firmata e Play Store sul PC).
 
 ## Convenzioni ID
 
