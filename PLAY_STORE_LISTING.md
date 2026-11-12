@@ -49,7 +49,7 @@ elezioni, scrutinio, voti, politica, rappresentante di lista, conteggio, statist
 
 ## Requisiti Grafici
 
-- **Icona App**: 512px x 512px (PNG, 32-bit).
+- **Icona App**: 512px x 512px (PNG, 32-bit): `assets/icon/play_store_512.png`, generata da `scripts/make_icons.py` (icona "Stanghette").
 - **Immagine in Evidenza (Feature Graphic)**: 1024px x 500px (JPG o PNG, nessun canale alpha). "Voto Tracker" al centro, sfondo scuro/tech.
 - **Screenshot Telefono**: Rapporto 16:9 o 9:16 (Min 2 lati > 320px, Max < 3840px). Consigliati almeno 4 screenshot (Dashboard, Settings, History, Dark Mode).
 

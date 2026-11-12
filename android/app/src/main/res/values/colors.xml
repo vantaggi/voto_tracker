@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- primary chiaro dell'app (seme indaco) -->
+    <color name="ic_launcher_background">#4648D4</color>
+    <!-- surface chiaro dell'app: fondo dello splash e della finestra -->
+    <color name="splash_background">#FCF8FF</color>
+    <color name="splash_icon_background">#4648D4</color>
+</resources>

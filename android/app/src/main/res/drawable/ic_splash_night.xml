@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generato da scripts/make_icons.py: non modificare a mano. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path android:pathData="M37,38 L37,70" android:strokeColor="#1000A9" android:strokeWidth="6" android:strokeLineCap="round" />
+    <path android:pathData="M48,38 L48,70" android:strokeColor="#1000A9" android:strokeWidth="6" android:strokeLineCap="round" />
+    <path android:pathData="M59,38 L59,70" android:strokeColor="#1000A9" android:strokeWidth="6" android:strokeLineCap="round" />
+    <path android:pathData="M70,38 L70,70" android:strokeColor="#1000A9" android:strokeWidth="6" android:strokeLineCap="round" />
+    <path android:pathData="M31.5,64.8 L76.5,43.2" android:strokeColor="#1000A9" android:strokeWidth="6" android:strokeLineCap="round" />
+</vector>
