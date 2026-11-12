@@ -102,6 +102,20 @@ SnackBar (floating, `inverseSurface`).
 - Colori dei candidati scelti solo da `CandidatePalette.candidates`, cerchi
   da 36 dp in aree da 48 dp.
 
+## 5.3 Condivisioni e grafici (C1-C6)
+
+- Tutti gli export partono da una sola `ResultsSnapshot` e formattano con
+  `ExportFormat`: virgola decimale in italiano, variazioni "+6,7 punti" con
+  il segno sempre scritto, date "12 novembre 2026, 10:28", file
+  "Titolo - AAAA-MM-GG.ext".
+- Immagine: 540 × 675 dp catturati a 2x, tema scuro, righe 36–64 dp con barra
+  da 8 dp, al massimo quante ne entrano e poi "+N altri".
+- PDF: A4 verticale, schema chiaro (`PdfPalette`), esito su
+  `primaryContainer` (`tertiaryContainer` senza vincitore), una sola tabella
+  dei risultati; firme solo a scrutinio completo.
+- Grafici: linee a gradini (mai curve), tacche intere con passo 1/2/5,
+  `FilterChip` come legenda; Confronto a barre con tacca sul precedente.
+
 ## 6. Regole pratiche
 
 - Nuovo testo visibile → aggiungilo a `lib/l10n/app_en.arb` e `app_it.arb`,
@@ -110,5 +124,5 @@ SnackBar (floating, `inverseSurface`).
   una dimensione specifica (es. altezza di un grafico) va in `AppDimensions`.
 - Nuovo colore → derivalo dal `ColorScheme`; se serve un colore-dato (es. nuova
   categoria di scheda), documenta la scelta qui.
-- Il PDF (`PdfExportService`) replica volutamente la palette indigo del tema con
-  `PdfColors.indigo*`: se cambi il seed, allinea anche il PDF.
+- Il PDF (`PdfExportService`) prende i colori dallo schema chiaro dell'app
+  con `PdfPalette.fromScheme`: segue anche il colore dinamico.

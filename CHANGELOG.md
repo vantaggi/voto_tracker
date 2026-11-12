@@ -55,6 +55,21 @@ Le sezioni sono generate dai commit convenzionali (vedi
     riordinano con un'animazione, bianche e nulle fuori classifica.
   - Foglio Condividi con Immagine e PDF in evidenza; "Modifica candidato"
     permette di scegliere il colore.
+- **Condivisioni ridisegnate:**
+  - Immagine 4:5 (1080 × 1350) con titolo, data, stato, esito, barra dei voti
+    e una riga con barra per ogni candidato (fino a 8, poi "+N altri"); non
+    esce più dai bordi quando c'è un vincitore.
+  - PDF "Verbale dei risultati": titolo dello scrutinio, data in italiano,
+    esito, numeri chiave, una sola tabella con barre e "Rispetto a prima",
+    andamento a gradini con legenda, firme a scrutinio completo, più pagine
+    se servono.
+  - CSV che si apre bene in Excel italiano (punto e virgola, virgola
+    decimale, accenti), senza righe di totale e protetto dalle formule.
+  - JSON nel formato dell'Archivio: si reimporta da "Importa da file".
+  - File con il nome dello scrutinio e la data.
+- **Grafici della Home:** "Andamento" con linee a gradini, chip con nome e voti
+  per accendere e spegnere le linee e lettura a una scheda col dito;
+  "Confronto" con barre e il risultato precedente al posto della ciambella.
 - Percentuali con la virgola decimale in italiano.
 - Palette dei candidati ridisegnata (HCT) per essere leggibile in light e dark;
   le schede nulle non sono più nere (invisibili nel tema scuro).
@@ -67,6 +82,8 @@ Le sezioni sono generate dai commit convenzionali (vedi
   cancella più nomi, colori e risultati precedenti: si azzerano solo i voti,
   con un avviso e il pulsante "Salva e azzera". Anche "Azzera scrutinio" ora
   tiene nomi e colori.
+- Nel grafico dell'andamento due candidati con lo stesso nome finivano su
+  una sola linea: ora la storia è per posizione.
 
 ### 🛠️ Refactoring
 - Logica dello scrutinio in `ScrutinyEngine` (puro, testato a parte) e

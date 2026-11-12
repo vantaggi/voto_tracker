@@ -106,12 +106,16 @@ Piano: documento "Voto Tracker — Piano master del refactor (v2.0)", approvato
 Piano: documento "Voto Tracker — Ridisegno della Home" (50 giri di critica e
 bozze), approvato ("ok tutto ma fallo subito su PR 3") il 12/11. Poi
 "Voto Tracker — Ridisegno delle altre schermate", approvato ("ok tutto") il 12/11.
+Infine "Voto Tracker — Ridisegno di condivisioni e grafici", approvato ("ok
+tutto") il 12/11.
 
 | ID | Task | Status | Priorità | Rischio | Stima | Note |
 |:--|:--|:--:|:--:|:--:|:--:|:--|
 | UI-008 | **Ridisegno della Home** (R1-R7) | 🏗️ In corso | 🔴 Alta | 🟡 Medio | - | Fatto nel cloud, golden guardati; da provare sul telefono insieme a P13 |
 | UI-009 | **Ridisegno delle altre schermate** (S1-S7, decisioni D1-D6) | 🏗️ In corso | 🔴 Alta | 🟡 Medio | - | Impostazioni, Archivio, Lettura schede, Proiettore, Condividi, Modifica candidato. Fatto nel cloud, rese guardate; da provare sul telefono |
 | FIX-012 | **Impostazioni non cancellano più nomi e colori** (S1) | 🏗️ In corso | 🔴 Alta | 🟢 Basso | - | Cambiare il numero di candidati teneva solo i voti a zero ma azzerava anche i nomi; ora restano, con avviso "Salva e azzera" |
+| UI-010 | **Condivisioni e grafici** (C1-C6, decisioni D1-D6) | 🏗️ In corso | 🔴 Alta | 🟡 Medio | - | Immagine 4:5, PDF "Verbale dei risultati", CSV per Excel italiano, JSON reimportabile, grafici Andamento e Confronto. Rese guardate; da provare sul telefono (condividere, stampare, aprire in Excel) |
+| FIX-013 | **Andamento: candidati con lo stesso nome** (C5) | 🏗️ In corso | 🟡 Media | 🟢 Basso | - | La storia era per nome e due omonimi diventavano una linea; ora è per posizione |
 
 Restano con te: P1 (prova PR #3), P2 (merge), P12 (migrazione sui dati veri,
 su una copia), P13 (giro sul telefono), P14 (release 2.0.0).

@@ -28,7 +28,7 @@ lib/
 │   ├── app_localizations*.dart        # AppLocalizations generato (flutter gen-l10n)
 │   ├── l10n_delegates.dart            # Delegate di localizzazione (material_ui/cupertino_ui)
 │   ├── l10n_ext.dart                  # context.l10n + helper nomi candidato / label vincitore
-│   └── export_labels.dart             # Stringhe localizzate per PDF/social (servizi senza context)
+│   └── export_format.dart             # Date, decimali, variazioni e nomi file per gli export (senza context)
 │
 ├── providers/
 │   ├── scrutiny_provider.dart         # ChangeNotifier centrale: vote-log, undo/redo, archivio, export
@@ -51,22 +51,23 @@ lib/
 │   ├── candidate_row.dart             # Righe dei candidati e "Altre schede" (bianche, nulle)
 │   ├── edit_candidate_dialog.dart     # Dialog "Modifica candidato" (nome, colore, risultato precedente)
 │   ├── undo_pill.dart                 # Pillola Annulla / Ripeti con il nome dell'ultimo voto
-│   ├── charts_card.dart               # Card apribile Storico / Percentuali
+│   ├── charts_card.dart               # Card apribile Andamento / Confronto
 │   ├── charts/                        # Un file per grafico (fl_chart)
-│   │   ├── history_chart.dart
-│   │   └── percentage_chart.dart
+│   │   ├── trend_chart.dart           # Andamento: linee a gradini, chip, lettura a una scheda
+│   │   └── compare_chart.dart         # Confronto: barre con il risultato precedente
 │   ├── export_sheet.dart              # Foglio Condividi: Immagine e PDF grandi, CSV e JSON piccoli
 │   ├── keep_screen_on.dart            # Schermo acceso mentre la schermata è aperta
-│   └── social_results_card.dart       # Card renderizzata per l'immagine social
+│   └── social_results_card.dart       # Immagine da condividere, 4:5
 │
 ├── services/
 │   ├── export_controller.dart         # Prepara lo stato per PNG/PDF/CSV/JSON (un solo punto)
+│   ├── results_snapshot.dart          # Fotografia dei risultati comune a tutti gli export
 │   ├── archive_transfer_service.dart  # Esporta/importa l'archivio in un file JSON (backup, cambio telefono)
 │   ├── pdf_palette.dart               # Colori del PDF dallo schema chiaro dell'app
 │   ├── wakelock_service.dart          # Wakelock con conteggio delle richieste
 │   ├── configuration_service.dart     # Import/export configurazione candidati (JSON via file_picker)
-│   ├── data_export_service.dart       # Export risultati grezzi CSV/JSON (condivisione file)
-│   ├── pdf_export_service.dart        # Report PDF a pagina singola (package pdf/printing)
+│   ├── data_export_service.dart       # CSV per Excel e JSON nel formato dell'Archivio
+│   ├── pdf_export_service.dart        # Verbale dei risultati PDF, più pagine (package pdf/printing)
 │   └── social_share_service.dart      # Screenshot di SocialResultsCard → condivisione PNG
 │
 ├── theme/
