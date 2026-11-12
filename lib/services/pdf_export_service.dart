@@ -337,11 +337,12 @@ class PdfExportService {
     ExportLabels labels,
     PdfPalette p,
   ) {
-    if (historyPoints.length < 2)
+    if (historyPoints.length < 2) {
       return pw.Container(
         height: 200,
         child: pw.Center(child: pw.Text(labels.insufficientData)),
       );
+    }
 
     final sortedKeys = historyPoints.keys.toList()..sort();
 
