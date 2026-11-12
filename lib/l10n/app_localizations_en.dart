@@ -450,4 +450,79 @@ class AppLocalizationsEn extends AppLocalizations {
   String deleteList(String name) {
     return 'Delete list $name';
   }
+
+  @override
+  String homeSubtitle(int assigned, int total) {
+    return '$assigned of $total ballots';
+  }
+
+  @override
+  String summaryOfTotal(int total) {
+    return '/ $total ballots';
+  }
+
+  @override
+  String summaryRemaining(int count) {
+    return '$count remaining';
+  }
+
+  @override
+  String get summaryCompleted => 'Completed';
+
+  @override
+  String summaryLeading(String name) {
+    return '$name is leading';
+  }
+
+  @override
+  String get summaryLeadingTie => 'Tie for the lead';
+
+  @override
+  String get summaryEmptyTitle => 'No ballots yet';
+
+  @override
+  String summaryEmptyBody(int candidates, int total) {
+    return '$candidates candidates, $total ballots expected. Check the names, then start.';
+  }
+
+  @override
+  String get summarySetup => 'Set up';
+
+  @override
+  String get shareResults => 'Share results';
+
+  @override
+  String get otherBallots => 'Other ballots';
+
+  @override
+  String candidateRowSemantics(String name, int votes, String percent) {
+    return '$name: $votes votes, $percent';
+  }
+
+  @override
+  String get chartsTitle => 'Trend and charts';
+
+  @override
+  String get chartsSubtitle => 'History and percentages';
+
+  @override
+  String undoLastVote(String name) {
+    return 'Undo $name';
+  }
+
+  @override
+  String get moreActions => 'More actions';
+
+  @override
+  String get resetScrutiny => 'Reset count';
+
+  @override
+  String get resetConfirmTitle => 'Reset the count?';
+
+  @override
+  String get resetConfirmBody =>
+      'All votes in this count go back to zero and can no longer be undone.';
+
+  @override
+  String get resetConfirm => 'Reset';
 }

@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:intl/intl.dart' show NumberFormat;
 import 'package:voto_tracker/l10n/app_localizations.dart';
 import 'package:voto_tracker/models/candidate.dart';
 import 'package:voto_tracker/models/scrutiny.dart';
@@ -66,4 +67,11 @@ String scrutinyDisplayTitle(BuildContext context, Scrutiny s) {
   if (title != null && title.isNotEmpty) return title;
   final date = MaterialLocalizations.of(context).formatMediumDate(s.createdAt);
   return AppLocalizations.of(context).defaultScrutinyTitle(date);
+}
+
+/// Percentuale con una cifra decimale nel formato della lingua ("40,0%" in
+/// italiano, "40.0%" in inglese).
+String formatPercent(BuildContext context, double value) {
+  final locale = Localizations.localeOf(context).toLanguageTag();
+  return '${NumberFormat.decimalPatternDigits(locale: locale, decimalDigits: 1).format(value)}%';
 }

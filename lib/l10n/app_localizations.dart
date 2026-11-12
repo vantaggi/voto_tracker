@@ -894,6 +894,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete list {name}'**
   String deleteList(String name);
+
+  /// No description provided for @homeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{assigned} of {total} ballots'**
+  String homeSubtitle(int assigned, int total);
+
+  /// No description provided for @summaryOfTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'/ {total} ballots'**
+  String summaryOfTotal(int total);
+
+  /// No description provided for @summaryRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} remaining'**
+  String summaryRemaining(int count);
+
+  /// No description provided for @summaryCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get summaryCompleted;
+
+  /// No description provided for @summaryLeading.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is leading'**
+  String summaryLeading(String name);
+
+  /// No description provided for @summaryLeadingTie.
+  ///
+  /// In en, this message translates to:
+  /// **'Tie for the lead'**
+  String get summaryLeadingTie;
+
+  /// No description provided for @summaryEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No ballots yet'**
+  String get summaryEmptyTitle;
+
+  /// No description provided for @summaryEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{candidates} candidates, {total} ballots expected. Check the names, then start.'**
+  String summaryEmptyBody(int candidates, int total);
+
+  /// No description provided for @summarySetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up'**
+  String get summarySetup;
+
+  /// No description provided for @shareResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Share results'**
+  String get shareResults;
+
+  /// No description provided for @otherBallots.
+  ///
+  /// In en, this message translates to:
+  /// **'Other ballots'**
+  String get otherBallots;
+
+  /// No description provided for @candidateRowSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: {votes} votes, {percent}'**
+  String candidateRowSemantics(String name, int votes, String percent);
+
+  /// No description provided for @chartsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trend and charts'**
+  String get chartsTitle;
+
+  /// No description provided for @chartsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'History and percentages'**
+  String get chartsSubtitle;
+
+  /// No description provided for @undoLastVote.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo {name}'**
+  String undoLastVote(String name);
+
+  /// No description provided for @moreActions.
+  ///
+  /// In en, this message translates to:
+  /// **'More actions'**
+  String get moreActions;
+
+  /// No description provided for @resetScrutiny.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset count'**
+  String get resetScrutiny;
+
+  /// No description provided for @resetConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset the count?'**
+  String get resetConfirmTitle;
+
+  /// No description provided for @resetConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'All votes in this count go back to zero and can no longer be undone.'**
+  String get resetConfirmBody;
+
+  /// No description provided for @resetConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get resetConfirm;
 }
 
 class _AppLocalizationsDelegate

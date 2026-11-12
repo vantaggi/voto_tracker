@@ -30,6 +30,9 @@ class ScrutinyProvider extends ChangeNotifier {
   bool get canUndo => _voteLog.isNotEmpty;
   bool get canRedo => _redoStack.isNotEmpty;
 
+  /// Candidato dell'ultimo voto annullabile (per "Annulla Rossi"), o null.
+  int? get lastVotedIndex => _voteLog.isEmpty ? null : _voteLog.last;
+
   // Calculated values - RESTORED
   int _totalVotesAssigned = 0;
   int _remainingVotes = 0;

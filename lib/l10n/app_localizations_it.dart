@@ -452,4 +452,79 @@ class AppLocalizationsIt extends AppLocalizations {
   String deleteList(String name) {
     return 'Elimina la lista $name';
   }
+
+  @override
+  String homeSubtitle(int assigned, int total) {
+    return '$assigned di $total schede';
+  }
+
+  @override
+  String summaryOfTotal(int total) {
+    return '/ $total schede';
+  }
+
+  @override
+  String summaryRemaining(int count) {
+    return '$count rimanenti';
+  }
+
+  @override
+  String get summaryCompleted => 'Completato';
+
+  @override
+  String summaryLeading(String name) {
+    return 'In testa $name';
+  }
+
+  @override
+  String get summaryLeadingTie => 'Pareggio in testa';
+
+  @override
+  String get summaryEmptyTitle => 'Nessuna scheda ancora';
+
+  @override
+  String summaryEmptyBody(int candidates, int total) {
+    return '$candidates candidati, $total schede attese. Controlla i nomi, poi inizia.';
+  }
+
+  @override
+  String get summarySetup => 'Imposta';
+
+  @override
+  String get shareResults => 'Condividi i risultati';
+
+  @override
+  String get otherBallots => 'Altre schede';
+
+  @override
+  String candidateRowSemantics(String name, int votes, String percent) {
+    return '$name: $votes voti, $percent';
+  }
+
+  @override
+  String get chartsTitle => 'Andamento e grafici';
+
+  @override
+  String get chartsSubtitle => 'Storico e percentuali';
+
+  @override
+  String undoLastVote(String name) {
+    return 'Annulla $name';
+  }
+
+  @override
+  String get moreActions => 'Altre azioni';
+
+  @override
+  String get resetScrutiny => 'Azzera scrutinio';
+
+  @override
+  String get resetConfirmTitle => 'Azzerare lo scrutinio?';
+
+  @override
+  String get resetConfirmBody =>
+      'Tutti i voti di questo scrutinio tornano a zero e non si possono più annullare.';
+
+  @override
+  String get resetConfirm => 'Azzera';
 }
