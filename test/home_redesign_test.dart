@@ -6,8 +6,8 @@ import 'package:voto_tracker/main.dart';
 import 'package:voto_tracker/models/settings.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/screens/home_page.dart';
-import 'package:voto_tracker/widgets/charts/history_chart.dart';
-import 'package:voto_tracker/widgets/charts/percentage_chart.dart';
+import 'package:voto_tracker/widgets/charts/compare_chart.dart';
+import 'package:voto_tracker/widgets/charts/trend_chart.dart';
 
 /// Ridisegno della Home (R2-R6): riepilogo, righe, pillola Annulla, grafici.
 void main() {
@@ -90,7 +90,7 @@ void main() {
     tester,
   ) async {
     await pumpHome(tester, const Size(412, 915));
-    expect(find.byType(HistoryChart), findsNothing);
+    expect(find.byType(TrendChart), findsNothing);
     await tester.scrollUntilVisible(
       find.text('Andamento e grafici'),
       200,
@@ -98,12 +98,12 @@ void main() {
     );
     await tester.tap(find.text('Andamento e grafici'));
     await tester.pumpAndSettle();
-    expect(find.byType(HistoryChart), findsOneWidget);
-    await tester.tap(find.text('Percentuali'));
+    expect(find.byType(TrendChart), findsOneWidget);
+    await tester.tap(find.text('Confronto'));
     await tester.pumpAndSettle();
-    expect(find.byType(PercentageChart), findsOneWidget);
+    expect(find.byType(CompareChart), findsOneWidget);
 
     await pumpHome(tester, const Size(1280, 800));
-    expect(find.byType(HistoryChart), findsOneWidget);
+    expect(find.byType(TrendChart), findsOneWidget);
   });
 }

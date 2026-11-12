@@ -1,14 +1,14 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
-import 'package:voto_tracker/widgets/charts/history_chart.dart';
-import 'package:voto_tracker/widgets/charts/percentage_chart.dart';
+import 'package:voto_tracker/widgets/charts/compare_chart.dart';
+import 'package:voto_tracker/widgets/charts/trend_chart.dart';
 
-enum _Chart { history, percentages }
+enum _Chart { trend, compare }
 
-/// "Andamento e grafici" (R5): intestazione che apre e chiude Storico e
-/// Percentuali. Chiusa sul telefono, aperta sul tablet. Il grafico "Corrente"
-/// non c'è più: ripeteva i numeri delle righe.
+/// "Andamento e grafici" (R5, C5): intestazione che apre e chiude Andamento
+/// (linee a gradini) e Confronto (barre con il risultato precedente).
+/// Chiusa sul telefono, aperta sul tablet.
 class ChartsCard extends StatefulWidget {
   const ChartsCard({super.key, this.initiallyExpanded = false});
 
@@ -20,7 +20,7 @@ class ChartsCard extends StatefulWidget {
 
 class _ChartsCardState extends State<ChartsCard> {
   late bool _expanded = widget.initiallyExpanded;
-  _Chart _chart = _Chart.history;
+  _Chart _chart = _Chart.trend;
 
   @override
   Widget build(BuildContext context) {
@@ -76,22 +76,25 @@ class _ChartsCardState extends State<ChartsCard> {
           Center(
             child: SegmentedButton<_Chart>(
               segments: [
-                ButtonSegment(value: _Chart.history, label: Text(l10n.history)),
                 ButtonSegment(
-                  value: _Chart.percentages,
-                  label: Text(l10n.percentages),
+                  value: _Chart.trend,
+                  label: Text(l10n.chartTrend),
+                ),
+                ButtonSegment(
+                  value: _Chart.compare,
+                  label: Text(l10n.chartCompare),
                 ),
               ],
               selected: {_chart},
               onSelectionChanged: (s) => setState(() => _chart = s.first),
             ),
           ),
-          const SizedBox(height: AppSpacing.m),
-          SizedBox(
-            height: 320,
-            child: _chart == _Chart.history
-                ? const HistoryChart()
-                : const PercentageChart(),
+          const SizedBox(height: AppSpacing.l),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+            child: _chart == _Chart.trend
+                ? const TrendChart()
+                : const CompareChart(),
           ),
         ],
       ],
