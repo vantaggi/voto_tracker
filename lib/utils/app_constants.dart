@@ -49,7 +49,7 @@ class AppDimensions {
   static const double archiveTwoPaneBreakpoint = 720.0;
 
   /// Larghezza dell'elenco nell'archivio a due colonne.
-  static const double archiveListPaneWidth = 360.0;
+  static const double archiveListPaneWidth = 400.0;
 }
 
 /// Scala di spaziatura (multipli di 4, griglia M3). Padding, margini e gap nei

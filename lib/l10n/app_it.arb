@@ -208,5 +208,16 @@
   "listExportFile": "Esporta i candidati in un file",
   "listImportFile": "Importa i candidati da un file",
   "appSettingsTitle": "Impostazioni dell'app",
-  "appSettingsSubtitle": "Lingua e aspetto"
+  "appSettingsSubtitle": "Lingua e aspetto",
+  "archiveGroupCurrent": "Aperto ora",
+  "archiveGroupOthers": "Altri scrutini",
+  "archiveSearch": "Cerca per nome",
+  "archiveNoResults": "Nessuno scrutinio con questo nome",
+  "archiveReopen": "Riapri",
+  "archiveGoToCount": "Vai al conteggio",
+  "archiveExportOne": "Esporta",
+  "newEmptyScrutinyHint": "Candidati e impostazioni di partenza",
+  "newFromCopy": "Copia «{title}»",
+  "newFromCopyHint": "Stessi candidati e regole, nessuna scheda",
+  "newFromList": "Da una lista salvata"
 }

@@ -51,8 +51,11 @@ void main() {
     expect(find.textContaining('2 su 100 schede'), findsOneWidget);
     expect(find.textContaining('In testa: Rossi'), findsOneWidget);
 
-    // Nuovo scrutinio: si torna al conteggio, a zero.
+    // Nuovo scrutinio vuoto: si torna al conteggio, a zero.
     await tester.tap(find.text('Nuovo scrutinio'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Copia «'), findsOneWidget);
+    await tester.tap(find.text('Scrutinio vuoto'));
     await tester.pumpAndSettle();
     expect(p.totalVotesAssigned, 0);
     expect(p.archive, hasLength(2));
@@ -63,7 +66,12 @@ void main() {
     // Riapri il primo dall'archivio: i voti ci sono ancora.
     await tester.tap(find.text('Archivio'));
     await tester.pumpAndSettle();
+    // Il tocco apre il dettaglio; Riapri torna al conteggio.
     await tester.tap(find.textContaining('In testa: Rossi'));
+    await tester.pumpAndSettle();
+    expect(p.currentScrutinyId, isNot(firstId));
+    expect(find.text('Rossi'), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilledButton, 'Riapri'));
     await tester.pumpAndSettle();
     expect(p.currentScrutinyId, firstId);
     expect(p.candidates[0].votes, 2);
@@ -74,7 +82,7 @@ void main() {
     await tester.pumpAndSettle();
     final firstTile = find.ancestor(
       of: find.textContaining('In testa: Rossi'),
-      matching: find.byType(ListTile),
+      matching: find.byType(Card),
     );
     await tester.tap(
       find.descendant(of: firstTile, matching: find.byIcon(Icons.more_vert)),
@@ -89,10 +97,9 @@ void main() {
     // Rinomina lo scrutinio aperto.
     await tester.tap(find.text('Archivio'));
     await tester.pumpAndSettle();
-    final currentTile = find.ancestor(
-      of: find.textContaining('Aperto ·'),
-      matching: find.byType(ListTile),
-    );
+    // Il gruppo "Aperto ora" viene per primo.
+    expect(find.text('Aperto ora'), findsOneWidget);
+    final currentTile = find.byType(Card).first;
     await tester.tap(
       find.descendant(of: currentTile, matching: find.byIcon(Icons.more_vert)),
     );
@@ -108,7 +115,7 @@ void main() {
     Future<void> openDelete() async {
       final tile = find.ancestor(
         of: find.text('Assemblea di classe'),
-        matching: find.byType(ListTile),
+        matching: find.byType(Card),
       );
       await tester.tap(
         find.descendant(of: tile, matching: find.byIcon(Icons.more_vert)),
@@ -175,22 +182,28 @@ void main() {
 
       // All'inizio il dettaglio mostra lo scrutinio aperto: niente "Apri".
       expect(find.byType(VerticalDivider), findsWidgets);
-      expect(find.widgetWithText(FilledButton, 'Apri'), findsNothing);
+      expect(find.widgetWithText(FilledButton, 'Riapri'), findsNothing);
+      expect(
+        find.widgetWithText(FilledButton, 'Vai al conteggio'),
+        findsOneWidget,
+      );
 
       // Tocco sull'altro: lo mostra a destra, senza aprirlo.
       await tester.tap(find.textContaining('2 su').first);
       await tester.pumpAndSettle();
       expect(p.currentScrutinyId, current);
-      expect(find.widgetWithText(FilledButton, 'Apri'), findsOneWidget);
-      expect(find.textContaining('2 · 100.0%'), findsOneWidget);
+      expect(find.widgetWithText(FilledButton, 'Riapri'), findsOneWidget);
+      expect(find.textContaining('2 · 100,0%'), findsOneWidget);
 
-      await tester.tap(find.widgetWithText(FilledButton, 'Apri'));
+      await tester.tap(find.widgetWithText(FilledButton, 'Riapri'));
       await tester.pumpAndSettle();
       expect(p.currentScrutinyId, isNot(current));
       expect(p.candidates[0].votes, 2);
     });
 
-    testWidgets('sul telefono il tocco apre subito', (tester) async {
+    testWidgets('sul telefono il tocco apre il dettaglio, Riapri apre', (
+      tester,
+    ) async {
       final p = await pumpApp(tester, const Size(420, 900));
       p.vote(1);
       await p.newScrutiny();
@@ -200,8 +213,48 @@ void main() {
       final current = p.currentScrutinyId;
       await tester.tap(find.textContaining('1 su').first);
       await tester.pumpAndSettle();
+      expect(p.currentScrutinyId, current);
+      await tester.tap(find.widgetWithText(FilledButton, 'Riapri'));
+      await tester.pumpAndSettle();
       expect(p.currentScrutinyId, isNot(current));
-      expect(find.widgetWithText(FilledButton, 'Apri'), findsNothing);
+      expect(find.byType(HomePage), findsOneWidget);
+    });
+
+    testWidgets('la ricerca compare con più di 8 scrutini e filtra', (
+      tester,
+    ) async {
+      final p = await pumpApp(tester, const Size(420, 900));
+      for (var i = 0; i < 9; i++) {
+        await p.newScrutiny();
+      }
+      await p.renameScrutiny(p.currentScrutinyId!, 'Assemblea');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Archivio'));
+      await tester.pumpAndSettle();
+      expect(find.byType(SearchBar), findsOneWidget);
+      await tester.enterText(find.byType(SearchBar), 'assem');
+      await tester.pumpAndSettle();
+      expect(find.text('Assemblea'), findsOneWidget);
+      expect(find.text('Altri scrutini'), findsNothing);
+      await tester.enterText(find.byType(SearchBar), 'zzz');
+      await tester.pumpAndSettle();
+      expect(find.text('Nessuno scrutinio con questo nome'), findsOneWidget);
+    });
+
+    testWidgets('Nuovo: copia dello scrutinio aperto', (tester) async {
+      final p = await pumpApp(tester, const Size(420, 900));
+      p.renameCandidate(0, 'Rossi');
+      p.vote(0);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Archivio'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Nuovo scrutinio'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.textContaining('Copia «'));
+      await tester.pumpAndSettle();
+      expect(p.archive, hasLength(2));
+      expect(p.candidates[0].name, 'Rossi');
+      expect(p.totalVotesAssigned, 0);
     });
   });
 }

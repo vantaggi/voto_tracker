@@ -1110,6 +1110,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Language and appearance'**
   String get appSettingsSubtitle;
+
+  /// No description provided for @archiveGroupCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'Open now'**
+  String get archiveGroupCurrent;
+
+  /// No description provided for @archiveGroupOthers.
+  ///
+  /// In en, this message translates to:
+  /// **'Other counts'**
+  String get archiveGroupOthers;
+
+  /// No description provided for @archiveSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by name'**
+  String get archiveSearch;
+
+  /// No description provided for @archiveNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No count with this name'**
+  String get archiveNoResults;
+
+  /// No description provided for @archiveReopen.
+  ///
+  /// In en, this message translates to:
+  /// **'Reopen'**
+  String get archiveReopen;
+
+  /// No description provided for @archiveGoToCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to the count'**
+  String get archiveGoToCount;
+
+  /// No description provided for @archiveExportOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get archiveExportOne;
+
+  /// No description provided for @newEmptyScrutinyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Default candidates and settings'**
+  String get newEmptyScrutinyHint;
+
+  /// No description provided for @newFromCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy “{title}”'**
+  String newFromCopy(String title);
+
+  /// No description provided for @newFromCopyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Same candidates and rules, no ballots'**
+  String get newFromCopyHint;
+
+  /// No description provided for @newFromList.
+  ///
+  /// In en, this message translates to:
+  /// **'From a saved list'**
+  String get newFromList;
 }
 
 class _AppLocalizationsDelegate

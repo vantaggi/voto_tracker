@@ -587,4 +587,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get appSettingsSubtitle => 'Language and appearance';
+
+  @override
+  String get archiveGroupCurrent => 'Open now';
+
+  @override
+  String get archiveGroupOthers => 'Other counts';
+
+  @override
+  String get archiveSearch => 'Search by name';
+
+  @override
+  String get archiveNoResults => 'No count with this name';
+
+  @override
+  String get archiveReopen => 'Reopen';
+
+  @override
+  String get archiveGoToCount => 'Go to the count';
+
+  @override
+  String get archiveExportOne => 'Export';
+
+  @override
+  String get newEmptyScrutinyHint => 'Default candidates and settings';
+
+  @override
+  String newFromCopy(String title) {
+    return 'Copy “$title”';
+  }
+
+  @override
+  String get newFromCopyHint => 'Same candidates and rules, no ballots';
+
+  @override
+  String get newFromList => 'From a saved list';
 }

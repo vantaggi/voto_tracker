@@ -6,11 +6,9 @@ import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/screens/home_actions.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
 import 'package:voto_tracker/widgets/export_sheet.dart';
+import 'package:voto_tracker/widgets/vote_stacked_bar.dart';
 
 const _tabular = [FontFeature.tabularFigures()];
-
-/// Spazio tra le fette della barra impilata.
-const double _segmentGap = 2;
 
 /// Riepilogo in cima alla Home (R2): barra con i colori dei candidati,
 /// schede contate e rimanenti, chi è in testa.
@@ -228,8 +226,8 @@ class _CountingSummary extends StatelessWidget {
   }
 }
 
-/// Barra impilata: una fetta per candidato (in classifica, poi bianche e
-/// nulle), lunga quanto la sua quota delle schede attese.
+/// Barra impilata del riepilogo: candidati in classifica, poi bianche e
+/// nulle, su tutte le schede attese.
 class _StackedBar extends StatelessWidget {
   const _StackedBar({required this.provider});
 
@@ -237,37 +235,15 @@ class _StackedBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final total = provider.settings.totalVoters;
-    final ordered = <Candidate>[
-      ...provider.sortedCandidates.where((c) => !c.isTechnical),
-      ...provider.candidates.where((c) => c.isTechnical),
-    ].where((c) => c.votes > 0).toList();
-    final rest = (total - provider.totalVotesAssigned).clamp(0, total);
-    return ExcludeSemantics(
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(AppShapes.small),
-        child: SizedBox(
-          height: 12,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (final c in ordered) ...[
-                Expanded(
-                  flex: c.votes,
-                  child: ColoredBox(color: c.color),
-                ),
-                const SizedBox(width: _segmentGap),
-              ],
-              if (rest > 0)
-                Expanded(
-                  flex: rest,
-                  child: ColoredBox(color: cs.surfaceContainerHighest),
-                ),
-            ],
-          ),
-        ),
-      ),
+    return VoteStackedBar(
+      total: provider.settings.totalVoters,
+      segments: [
+        for (final c in <Candidate>[
+          ...provider.sortedCandidates.where((c) => !c.isTechnical),
+          ...provider.candidates.where((c) => c.isTechnical),
+        ])
+          (color: c.color, votes: c.votes),
+      ],
     );
   }
 }

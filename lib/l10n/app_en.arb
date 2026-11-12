@@ -212,5 +212,17 @@
   "listExportFile": "Export candidates to a file",
   "listImportFile": "Import candidates from a file",
   "appSettingsTitle": "App settings",
-  "appSettingsSubtitle": "Language and appearance"
+  "appSettingsSubtitle": "Language and appearance",
+  "archiveGroupCurrent": "Open now",
+  "archiveGroupOthers": "Other counts",
+  "archiveSearch": "Search by name",
+  "archiveNoResults": "No count with this name",
+  "archiveReopen": "Reopen",
+  "archiveGoToCount": "Go to the count",
+  "archiveExportOne": "Export",
+  "newEmptyScrutinyHint": "Default candidates and settings",
+  "newFromCopy": "Copy “{title}”",
+  "@newFromCopy": {"placeholders": {"title": {"type": "String"}}},
+  "newFromCopyHint": "Same candidates and rules, no ballots",
+  "newFromList": "From a saved list"
 }

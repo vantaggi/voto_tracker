@@ -79,6 +79,8 @@ void main() {
       find.widgetWithText(FloatingActionButton, 'Nuovo scrutinio'),
     );
     await tester.pumpAndSettle();
+    await tester.tap(find.text('Scrutinio vuoto'));
+    await tester.pumpAndSettle();
     expect(p.currentScrutinyId, isNot(first));
     expect(p.totalVotesAssigned, 0);
 

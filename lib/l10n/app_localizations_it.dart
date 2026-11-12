@@ -589,4 +589,39 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get appSettingsSubtitle => 'Lingua e aspetto';
+
+  @override
+  String get archiveGroupCurrent => 'Aperto ora';
+
+  @override
+  String get archiveGroupOthers => 'Altri scrutini';
+
+  @override
+  String get archiveSearch => 'Cerca per nome';
+
+  @override
+  String get archiveNoResults => 'Nessuno scrutinio con questo nome';
+
+  @override
+  String get archiveReopen => 'Riapri';
+
+  @override
+  String get archiveGoToCount => 'Vai al conteggio';
+
+  @override
+  String get archiveExportOne => 'Esporta';
+
+  @override
+  String get newEmptyScrutinyHint => 'Candidati e impostazioni di partenza';
+
+  @override
+  String newFromCopy(String title) {
+    return 'Copia «$title»';
+  }
+
+  @override
+  String get newFromCopyHint => 'Stessi candidati e regole, nessuna scheda';
+
+  @override
+  String get newFromList => 'Da una lista salvata';
 }
