@@ -4,15 +4,46 @@ import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/screens/ballot_reading_screen.dart';
 import 'package:voto_tracker/screens/projector_mode_screen.dart';
-import 'package:voto_tracker/screens/settings_dialog.dart';
+import 'package:voto_tracker/screens/settings_page.dart';
 
 /// Azioni della Home richiamate da più punti (barra in alto, menu ⋮, card di
 /// riepilogo): un solo posto per aprire ogni schermata.
 abstract final class HomeActions {
-  static Future<void> openSettings(BuildContext context) => showDialog<void>(
-    context: context,
-    builder: (_) => const SettingsDialog(),
-  );
+  /// Larghezza da cui le impostazioni sono una finestra e non una pagina.
+  static const double settingsDialogBreakpoint = 600;
+
+  /// Larghezza della finestra delle impostazioni sul tablet.
+  static const double settingsDialogWidth = 560;
+
+  /// Altezza massima della finestra delle impostazioni sul tablet.
+  static const double settingsDialogMaxHeight = 760;
+
+  /// Impostazioni dello scrutinio (S2): pagina intera sul telefono,
+  /// finestra di 560dp sul tablet.
+  static Future<void> openSettings(BuildContext context) {
+    if (MediaQuery.sizeOf(context).width < settingsDialogBreakpoint) {
+      return Navigator.push(
+        context,
+        MaterialPageRoute<void>(
+          fullscreenDialog: true,
+          builder: (_) => const SettingsPage(),
+        ),
+      );
+    }
+    return showDialog<void>(
+      context: context,
+      builder: (_) => Dialog(
+        clipBehavior: Clip.antiAlias,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: settingsDialogWidth,
+            maxHeight: settingsDialogMaxHeight,
+          ),
+          child: const SettingsPage(),
+        ),
+      ),
+    );
+  }
 
   static Future<void> openBallotReading(BuildContext context) => Navigator.push(
     context,

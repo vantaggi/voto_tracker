@@ -135,7 +135,7 @@ void main() {
       await tester.scrollUntilVisible(
         find.text('Salva i candidati come lista'),
         200,
-        scrollable: find.byType(Scrollable).last,
+        scrollable: settingsScrollable,
       );
       await tester.tap(find.text('Salva i candidati come lista'));
       await tester.pumpAndSettle();
@@ -143,7 +143,7 @@ void main() {
       await tester.tap(find.widgetWithText(FilledButton, 'Salva').last);
       await tester.pumpAndSettle();
       expect(p.candidateLists.single.name, 'Assemblea');
-      await tester.tap(find.text('Annulla'));
+      await tester.tap(find.byType(CloseButton));
       await tester.pumpAndSettle();
 
       // Lascia sparire la SnackBar "Lista salvata".

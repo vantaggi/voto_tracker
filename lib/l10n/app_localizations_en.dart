@@ -539,4 +539,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get saveAndReset => 'Save and reset';
+
+  @override
+  String get settingsTitle => 'Count settings';
+
+  @override
+  String get settingsGroupBallots => 'Ballots and candidates';
+
+  @override
+  String get settingsGroupRules => 'Rules';
+
+  @override
+  String get settingsGroupLists => 'Candidate lists';
+
+  @override
+  String get settingsVoters => 'Voters';
+
+  @override
+  String get settingsVotersHint => 'Ballots expected in total';
+
+  @override
+  String get settingsCandidates => 'Candidates';
+
+  @override
+  String settingsCandidatesHint(int min, int max) {
+    return 'From $min to $max';
+  }
+
+  @override
+  String stepperDecrease(String label) {
+    return 'Decrease $label';
+  }
+
+  @override
+  String stepperIncrease(String label) {
+    return 'Increase $label';
+  }
+
+  @override
+  String get listExportFile => 'Export candidates to a file';
+
+  @override
+  String get listImportFile => 'Import candidates from a file';
+
+  @override
+  String get appSettingsTitle => 'App settings';
+
+  @override
+  String get appSettingsSubtitle => 'Language and appearance';
 }

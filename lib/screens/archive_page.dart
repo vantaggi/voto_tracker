@@ -5,12 +5,13 @@ import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/models/candidate.dart';
 import 'package:voto_tracker/models/scrutiny.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
+import 'package:voto_tracker/screens/app_settings_page.dart';
 import 'package:voto_tracker/services/archive_transfer_service.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
 
 enum _ArchiveAction { open, duplicate, rename, delete }
 
-enum _ArchiveMenu { export, import }
+enum _ArchiveMenu { export, import, appSettings }
 
 /// Archivio degli scrutini (FEAT-004): elenco, nuovo, duplica come modello,
 /// riapri, rinomina, elimina con conferma. [onOpened] viene chiamato quando
@@ -48,6 +49,7 @@ class _ArchivePageState extends State<ArchivePage> {
             onSelected: (choice) => switch (choice) {
               _ArchiveMenu.export => _export(context),
               _ArchiveMenu.import => _import(context),
+              _ArchiveMenu.appSettings => AppSettingsPage.open(context),
             },
             itemBuilder: (context) => [
               PopupMenuItem(
@@ -63,6 +65,15 @@ class _ArchivePageState extends State<ArchivePage> {
                 child: ListTile(
                   leading: const Icon(Icons.download),
                   title: Text(l10n.archiveImport),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuDivider(),
+              PopupMenuItem(
+                value: _ArchiveMenu.appSettings,
+                child: ListTile(
+                  leading: const Icon(Icons.settings_outlined),
+                  title: Text(l10n.appSettingsTitle),
                   contentPadding: EdgeInsets.zero,
                 ),
               ),

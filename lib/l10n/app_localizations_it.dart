@@ -87,10 +87,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get winnerFallback => 'VINCITORE';
 
   @override
-  String get blankVotes => 'Schede Bianche';
+  String get blankVotes => 'Schede bianche';
 
   @override
-  String get spoiledVotes => 'Schede Nulle';
+  String get spoiledVotes => 'Schede nulle';
 
   @override
   String get editName => 'Modifica Nome';
@@ -541,4 +541,52 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get saveAndReset => 'Salva e azzera';
+
+  @override
+  String get settingsTitle => 'Impostazioni dello scrutinio';
+
+  @override
+  String get settingsGroupBallots => 'Schede e candidati';
+
+  @override
+  String get settingsGroupRules => 'Regole';
+
+  @override
+  String get settingsGroupLists => 'Liste di candidati';
+
+  @override
+  String get settingsVoters => 'Votanti';
+
+  @override
+  String get settingsVotersHint => 'Schede attese in tutto';
+
+  @override
+  String get settingsCandidates => 'Candidati';
+
+  @override
+  String settingsCandidatesHint(int min, int max) {
+    return 'Da $min a $max';
+  }
+
+  @override
+  String stepperDecrease(String label) {
+    return 'Diminuisci $label';
+  }
+
+  @override
+  String stepperIncrease(String label) {
+    return 'Aumenta $label';
+  }
+
+  @override
+  String get listExportFile => 'Esporta i candidati in un file';
+
+  @override
+  String get listImportFile => 'Importa i candidati da un file';
+
+  @override
+  String get appSettingsTitle => 'Impostazioni dell\'app';
+
+  @override
+  String get appSettingsSubtitle => 'Lingua e aspetto';
 }

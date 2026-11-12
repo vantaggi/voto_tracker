@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:voto_tracker/screens/settings_page.dart';
 
 /// Apre una voce del menu ⋮ della Home (proiettore, impostazioni, azzera)
 /// cercandola per icona, così funziona in ogni lingua.
@@ -17,3 +18,11 @@ Future<void> openHomeSettings(WidgetTester tester) =>
 /// Modalità proiettore dal menu ⋮ della Home.
 Future<void> openHomeProjector(WidgetTester tester) =>
     tapHomeMenuItem(tester, Icons.tv);
+
+/// La lista che scorre delle impostazioni (non quella interna di un campo).
+Finder get settingsScrollable => find
+    .descendant(
+      of: find.byType(SettingsPage),
+      matching: find.byType(Scrollable),
+    )
+    .first;

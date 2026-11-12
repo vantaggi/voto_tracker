@@ -195,5 +195,22 @@
   "resetConfirm": "Reset",
   "settingsResetWarning": "Changing candidates, blank or spoiled ballots resets {count, plural, =1{the counted ballot} other{the {count} counted ballots}}. Names and colours stay.",
   "@settingsResetWarning": {"placeholders": {"count": {"type": "int"}}},
-  "saveAndReset": "Save and reset"
+  "saveAndReset": "Save and reset",
+  "settingsTitle": "Count settings",
+  "settingsGroupBallots": "Ballots and candidates",
+  "settingsGroupRules": "Rules",
+  "settingsGroupLists": "Candidate lists",
+  "settingsVoters": "Voters",
+  "settingsVotersHint": "Ballots expected in total",
+  "settingsCandidates": "Candidates",
+  "settingsCandidatesHint": "From {min} to {max}",
+  "@settingsCandidatesHint": {"placeholders": {"min": {"type": "int"}, "max": {"type": "int"}}},
+  "stepperDecrease": "Decrease {label}",
+  "@stepperDecrease": {"placeholders": {"label": {"type": "String"}}},
+  "stepperIncrease": "Increase {label}",
+  "@stepperIncrease": {"placeholders": {"label": {"type": "String"}}},
+  "listExportFile": "Export candidates to a file",
+  "listImportFile": "Import candidates from a file",
+  "appSettingsTitle": "App settings",
+  "appSettingsSubtitle": "Language and appearance"
 }

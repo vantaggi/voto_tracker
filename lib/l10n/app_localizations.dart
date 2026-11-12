@@ -1026,6 +1026,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save and reset'**
   String get saveAndReset;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Count settings'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsGroupBallots.
+  ///
+  /// In en, this message translates to:
+  /// **'Ballots and candidates'**
+  String get settingsGroupBallots;
+
+  /// No description provided for @settingsGroupRules.
+  ///
+  /// In en, this message translates to:
+  /// **'Rules'**
+  String get settingsGroupRules;
+
+  /// No description provided for @settingsGroupLists.
+  ///
+  /// In en, this message translates to:
+  /// **'Candidate lists'**
+  String get settingsGroupLists;
+
+  /// No description provided for @settingsVoters.
+  ///
+  /// In en, this message translates to:
+  /// **'Voters'**
+  String get settingsVoters;
+
+  /// No description provided for @settingsVotersHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Ballots expected in total'**
+  String get settingsVotersHint;
+
+  /// No description provided for @settingsCandidates.
+  ///
+  /// In en, this message translates to:
+  /// **'Candidates'**
+  String get settingsCandidates;
+
+  /// No description provided for @settingsCandidatesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'From {min} to {max}'**
+  String settingsCandidatesHint(int min, int max);
+
+  /// No description provided for @stepperDecrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Decrease {label}'**
+  String stepperDecrease(String label);
+
+  /// No description provided for @stepperIncrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Increase {label}'**
+  String stepperIncrease(String label);
+
+  /// No description provided for @listExportFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Export candidates to a file'**
+  String get listExportFile;
+
+  /// No description provided for @listImportFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Import candidates from a file'**
+  String get listImportFile;
+
+  /// No description provided for @appSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App settings'**
+  String get appSettingsTitle;
+
+  /// No description provided for @appSettingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Language and appearance'**
+  String get appSettingsSubtitle;
 }
 
 class _AppLocalizationsDelegate

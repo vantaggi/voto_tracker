@@ -35,8 +35,8 @@
   "tie": "Pareggio",
   "winnerFallback": "VINCITORE",
 
-  "blankVotes": "Schede Bianche",
-  "spoiledVotes": "Schede Nulle",
+  "blankVotes": "Schede bianche",
+  "spoiledVotes": "Schede nulle",
 
   "editName": "Modifica Nome",
   "candidateName": "Nome Candidato",
@@ -194,5 +194,19 @@
   "resetConfirmBody": "Tutti i voti tornano a zero. Nomi e colori dei candidati restano. Non si può annullare.",
   "resetConfirm": "Azzera",
   "settingsResetWarning": "Cambiando candidati, bianche o nulle si azzerano {count, plural, =1{la scheda contata} other{le {count} schede contate}}. Nomi e colori restano.",
-  "saveAndReset": "Salva e azzera"
+  "saveAndReset": "Salva e azzera",
+  "settingsTitle": "Impostazioni dello scrutinio",
+  "settingsGroupBallots": "Schede e candidati",
+  "settingsGroupRules": "Regole",
+  "settingsGroupLists": "Liste di candidati",
+  "settingsVoters": "Votanti",
+  "settingsVotersHint": "Schede attese in tutto",
+  "settingsCandidates": "Candidati",
+  "settingsCandidatesHint": "Da {min} a {max}",
+  "stepperDecrease": "Diminuisci {label}",
+  "stepperIncrease": "Aumenta {label}",
+  "listExportFile": "Esporta i candidati in un file",
+  "listImportFile": "Importa i candidati da un file",
+  "appSettingsTitle": "Impostazioni dell'app",
+  "appSettingsSubtitle": "Lingua e aspetto"
 }
