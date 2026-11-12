@@ -1,61 +1,61 @@
 import 'dart:io';
 
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:voto_tracker/l10n/export_labels.dart';
-import 'package:voto_tracker/models/candidate.dart';
-import 'package:voto_tracker/theme/app_theme.dart';
+import 'package:voto_tracker/l10n/app_localizations.dart';
+import 'package:voto_tracker/l10n/export_format.dart';
+import 'package:voto_tracker/services/results_snapshot.dart';
+import 'package:voto_tracker/utils/app_constants.dart';
 import 'package:voto_tracker/widgets/social_results_card.dart';
 
+/// Cattura [SocialResultsCard] a 1080 × 1350 px e la condivide (C2).
 class SocialShareService {
-    static Future<void> shareResults({
-        required List<Candidate> candidates,
-        required int totalVotes,
-        required int totalVoters,
-        required int remainingVotes,
-        required ExportLabels labels,
-        String? winner,
-        String? winnerLabel
-    }) async {
-        final controller = ScreenshotController();
-        
-        try {
-            const double pixelRatio = 3.0; // High res
-            
-            final Uint8List image = await controller.captureFromWidget(
-                Theme(
-                    data: AppTheme.darkTheme, // Force Dark Theme for consistent share image
-                    child: SocialResultsCard(
-                        candidates: candidates,
-                        totalVotes: totalVotes,
-                        totalVoters: totalVoters,
-                        remainingVotes: remainingVotes,
-                        labels: labels,
-                        winner: winner,
-                        winnerLabel: winnerLabel
-                    ),
-                ),
-                delay: const Duration(milliseconds: 10),
-                pixelRatio: pixelRatio
-            );
-            
-            final directory = await getTemporaryDirectory();
-            final fileName = 'voto_tracker_share_${DateTime.now().millisecondsSinceEpoch}.png';
-            final file = File('${directory.path}/$fileName');
-            await file.writeAsBytes(image);
-            
-            await SharePlus.instance.share(ShareParams(
-                files: [XFile(file.path)],
-                text: winner != null
-                    ? '🏆 ${winnerLabel ?? labels.winnerFallback}: $winner!'
-                    : '📊 ${labels.liveScrutiny} · ${labels.appTitlePro}'
-            ));
-            
-        } catch(e) {
-            debugPrint("Error sharing image: $e");
-        }
+  const SocialShareService._();
+
+  /// `false` se la cattura o la condivisione falliscono.
+  static Future<bool> shareResults({
+    required ResultsSnapshot snapshot,
+    required AppLocalizations l10n,
+    required ExportFormat format,
+    required ThemeData theme,
+  }) async {
+    try {
+      final Uint8List image = await ScreenshotController().captureFromWidget(
+        MediaQuery(
+          data: const MediaQueryData(),
+          child: Directionality(
+            textDirection: TextDirection.ltr,
+            child: Theme(
+              data: theme,
+              child: SocialResultsCard(
+                snapshot: snapshot,
+                l10n: l10n,
+                format: format,
+              ),
+            ),
+          ),
+        ),
+        delay: const Duration(milliseconds: 10),
+        pixelRatio: AppDimensions.socialPixelRatio,
+      );
+      final directory = await getTemporaryDirectory();
+      final file = File(
+        '${directory.path}/${ExportFormat.fileName(snapshot.title, snapshot.at, 'png')}',
+      );
+      await file.writeAsBytes(image);
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path, mimeType: 'image/png')],
+          text: l10n.exportShareText(snapshot.title),
+        ),
+      );
+      return true;
+    } catch (e) {
+      debugPrint('Errore condivisione immagine: $e');
+      return false;
     }
+  }
 }

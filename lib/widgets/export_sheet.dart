@@ -35,12 +35,12 @@ class _ExportSheet extends StatelessWidget {
 
     /// Chiude il foglio e lancia l'export; se fallisce mostra una SnackBar.
     void run(Future<Object?> Function(ExportController c) action) {
+      final themes = context.read<AppThemes>();
       final controller = ExportController(
         context.read<ScrutinyProvider>(),
         l10n,
-        palette: PdfPalette.fromScheme(
-          context.read<AppThemes>().light.colorScheme,
-        ),
+        palette: PdfPalette.fromScheme(themes.light.colorScheme),
+        themes: themes,
       );
       final messenger = ScaffoldMessenger.of(context);
       final errorMsg = l10n.exportError;

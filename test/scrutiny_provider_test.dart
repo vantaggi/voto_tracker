@@ -232,21 +232,34 @@ void main() {
   });
 
   group('ScrutinyProvider — export & history', () {
-    test('exportToCsv contiene intestazione e totale', () async {
-      final p = await _providerWith(candidates: 2, voters: 10);
-      p.vote(0);
-      final csv = p.exportToCsv();
-      expect(csv, contains('Candidato,Voti,Percentuale'));
-      expect(csv, contains('Totale Voti,1'));
-    });
-
-    test('historyPoints cresce con i voti partendo dal punto 0', () async {
+    test('history cresce con i voti partendo dal punto 0', () async {
       final p = await _providerWith(candidates: 2, voters: 10);
       p.vote(0);
       p.vote(1);
-      final pts = p.historyPoints;
-      expect(pts.containsKey(0), isTrue);
-      expect(pts.length, 3); // punto 0 + due voti
+      expect(p.history, [
+        [0, 0],
+        [1, 0],
+        [1, 1],
+      ]);
+    });
+
+    test('history per posizione: due candidati con lo stesso nome', () async {
+      final p = await _providerWith(candidates: 2, voters: 10);
+      p.renameCandidate(0, 'Rossi');
+      p.renameCandidate(1, 'Rossi');
+      p.vote(0);
+      p.vote(1);
+      p.vote(1);
+      expect(p.history.last, [1, 2]);
+    });
+
+    test('liveScrutiny riflette i voti anche prima del salvataggio', () async {
+      final p = await _providerWith(candidates: 2, voters: 10);
+      p.vote(1);
+      final s = p.liveScrutiny(DateTime(2026, 11, 12));
+      expect(s!.voteLog, [1]);
+      expect(s.candidates[1].votes, 1);
+      expect(s.id, p.currentScrutinyId);
     });
   });
 }

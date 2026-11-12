@@ -681,42 +681,29 @@ class ScrutinyProvider extends ChangeNotifier {
       _candidates[i],
   ];
 
-  /// Andamento per i grafici: schede scrutinate → voti per nome.
-  Map<int, Map<String, int>> get historyPoints {
-    final points = ScrutinyEngine.history(_candidates.length, _voteLog);
-    return {
-      for (var k = 0; k < points.length; k++)
-        k: {
-          for (var i = 0; i < _candidates.length; i++)
-            _candidates[i].name: points[k][i],
-        },
-    };
-  }
+  /// Andamento per grafici ed export: l'elemento `k` ha i voti di ogni
+  /// candidato (per posizione, mai per nome) dopo le prime `k` schede.
+  List<List<int>> get history =>
+      ScrutinyEngine.history(_candidates.length, _voteLog);
 
-  // Export Data Helper
-  String exportToCsv() {
-    final buffer = StringBuffer();
-    buffer.writeln('Candidato,Voti,Percentuale');
-    for (var c in _candidates) {
-      buffer.writeln(
-        '${c.name},${c.votes},${c.getPercentage(_totalVotesAssigned).toStringAsFixed(2)}%',
-      );
-    }
-    buffer.writeln('Totale Voti,$_totalVotesAssigned,');
-    buffer.writeln('Votanti Previsti,${_settings.totalVoters},');
-    return buffer.toString();
-  }
+  /// Registro delle schede (indici dei candidati), dalla prima.
+  List<int> get voteLog => List.unmodifiable(_voteLog);
 
-  Map<String, dynamic> exportToJson() {
-    return {
-      'candidates': _candidates.map((c) => c.toJson()).toList(),
-      'settings': _settings.toJson(),
-      'stats': {
-        'totalVotes': _totalVotesAssigned,
-        'totalVoters': _settings.totalVoters,
-        'winner': _winnerName,
-        'winnerStatus': _winnerStatus.name,
-      },
-    };
+  /// Copia dello scrutinio aperto con lo stato di adesso (anche se il
+  /// salvataggio è ancora in attesa), per gli export. `null` in caricamento.
+  Scrutiny? liveScrutiny(DateTime now) {
+    final current = _archive?.current;
+    if (current == null) return null;
+    return Scrutiny.fromJson(
+      Scrutiny(
+        id: current.id,
+        title: current.title,
+        createdAt: current.createdAt,
+        updatedAt: now,
+        settings: _settings,
+        candidates: _candidates,
+        voteLog: List.of(_voteLog),
+      ).toJson(),
+    );
   }
 }

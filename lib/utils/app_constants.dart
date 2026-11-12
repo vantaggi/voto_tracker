@@ -3,9 +3,6 @@
 /// I testi della UI vivono nei file ARB (`lib/l10n/`) e si usano via
 /// `context.l10n` — NON aggiungere qui stringhe di interfaccia.
 class AppStrings {
-  // Brand (non tradotto)
-  static const String appTitlePro = 'Voto Tracker Pro';
-
   // Nomi/prefissi di default dei candidati (dato persistito, fallback export)
   static const String candidatePrefix = 'Candidato';
   static const String blankVotes = 'Schede Bianche';
@@ -50,6 +47,26 @@ class AppDimensions {
 
   /// Larghezza dell'elenco nell'archivio a due colonne.
   static const double archiveListPaneWidth = 400.0;
+
+  /// Immagine da condividere (C2): 4:5, catturata a 2x = 1080 × 1350 px.
+  static const double socialWidth = 540.0;
+  static const double socialHeight = 675.0;
+  static const double socialPixelRatio = 2.0;
+  static const double socialRankDot = 30.0;
+  static const double socialRowMin = 36.0;
+  static const double socialRowMax = 64.0;
+  static const double socialVotesWidth = 44.0;
+  static const double socialBar = 8.0;
+  static const double socialStackedBar = 14.0;
+
+  /// Grafici della Home (C5).
+  static const double trendChartHeight = 240.0;
+  static const double chartAxisReserved = 32.0;
+  static const double chartBottomReserved = 24.0;
+  static const double chartLegendDot = 6.0;
+  static const double compareBarHeight = 12.0;
+  static const double comparePreviousTick = 3.0;
+  static const double compareValueWidth = 96.0;
 }
 
 /// Scala di spaziatura (multipli di 4, griglia M3). Padding, margini e gap nei

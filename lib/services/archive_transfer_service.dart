@@ -25,12 +25,20 @@ class ArchiveTransferService {
 
   /// Contenuto del file: `{app, format, exportedAt, scrutinies: [...]}`.
   static String encode(List<Scrutiny> items, DateTime now) =>
-      const JsonEncoder.withIndent('  ').convert({
-        'app': appId,
-        'format': format,
-        'exportedAt': now.toUtc().toIso8601String(),
-        'scrutinies': [for (final s in items) s.toJson()],
-      });
+      const JsonEncoder.withIndent('  ')
+          .convert(envelope([for (final s in items) s.toJson()], now));
+
+  /// Involucro del file con gli scrutini già in JSON (lo usa anche
+  /// l'esportazione JSON dei risultati, che aggiunge il blocco `results`).
+  static Map<String, dynamic> envelope(
+    List<Map<String, dynamic>> scrutinies,
+    DateTime now,
+  ) => {
+    'app': appId,
+    'format': format,
+    'exportedAt': now.toUtc().toIso8601String(),
+    'scrutinies': scrutinies,
+  };
 
   /// Legge un file prodotto da [encode]. Lancia [ArchiveFormatException] se
   /// il file non è un archivio di Voto Tracker leggibile.

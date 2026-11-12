@@ -49,24 +49,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exportError => 'Export failed';
 
   @override
-  String get scrutinisedVotes => 'Counted votes';
-
-  @override
-  String get remaining => 'Remaining';
-
-  @override
-  String get votesTotal => 'TOTAL VOTES';
-
-  @override
   String votesToWin(int count) {
     return '$count votes left to win';
   }
-
-  @override
-  String get votes => 'votes';
-
-  @override
-  String get votesShort => 'Votes';
 
   @override
   String get winnerElected => 'ELECTED';
@@ -79,9 +64,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tie => 'Tie';
-
-  @override
-  String get winnerFallback => 'WINNER';
 
   @override
   String get blankVotes => 'Blank votes';
@@ -108,21 +90,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get save => 'Save';
 
   @override
-  String get current => 'Current';
-
-  @override
-  String get history => 'History';
-
-  @override
-  String get percentages => 'Percentages';
-
-  @override
-  String get noHistoryAvailable => 'No history available';
-
-  @override
-  String get noVotesRecorded => 'No votes recorded';
-
-  @override
   String get undoTooltip => 'Undo last action';
 
   @override
@@ -145,57 +112,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get languageEnglish => 'English';
-
-  @override
-  String get reportSubtitle => 'OFFICIAL SCRUTINY REPORT';
-
-  @override
-  String get completion => 'COMPLETION';
-
-  @override
-  String get completionShort => 'COMPL.';
-
-  @override
-  String get rankingTitle => 'RANKING';
-
-  @override
-  String get trendTitle => 'VOTE TREND';
-
-  @override
-  String get insufficientData => 'Insufficient data';
-
-  @override
-  String get colPosition => 'POS';
-
-  @override
-  String get colCandidate => 'CANDIDATE';
-
-  @override
-  String get colStatus => 'STATUS';
-
-  @override
-  String get leader => 'LEADER';
-
-  @override
-  String get generatedWithPro => 'Generated with Voto Tracker Pro';
-
-  @override
-  String get pageFooter => 'Page 1 of 1';
-
-  @override
-  String get updateLabel => 'UPDATE';
-
-  @override
-  String get liveScrutiny => 'LIVE SCRUTINY';
-
-  @override
-  String get partialRanking => 'PARTIAL RANKING';
-
-  @override
-  String get generatedWith => 'Generated with Voto Tracker';
-
-  @override
-  String get countedShort => 'Counted';
 
   @override
   String get appearance => 'Appearance';
@@ -454,7 +370,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chartsTitle => 'Trend and charts';
 
   @override
-  String get chartsSubtitle => 'History and percentages';
+  String get chartsSubtitle => 'Trend and comparison';
 
   @override
   String undoLastVote(String name) {
@@ -611,5 +527,182 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String previousResultHintNumber(String example) {
     return 'E.g. $example';
+  }
+
+  @override
+  String get exportStatusInProgress => 'In progress';
+
+  @override
+  String get exportStatusFinal => 'Final result';
+
+  @override
+  String exportVotesPercent(String votes, String percent) {
+    return '$votes votes · $percent';
+  }
+
+  @override
+  String exportMoreCandidates(String count) {
+    return '+$count more';
+  }
+
+  @override
+  String get exportFooterApp => 'Made with Voto Tracker';
+
+  @override
+  String exportShareText(String title) {
+    return '$title · results';
+  }
+
+  @override
+  String get pdfTitle => 'RESULTS REPORT';
+
+  @override
+  String pdfExpectedVoters(String count) {
+    return '$count ballots expected';
+  }
+
+  @override
+  String pdfProvisional(String counted, String total) {
+    return 'Provisional result: $counted of $total ballots counted.';
+  }
+
+  @override
+  String pdfWinnerDetail(String votes, String counted, String percent) {
+    return '$votes votes of $counted ballots ($percent)';
+  }
+
+  @override
+  String get pdfKeyCounted => 'ballots counted';
+
+  @override
+  String get pdfKeyRemaining => 'remaining';
+
+  @override
+  String get pdfKeyValid => 'valid votes';
+
+  @override
+  String get pdfKeyBlankSpoiled => 'blank · spoiled';
+
+  @override
+  String get pdfKeyTurnout => 'turnout';
+
+  @override
+  String pdfCountedOf(String counted, String total) {
+    return '$counted of $total';
+  }
+
+  @override
+  String get pdfResults => 'Results';
+
+  @override
+  String get pdfColCandidate => 'Candidate';
+
+  @override
+  String get pdfColVotes => 'Votes';
+
+  @override
+  String get pdfColChange => 'Compared to before';
+
+  @override
+  String get pdfTotal => 'Total';
+
+  @override
+  String get pdfNote => 'Percentages of the ballots counted.';
+
+  @override
+  String get pdfNoteChange =>
+      '\"Compared to before\" in percentage points over the previous result.';
+
+  @override
+  String get pdfTrend => 'Trend';
+
+  @override
+  String get pdfTrendAxes => 'votes · ballots counted';
+
+  @override
+  String get pdfSignPresident => 'The chair';
+
+  @override
+  String get pdfSignTellers => 'The tellers';
+
+  @override
+  String pdfPage(String page, String pages) {
+    return 'Page $page of $pages';
+  }
+
+  @override
+  String get csvPosition => 'Position';
+
+  @override
+  String get csvCandidate => 'Candidate';
+
+  @override
+  String get csvType => 'Type';
+
+  @override
+  String get csvVotes => 'Votes';
+
+  @override
+  String get csvPercent => 'Percentage';
+
+  @override
+  String get csvPrevious => 'Previous percentage';
+
+  @override
+  String get csvChange => 'Change';
+
+  @override
+  String get csvTypeCandidate => 'candidate';
+
+  @override
+  String get csvTypeBlank => 'blank';
+
+  @override
+  String get csvTypeSpoiled => 'spoiled';
+
+  @override
+  String get chartTrend => 'Trend';
+
+  @override
+  String get chartCompare => 'Comparison';
+
+  @override
+  String get chartBallotsAxis => 'Ballots counted';
+
+  @override
+  String get chartTechnicalChip => 'Blank and spoiled';
+
+  @override
+  String chartAtBallot(String n, String values) {
+    return 'At ballot $n: $values';
+  }
+
+  @override
+  String chartAfter(String n, String values) {
+    return 'After $n ballots: $values';
+  }
+
+  @override
+  String get chartEmpty => 'Charts appear from the first vote';
+
+  @override
+  String get chartLegendNow => 'Now';
+
+  @override
+  String get chartLegendPrevious => 'Previous result';
+
+  @override
+  String chartPoints(String value) {
+    return '$value pts';
+  }
+
+  @override
+  String chartCompareRow(String name, String percent) {
+    return '$name: $percent';
+  }
+
+  @override
+  String chartCompareRowChange(String name, String percent, String change) {
+    return '$name: $percent, $change points compared to before';
   }
 }
