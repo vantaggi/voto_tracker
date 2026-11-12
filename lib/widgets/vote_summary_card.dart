@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/models/candidate.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
-import 'package:voto_tracker/screens/home_actions.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
 import 'package:voto_tracker/widgets/export_sheet.dart';
 import 'package:voto_tracker/widgets/vote_stacked_bar.dart';
@@ -13,65 +12,17 @@ const _tabular = [FontFeature.tabularFigures()];
 /// Riepilogo in cima alla Home (R2): barra con i colori dei candidati,
 /// schede contate e rimanenti, chi è in testa.
 ///
-/// Tre stati: nessuna scheda (spiega cosa fare), in corso, esito (eletto,
-/// vittoria matematica, pareggio, ballottaggio, quorum non raggiunto).
+/// Stati: nessuna scheda, in corso, esito (eletto, vittoria matematica,
+/// pareggio, ballottaggio, quorum non raggiunto). Senza schede la card ha la
+/// stessa forma di quella in corso, con "Tocca + per contare" al posto di chi
+/// è in testa: al primo voto l'altezza non cambia e la lista sotto non sale,
+/// così il + resta sotto il dito (FIX-014).
 class VoteSummaryCard extends StatelessWidget {
   const VoteSummaryCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<ScrutinyProvider>();
-    if (provider.totalVotesAssigned == 0 && !provider.canRedo) {
-      return const _EmptySummary();
-    }
-    return _CountingSummary(provider: provider);
-  }
-}
-
-class _EmptySummary extends StatelessWidget {
-  const _EmptySummary();
-
-  @override
-  Widget build(BuildContext context) {
-    final provider = context.watch<ScrutinyProvider>();
-    final l10n = context.l10n;
-    final tt = Theme.of(context).textTheme;
-    final cs = Theme.of(context).colorScheme;
-    final real = provider.candidates.where((c) => !c.isTechnical).length;
-    return Card.filled(
-      color: cs.surfaceContainerHigh,
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.l),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.summaryEmptyTitle, style: tt.titleLarge),
-            const SizedBox(height: AppSpacing.s),
-            Text(
-              l10n.summaryEmptyBody(real, provider.settings.totalVoters),
-              style: tt.bodyLarge?.copyWith(color: cs.onSurfaceVariant),
-            ),
-            const SizedBox(height: AppSpacing.l),
-            Wrap(
-              spacing: AppSpacing.m,
-              runSpacing: AppSpacing.s,
-              children: [
-                FilledButton.tonalIcon(
-                  onPressed: () => HomeActions.openSettings(context),
-                  icon: const Icon(Icons.tune),
-                  label: Text(l10n.summarySetup),
-                ),
-                FilledButton.icon(
-                  onPressed: () => HomeActions.openBallotReading(context),
-                  icon: const Icon(Icons.ballot_outlined),
-                  label: Text(l10n.ballotReadingTitle),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
+    return _CountingSummary(provider: context.watch<ScrutinyProvider>());
   }
 }
 
@@ -191,38 +142,77 @@ class _CountingSummary extends StatelessWidget {
     );
   }
 
-  /// "In testa X" (o "Pareggio in testa") e i voti che mancano alla vittoria.
+  /// "In testa X" (o "Pareggio in testa") e i voti che mancano alla
+  /// vittoria; senza schede, "Tocca + per contare".
   List<Widget> _leader(BuildContext context) {
     final l10n = context.l10n;
-    final tt = Theme.of(context).textTheme;
-    final cs = Theme.of(context).colorScheme;
     final leaders = [
       for (final c in provider.candidates)
         if (!c.isTechnical && c.rank == 1 && c.votes > 0) c,
     ];
-    if (leaders.isEmpty) return const [];
+    if (leaders.isEmpty) {
+      return [
+        const SizedBox(height: AppSpacing.s),
+        _InfoLine(icon: Icons.touch_app_outlined, text: l10n.summaryEmptyHint),
+      ];
+    }
     final toWin = provider.votesUntilMajority;
     return [
       const SizedBox(height: AppSpacing.s),
-      Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.emoji_events_outlined, size: 18, color: cs.primary),
-          const SizedBox(width: AppSpacing.s),
-          Expanded(
-            child: Text(
-              [
-                leaders.length == 1
-                    ? l10n.summaryLeading(leaders.first.name)
-                    : l10n.summaryLeadingTie,
-                if (toWin != null && toWin > 0) l10n.votesToWin(toWin),
-              ].join(' · '),
-              style: tt.bodyMedium,
-            ),
-          ),
-        ],
+      _InfoLine(
+        icon: Icons.emoji_events_outlined,
+        text: [
+          leaders.length == 1
+              ? l10n.summaryLeading(leaders.first.name)
+              : l10n.summaryLeadingTie,
+          if (toWin != null && toWin > 0) l10n.votesToWin(toWin),
+        ].join(' · '),
       ),
     ];
+  }
+}
+
+/// Riga con icona del riepilogo. Tiene sempre il posto di due righe di testo:
+/// quando cambia chi è in testa, o al primo voto, l'altezza non cambia e la
+/// lista sotto resta ferma (FIX-014).
+class _InfoLine extends StatelessWidget {
+  const _InfoLine({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.bodyMedium;
+    final cs = Theme.of(context).colorScheme;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: AppDimensions.summaryInfoIcon, color: cs.primary),
+        const SizedBox(width: AppSpacing.s),
+        Expanded(
+          child: Stack(
+            children: [
+              ExcludeSemantics(
+                child: Visibility(
+                  visible: false,
+                  maintainState: true,
+                  maintainAnimation: true,
+                  maintainSize: true,
+                  child: Text('\n', style: style),
+                ),
+              ),
+              Text(
+                text,
+                style: style,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }
 

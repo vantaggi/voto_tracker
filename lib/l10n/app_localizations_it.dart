@@ -350,12 +350,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get summaryEmptyTitle => 'Nessuna scheda ancora';
 
   @override
-  String summaryEmptyBody(int candidates, int total) {
-    return '$candidates candidati, $total schede attese. Controlla i nomi, poi inizia.';
-  }
-
-  @override
-  String get summarySetup => 'Imposta';
+  String get summaryEmptyHint => 'Tocca + per contare la prima scheda.';
 
   @override
   String get shareResults => 'Condividi i risultati';

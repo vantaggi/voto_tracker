@@ -15,6 +15,14 @@ Le sezioni sono generate dai commit convenzionali (vedi
 
 ## [2.0.0] - 2026-11-12
 
+### 🐞 Bug Fix
+- **Home: i + non saltano più al primo voto.** Il riquadro "Nessuna scheda
+  ancora" era più alto di quello del conteggio: al primo voto la lista saliva
+  di circa 60 dp e i tocchi veloci successivi cadevano fuori dal +. Ora il
+  riepilogo ha sempre la stessa forma ("0 / 100 schede" e "Tocca + per
+  contare la prima scheda") e la riga "In testa" tiene il posto di due righe.
+  Imposta e Lettura schede restano nel menu e nella barra in alto (FIX-014).
+
 ### 🚀 Nuove Funzionalità
 - **Archivio scrutini:** più scrutini salvati, con nuovo, duplica come modello
   (stessi candidati, nessuna scheda), riapri, rinomina ed elimina con conferma.

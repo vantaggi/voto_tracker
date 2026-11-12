@@ -14,6 +14,9 @@ class AppStrings {
 }
 
 class AppDimensions {
+  /// Icona delle righe "In testa" e "Tocca + per contare" del riepilogo.
+  static const double summaryInfoIcon = 18;
+
   static const double paddingAll = 16.0;
   static const double paddingIconText = 12.0;
   static const double paddingAppBarIcon = 8.0;

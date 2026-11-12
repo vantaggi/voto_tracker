@@ -25,15 +25,15 @@ void main() {
 
   testWidgets('riepilogo: vuoto, in corso, eletto', (tester) async {
     final p = await pumpHome(tester, const Size(412, 915));
-    expect(find.text('Nessuna scheda ancora'), findsOneWidget);
-    expect(find.text('Imposta'), findsOneWidget);
+    expect(find.text('Tocca + per contare la prima scheda.'), findsOneWidget);
+    expect(find.text('0 di 100 schede'), findsOneWidget);
 
     p.renameCandidate(0, 'Rossi');
     p.vote(0);
     p.vote(0);
     p.vote(1);
     await tester.pumpAndSettle();
-    expect(find.text('Nessuna scheda ancora'), findsNothing);
+    expect(find.text('Tocca + per contare la prima scheda.'), findsNothing);
     expect(find.text('97 rimanenti'), findsOneWidget);
     expect(find.textContaining('In testa Rossi'), findsOneWidget);
     expect(find.text('3 di 100 schede'), findsOneWidget);
@@ -43,6 +43,24 @@ void main() {
     expect(find.text('ELETTO'), findsOneWidget);
     expect(find.text('Completato'), findsOneWidget);
     expect(find.text('Condividi i risultati'), findsOneWidget);
+  });
+
+  testWidgets('al primo voto i + non si spostano (FIX-014)', (tester) async {
+    await pumpHome(tester, const Size(412, 915));
+    final plus = find.byIcon(Icons.add).first;
+    final before = tester.getCenter(plus);
+    // Tocchi veloci nello stesso punto, come col pollice.
+    for (var i = 0; i < 5; i++) {
+      await tester.tapAt(before);
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    await tester.pumpAndSettle();
+    expect(tester.getCenter(plus), before);
+    final p = Provider.of<ScrutinyProvider>(
+      tester.element(find.byType(HomePage)),
+      listen: false,
+    );
+    expect(p.candidates.first.votes, 5);
   });
 
   testWidgets('a scrutinio completo i + sono disattivati', (tester) async {
