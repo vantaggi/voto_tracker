@@ -1,17 +1,72 @@
+import 'dart:async';
+
+import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/models/candidate.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/theme/app_theme.dart';
+import 'package:voto_tracker/theme/candidate_palette.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
 import 'package:voto_tracker/widgets/keep_screen_on.dart';
+import 'package:voto_tracker/widgets/vote_stacked_bar.dart';
 
-/// Modalità proiettore: classifica a tutto schermo, tema scuro.
+/// Altezza minima e massima di una riga della classifica.
+const double _minRowHeight = 56;
+const double _maxRowHeight = 160;
+
+/// Spazio tra le righe.
+const double _rowGap = AppSpacing.s;
+
+/// Per quanto resta visibile la × dopo un tocco.
+const Duration _controlsTimeout = Duration(seconds: 3);
+
+/// Durata del riordino animato delle righe.
+const Duration _reorderDuration = Duration(milliseconds: 450);
+
+/// Modalità proiettore (ridisegno S5): schermo intero senza barre di sistema,
+/// tema scuro, intestazione con titolo, schede e barra impilata, classifica
+/// che riempie l'altezza e si riordina con un'animazione. Bianche e nulle
+/// stanno in una riga a parte in fondo (D4). Un tocco mostra la × per uscire.
 /// P9: una riga parlata per candidato, esito annunciato appena cambia,
 /// testo di sistema limitato a 1,5x e nessun overflow sul telefono.
-class ProjectorModeScreen extends StatelessWidget {
+class ProjectorModeScreen extends StatefulWidget {
   const ProjectorModeScreen({super.key});
+
+  @override
+  State<ProjectorModeScreen> createState() => _ProjectorModeScreenState();
+}
+
+class _ProjectorModeScreenState extends State<ProjectorModeScreen> {
+  bool _controls = true;
+  Timer? _hide;
+
+  @override
+  void initState() {
+    super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    _scheduleHide();
+  }
+
+  @override
+  void dispose() {
+    _hide?.cancel();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    super.dispose();
+  }
+
+  void _scheduleHide() {
+    _hide?.cancel();
+    _hide = Timer(_controlsTimeout, () {
+      if (mounted) setState(() => _controls = false);
+    });
+  }
+
+  void _showControls() {
+    setState(() => _controls = true);
+    _scheduleHide();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,70 +76,41 @@ class ProjectorModeScreen extends StatelessWidget {
         data: context.read<AppThemes>().dark,
         child: Builder(
           builder: (context) {
-            final colorScheme = Theme.of(context).colorScheme;
+            final cs = Theme.of(context).colorScheme;
             // I testi sono già enormi: oltre 1,5x uscirebbero dallo schermo.
             return MediaQuery.withClampedTextScaling(
               maxScaleFactor: 1.5,
               child: Scaffold(
-                backgroundColor: colorScheme.surface,
-                appBar: AppBar(
-                  title: Text(context.l10n.projectorMode),
-                  backgroundColor: Colors.transparent,
-                  foregroundColor: colorScheme.onSurfaceVariant,
-                  elevation: 0,
-                ),
-                body: Consumer<ScrutinyProvider>(
-                  builder: (context, provider, child) {
-                    final candidates = provider.sortedCandidates
-                        .where((c) => c.votes > 0)
-                        .toList();
-                    final totalVotes = provider.totalVotesAssigned;
-
-                    if (candidates.isEmpty) {
-                      return Center(
-                        child: Text(
-                          context.l10n.waitingForData,
-                          style: Theme.of(context).textTheme.displaySmall
-                              ?.copyWith(color: colorScheme.onSurfaceVariant),
-                          textAlign: TextAlign.center,
-                        ),
-                      );
-                    }
-
-                    // Il primo è il massimo: la lista è in ordine.
-                    final maxVotes = candidates.first.votes;
-
-                    return Column(
-                      children: [
-                        _buildHeader(context, provider),
-                        Expanded(
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              final compact =
-                                  constraints.maxWidth <
-                                  AppDimensions.compactBreakpoint;
-                              return ListView.builder(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: compact
-                                      ? AppSpacing.l
-                                      : AppSpacing.xxl,
-                                  vertical: AppSpacing.xl,
-                                ),
-                                itemCount: candidates.length,
-                                itemBuilder: (context, index) => _ProjectorRow(
-                                  position: index + 1,
-                                  candidate: candidates[index],
-                                  totalVotes: totalVotes,
-                                  maxVotes: maxVotes,
-                                  compact: compact,
-                                ),
-                              );
-                            },
+                backgroundColor: cs.surface,
+                body: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: _showControls,
+                  child: Stack(
+                    children: [
+                      const Positioned.fill(
+                        child: SafeArea(child: _ProjectorBody()),
+                      ),
+                      Positioned(
+                        top: AppSpacing.l,
+                        right: AppSpacing.l,
+                        child: SafeArea(
+                          child: AnimatedOpacity(
+                            opacity: _controls ? 1 : 0,
+                            duration: const Duration(milliseconds: 200),
+                            child: IgnorePointer(
+                              ignoring: !_controls,
+                              child: IconButton.filledTonal(
+                                tooltip: MaterialLocalizations.of(context)
+                                    .closeButtonTooltip,
+                                onPressed: () => Navigator.maybePop(context),
+                                icon: const Icon(Icons.close),
+                              ),
+                            ),
                           ),
                         ),
-                      ],
-                    );
-                  },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -93,102 +119,207 @@ class ProjectorModeScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildHeader(BuildContext context, ScrutinyProvider provider) {
-    final l10n = context.l10n;
-    final colorScheme = Theme.of(context).colorScheme;
+class _ProjectorBody extends StatelessWidget {
+  const _ProjectorBody();
 
-    if (provider.hasWinner) {
-      final label = localizedWinnerLabel(l10n, provider.winnerStatus) ?? '';
-      final winnerText = localizedOutcomeHeadline(
-        l10n,
-        provider.winnerStatus,
-        provider.winnerName,
-      );
-
-      // P9: l'esito viene annunciato appena cambia.
-      return Semantics(
-        liveRegion: true,
-        container: true,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: provider.isInconclusive
-                ? colorScheme.tertiaryContainer
-                : colorScheme.primaryContainer,
-            borderRadius: const BorderRadius.vertical(
-              bottom: Radius.circular(32),
-            ),
-          ),
-          alignment: Alignment.center,
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<ScrutinyProvider>();
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact = constraints.maxWidth < AppDimensions.compactBreakpoint;
+        final side = compact ? AppSpacing.l : AppSpacing.xxl;
+        return Padding(
+          padding: EdgeInsets.fromLTRB(side, AppSpacing.l, side, AppSpacing.l),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                label,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: provider.isInconclusive
-                      ? colorScheme.onTertiaryContainer
-                      : colorScheme.onPrimaryContainer,
-                  fontWeight: FontWeight.bold,
-                ),
+              _Header(provider: provider, compact: compact),
+              const SizedBox(height: AppSpacing.xl),
+              Expanded(
+                child: _Ranking(provider: provider, compact: compact),
               ),
-              Text(
-                winnerText.toUpperCase(),
-                style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                  color: provider.isInconclusive
-                      ? colorScheme.onTertiaryContainer
-                      : colorScheme.onPrimaryContainer,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 2,
-                ),
-                textAlign: TextAlign.center,
-              ),
+              _TechnicalFooter(provider: provider),
             ],
           ),
-        ),
-      );
-    }
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.xl),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.how_to_vote_outlined,
-            color: colorScheme.onSurfaceVariant,
-            size: 32,
-          ),
-          const SizedBox(width: AppSpacing.l),
-          Flexible(
-            child: Text(
-              "${l10n.votesTotal}: ${provider.totalVotesAssigned} / ${provider.settings.totalVoters}",
-              style: Theme.of(context).textTheme.headlineSmall
-                  ?.copyWith(color: colorScheme.onSurfaceVariant),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
 
-/// Una riga della classifica: barra di avanzamento sullo sfondo, posizione,
-/// nome, percentuale e voti.
+/// Titolo, schede contate, barra impilata ed esito.
+class _Header extends StatelessWidget {
+  const _Header({required this.provider, required this.compact});
+
+  final ScrutinyProvider provider;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final tt = Theme.of(context).textTheme;
+    final cs = Theme.of(context).colorScheme;
+    final scrutiny = provider.currentScrutiny;
+    final label = provider.hasWinner
+        ? localizedWinnerLabel(l10n, provider.winnerStatus)
+        : null;
+    final outcomeColor = provider.isInconclusive ? cs.tertiary : cs.primary;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          // Lascia posto alla ×.
+          padding: const EdgeInsets.only(right: AppTouch.minTarget),
+          child: Text(
+            scrutiny == null
+                ? l10n.projectorMode
+                : scrutinyDisplayTitle(context, scrutiny),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: (compact ? tt.titleLarge : tt.headlineSmall)?.copyWith(
+              color: cs.onSurfaceVariant,
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          [
+            l10n.homeSubtitle(
+              provider.totalVotesAssigned,
+              provider.settings.totalVoters,
+            ),
+            if (provider.remainingVotes > 0)
+              l10n.summaryRemaining(provider.remainingVotes)
+            else
+              l10n.summaryCompleted,
+          ].join(' · '),
+          style: (compact ? tt.titleMedium : tt.headlineSmall)?.copyWith(
+            color: cs.onSurface,
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.m),
+        VoteStackedBar(
+          total: provider.settings.totalVoters,
+          height: AppSpacing.m,
+          segments: [
+            for (final c in [
+              ...provider.sortedCandidates.where((c) => !c.isTechnical),
+              ...provider.candidates.where((c) => c.isTechnical),
+            ])
+              (color: c.color, votes: c.votes),
+          ],
+        ),
+        if (label != null) ...[
+          const SizedBox(height: AppSpacing.l),
+          // P9: l'esito viene annunciato appena cambia.
+          Semantics(
+            liveRegion: true,
+            container: true,
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: '$label  ',
+                    style: tt.titleLarge?.copyWith(
+                      color: outcomeColor,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  TextSpan(
+                    text: localizedOutcomeHeadline(
+                      l10n,
+                      provider.winnerStatus,
+                      provider.winnerName,
+                    ),
+                    style: (compact ? tt.headlineMedium : tt.displaySmall)
+                        ?.copyWith(
+                          color: outcomeColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// Classifica dei candidati: le righe si dividono l'altezza (56–160dp) e si
+/// spostano con un'animazione quando cambia l'ordine.
+class _Ranking extends StatelessWidget {
+  const _Ranking({required this.provider, required this.compact});
+
+  final ScrutinyProvider provider;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final all = provider.candidates;
+    final ranked = provider.sortedCandidates
+        .where((c) => !c.isTechnical)
+        .toList();
+    final counted = provider.totalVotesAssigned;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final n = ranked.length;
+        final rowHeight = ((constraints.maxHeight - _rowGap * (n - 1)) / n)
+            .clamp(_minRowHeight, _maxRowHeight);
+        final height = n * rowHeight + (n - 1) * _rowGap;
+        return SingleChildScrollView(
+          child: SizedBox(
+            height: height,
+            child: Stack(
+              children: [
+                // Ordine fisso dei figli (per indice), posizione dalla
+                // classifica: così ogni riga scivola al suo posto.
+                for (final c in all.where((c) => !c.isTechnical))
+                  AnimatedPositioned(
+                    key: ValueKey(all.indexOf(c)),
+                    duration: _reorderDuration,
+                    curve: Curves.easeInOutCubic,
+                    left: 0,
+                    right: 0,
+                    top: ranked.indexOf(c) * (rowHeight + _rowGap),
+                    height: rowHeight,
+                    child: _ProjectorRow(
+                      position: ranked.indexOf(c) + 1,
+                      candidate: c,
+                      totalVotes: counted,
+                      height: rowHeight,
+                      compact: compact,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Una riga: posizione, nome, barra della quota sulle schede contate,
+/// percentuale e voti.
 class _ProjectorRow extends StatelessWidget {
   const _ProjectorRow({
     required this.position,
     required this.candidate,
     required this.totalVotes,
-    required this.maxVotes,
+    required this.height,
     required this.compact,
   });
 
   final int position;
   final Candidate candidate;
   final int totalVotes;
-  final int maxVotes;
+  final double height;
 
   /// Telefono in verticale: margini più stretti.
   final bool compact;
@@ -196,13 +327,18 @@ class _ProjectorRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+    final cs = Theme.of(context).colorScheme;
     final percentage = candidate.getPercentage(totalVotes);
-    final progress = maxVotes > 0 ? candidate.votes / maxVotes : 0.0;
-    final isFirst = position == 1;
+    final share = totalVotes > 0 ? candidate.votes / totalVotes : 0.0;
+    final isFirst = position == 1 && candidate.votes > 0;
     final name = localizedCandidateName(l10n, candidate);
-    final gap = compact ? AppSpacing.l : AppSpacing.xl;
+    final gap = compact ? AppSpacing.m : AppSpacing.xl;
+    final big = height >= 96;
+    final badge = (height - AppSpacing.l * 2).clamp(
+      AppSpacing.xxl,
+      AppSpacing.xxxl + AppSpacing.l,
+    );
 
     // TalkBack legge una riga sola; il disegno sotto è escluso.
     return Semantics(
@@ -211,115 +347,153 @@ class _ProjectorRow extends StatelessWidget {
         position,
         name,
         candidate.votes,
-        percentage.toStringAsFixed(1),
+        formatOneDecimal(context, percentage),
       ),
       child: ExcludeSemantics(
-        child: Container(
-          margin: const EdgeInsets.only(bottom: AppSpacing.xl),
-          // Altezza minima, non fissa: col testo grande la riga cresce.
-          constraints: const BoxConstraints(minHeight: 100),
-          child: Stack(
-            alignment: Alignment.centerLeft,
-            children: [
-              Positioned.fill(
-                child: FractionallySizedBox(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(AppShapes.large),
+          child: ColoredBox(
+            color: cs.surfaceContainer,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                FractionallySizedBox(
                   alignment: Alignment.centerLeft,
-                  widthFactor: progress,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: candidate.color.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(
-                        AppShapes.extraLargeCard,
+                  widthFactor: share,
+                  child: ColoredBox(
+                    color: candidate.color.withValues(alpha: 0.45),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: gap),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: badge,
+                        height: badge,
+                        decoration: BoxDecoration(
+                          color: isFirst ? cs.primary : candidate.color,
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            '$position',
+                            style: (big ? tt.headlineMedium : tt.titleMedium)
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w900,
+                                  color: isFirst
+                                      ? cs.onPrimary
+                                      : CandidatePalette.onColor(
+                                          candidate.color,
+                                        ),
+                                ),
+                          ),
+                        ),
                       ),
+                      SizedBox(width: gap),
+                      Expanded(
+                        child: Text(
+                          name,
+                          style: (big ? tt.headlineLarge : tt.titleLarge)
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: cs.onSurface,
+                              ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      SizedBox(width: gap),
+                      // Percentuale e voti si rimpiccioliscono invece di
+                      // uscire dallo schermo.
+                      Flexible(
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.baseline,
+                              textBaseline: TextBaseline.alphabetic,
+                              children: [
+                                Text(
+                                  formatPercent(context, percentage),
+                                  style:
+                                      (big ? tt.headlineSmall : tt.titleMedium)
+                                          ?.copyWith(
+                                            color: cs.onSurfaceVariant,
+                                          ),
+                                ),
+                                SizedBox(width: gap),
+                                Text(
+                                  '${candidate.votes}',
+                                  style:
+                                      (big
+                                              ? tt.displayMedium
+                                              : tt.headlineMedium)
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: cs.onSurface,
+                                            fontFeatures: const [
+                                              FontFeature.tabularFigures(),
+                                            ],
+                                          ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Bianche e nulle fuori dalla classifica (D4), in una riga in fondo.
+class _TechnicalFooter extends StatelessWidget {
+  const _TechnicalFooter({required this.provider});
+
+  final ScrutinyProvider provider;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final tt = Theme.of(context).textTheme;
+    final cs = Theme.of(context).colorScheme;
+    final technical = provider.candidates.where((c) => c.isTechnical).toList();
+    if (technical.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.l),
+      child: Wrap(
+        spacing: AppSpacing.xl,
+        runSpacing: AppSpacing.s,
+        children: [
+          for (final c in technical)
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircleAvatar(radius: AppSpacing.s, backgroundColor: c.color),
+                const SizedBox(width: AppSpacing.s),
+                Flexible(
+                  child: Text(
+                    '${localizedCandidateName(l10n, c)}  ${c.votes}',
+                    style: tt.titleLarge?.copyWith(
+                      color: cs.onSurfaceVariant,
+                      fontFeatures: const [FontFeature.tabularFigures()],
                     ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: gap,
-                  vertical: AppSpacing.l,
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 64,
-                      height: 64,
-                      decoration: BoxDecoration(
-                        color: isFirst
-                            ? colorScheme.primaryContainer
-                            : colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(
-                          AppShapes.largeIncreased,
-                        ),
-                        border: isFirst
-                            ? Border.all(color: colorScheme.primary, width: 2)
-                            : null,
-                      ),
-                      alignment: Alignment.center,
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          '$position',
-                          style: textTheme.headlineLarge?.copyWith(
-                            fontWeight: FontWeight.w900,
-                            color: isFirst
-                                ? colorScheme.onPrimaryContainer
-                                : colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: gap),
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        name.toUpperCase(),
-                        style: textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1.2,
-                          color: colorScheme.onSurface,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    // Percentuale e voti si rimpiccioliscono invece di uscire
-                    // dallo schermo.
-                    Flexible(
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Row(
-                            children: [
-                              Text(
-                                '${percentage.toStringAsFixed(1)}%',
-                                style: textTheme.headlineSmall?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                              SizedBox(
-                                width: compact ? AppSpacing.l : AppSpacing.xxl,
-                              ),
-                              Text(
-                                '${candidate.votes}',
-                                style: textTheme.displayMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: candidate.color,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+              ],
+            ),
+        ],
       ),
     );
   }

@@ -71,7 +71,14 @@ String scrutinyDisplayTitle(BuildContext context, Scrutiny s) {
 
 /// Percentuale con una cifra decimale nel formato della lingua ("40,0%" in
 /// italiano, "40.0%" in inglese).
-String formatPercent(BuildContext context, double value) {
+String formatPercent(BuildContext context, double value) =>
+    '${formatOneDecimal(context, value)}%';
+
+/// Numero con una cifra decimale nel formato della lingua ("40,0").
+String formatOneDecimal(BuildContext context, double value) {
   final locale = Localizations.localeOf(context).toLanguageTag();
-  return '${NumberFormat.decimalPatternDigits(locale: locale, decimalDigits: 1).format(value)}%';
+  return NumberFormat.decimalPatternDigits(
+    locale: locale,
+    decimalDigits: 1,
+  ).format(value);
 }

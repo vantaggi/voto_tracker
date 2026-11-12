@@ -106,11 +106,11 @@ void main() {
       final handle = tester.ensureSemantics();
       await openProjector(tester, const Size(1280, 800));
       expect(
-        find.bySemanticsLabel('1° posto, Candidato 1: 3 voti, 75.0%'),
+        find.bySemanticsLabel('1° posto, Candidato 1: 3 voti, 75,0%'),
         findsOneWidget,
       );
       expect(
-        find.bySemanticsLabel('2° posto, Candidato 2: 1 voti, 25.0%'),
+        find.bySemanticsLabel('2° posto, Candidato 2: 1 voti, 25,0%'),
         findsOneWidget,
       );
       handle.dispose();
