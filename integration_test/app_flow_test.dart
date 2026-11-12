@@ -12,7 +12,7 @@ import 'package:voto_tracker/services/wakelock_service.dart';
 /// P11: flusso completo sul dispositivo vero.
 ///
 /// Si lancia dal PC col telefono collegato, sulla build di debug:
-///   flutter test integration_test -d <id-telefono>
+///   `flutter test integration_test -d ID_TELEFONO`
 /// I dati sono finti (SharedPreferences in memoria): non tocca gli scrutini
 /// della build di debug né, tanto meno, quelli della release.
 void main() {
