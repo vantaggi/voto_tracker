@@ -4,9 +4,9 @@ description: "Un'applicazione Flutter avanzata per il monitoraggio e l'analisi d
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-# Version 1.1.0: Major feature enhancements including dark mode, advanced stats,
-# mathematical winner calculation, and history chart improvements.
-version: 1.2.0+5
+# Version 2.0.0: archivio scrutini, regole di vittoria, lettura schede, Home e
+# schermate ridisegnate, nuovi export, icona e splash.
+version: 2.0.0+6
 
 environment:
   sdk: ^3.13.0

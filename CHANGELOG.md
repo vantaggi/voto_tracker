@@ -13,6 +13,8 @@ Le sezioni sono generate dai commit convenzionali (vedi
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-11-12
+
 ### 🚀 Nuove Funzionalità
 - **Archivio scrutini:** più scrutini salvati, con nuovo, duplica come modello
   (stessi candidati, nessuna scheda), riapri, rinomina ed elimina con conferma.
