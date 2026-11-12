@@ -219,5 +219,7 @@
   "newEmptyScrutinyHint": "Candidati e impostazioni di partenza",
   "newFromCopy": "Copia «{title}»",
   "newFromCopyHint": "Stessi candidati e regole, nessuna scheda",
-  "newFromList": "Da una lista salvata"
+  "newFromList": "Da una lista salvata",
+  "ballotBackToCount": "Torna allo scrutinio",
+  "ballotTileSemantics": "{name}, {votes, plural, =1{1 voto} other{{votes} voti}}"
 }

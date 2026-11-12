@@ -1176,6 +1176,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'From a saved list'**
   String get newFromList;
+
+  /// No description provided for @ballotBackToCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to the count'**
+  String get ballotBackToCount;
+
+  /// No description provided for @ballotTileSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}, {votes, plural, =1{1 vote} other{{votes} votes}}'**
+  String ballotTileSemantics(String name, int votes);
 }
 
 class _AppLocalizationsDelegate

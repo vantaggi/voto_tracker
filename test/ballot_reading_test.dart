@@ -43,7 +43,21 @@ void main() {
     expect(p.candidates[0].votes, 1);
     expect(p.candidates[1].votes, 1);
     expect(find.text('Scheda 3 di 100'), findsOneWidget);
-    expect(find.text('Ultima: Candidato 2'), findsOneWidget);
+    expect(find.text('Annulla Candidato 2'), findsOneWidget);
+  });
+
+  testWidgets('bianche e nulle in fondo, i candidati riempiono lo schermo', (
+    tester,
+  ) async {
+    final p = await openReading(tester);
+    final tech = p.candidates.indexWhere((c) => c.isTechnical);
+    final techBox = tester.getRect(find.byKey(ValueKey('ballot-$tech')));
+    final firstBox = tester.getRect(find.byKey(const ValueKey('ballot-0')));
+    expect(techBox.height, 72);
+    expect(firstBox.height, greaterThan(techBox.height * 2));
+    expect(techBox.top, greaterThan(firstBox.bottom));
+    await tapBallot(tester, tech);
+    expect(p.candidates[tech].votes, 1);
   });
 
   testWidgets('doppio tocco rapido conta una scheda sola', (tester) async {
@@ -58,7 +72,7 @@ void main() {
   testWidgets('annulla toglie l\'ultima scheda', (tester) async {
     final p = await openReading(tester);
     await tapBallot(tester, 2);
-    await tester.tap(find.text('Annulla ultima'));
+    await tester.tap(find.text('Annulla Candidato 3'));
     await tester.pumpAndSettle();
     expect(p.totalVotesAssigned, 0);
     expect(find.text('Scheda 1 di 100'), findsOneWidget);
@@ -71,7 +85,10 @@ void main() {
     await tapBallot(tester, 0);
     await tapBallot(tester, 0);
     expect(find.text('Scrutinio completato'), findsOneWidget);
-    await tapBallot(tester, 1);
+    expect(find.byKey(const ValueKey('ballot-1')), findsNothing);
+    await tester.tap(find.text('Torna allo scrutinio'));
+    await tester.pumpAndSettle();
+    expect(find.byType(BallotReadingScreen), findsNothing);
     expect(p.totalVotesAssigned, 2);
   });
 }

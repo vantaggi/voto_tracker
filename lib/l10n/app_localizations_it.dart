@@ -624,4 +624,18 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get newFromList => 'Da una lista salvata';
+
+  @override
+  String get ballotBackToCount => 'Torna allo scrutinio';
+
+  @override
+  String ballotTileSemantics(String name, int votes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      votes,
+      locale: localeName,
+      other: '$votes voti',
+      one: '1 voto',
+    );
+    return '$name, $_temp0';
+  }
 }

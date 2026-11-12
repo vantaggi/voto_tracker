@@ -224,5 +224,8 @@
   "newFromCopy": "Copy “{title}”",
   "@newFromCopy": {"placeholders": {"title": {"type": "String"}}},
   "newFromCopyHint": "Same candidates and rules, no ballots",
-  "newFromList": "From a saved list"
+  "newFromList": "From a saved list",
+  "ballotBackToCount": "Back to the count",
+  "ballotTileSemantics": "{name}, {votes, plural, =1{1 vote} other{{votes} votes}}",
+  "@ballotTileSemantics": {"placeholders": {"name": {"type": "String"}, "votes": {"type": "int"}}}
 }
