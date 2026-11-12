@@ -521,8 +521,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get resetConfirmBody =>
-      'All votes go back to zero and candidates get their default names back. This can\'t be undone.';
+      'All votes go back to zero. Candidate names and colours stay. This can\'t be undone.';
 
   @override
   String get resetConfirm => 'Reset';
+
+  @override
+  String settingsResetWarning(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'the $count counted ballots',
+      one: 'the counted ballot',
+    );
+    return 'Changing candidates, blank or spoiled ballots resets $_temp0. Names and colours stay.';
+  }
+
+  @override
+  String get saveAndReset => 'Save and reset';
 }

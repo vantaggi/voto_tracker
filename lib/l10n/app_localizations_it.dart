@@ -523,8 +523,22 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get resetConfirmBody =>
-      'Tutti i voti tornano a zero e i candidati riprendono i nomi predefiniti. Non si può annullare.';
+      'Tutti i voti tornano a zero. Nomi e colori dei candidati restano. Non si può annullare.';
 
   @override
   String get resetConfirm => 'Azzera';
+
+  @override
+  String settingsResetWarning(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'le $count schede contate',
+      one: 'la scheda contata',
+    );
+    return 'Cambiando candidati, bianche o nulle si azzerano $_temp0. Nomi e colori restano.';
+  }
+
+  @override
+  String get saveAndReset => 'Salva e azzera';
 }

@@ -1006,7 +1006,7 @@ abstract class AppLocalizations {
   /// No description provided for @resetConfirmBody.
   ///
   /// In en, this message translates to:
-  /// **'All votes go back to zero and candidates get their default names back. This can\'t be undone.'**
+  /// **'All votes go back to zero. Candidate names and colours stay. This can\'t be undone.'**
   String get resetConfirmBody;
 
   /// No description provided for @resetConfirm.
@@ -1014,6 +1014,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reset'**
   String get resetConfirm;
+
+  /// No description provided for @settingsResetWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Changing candidates, blank or spoiled ballots resets {count, plural, =1{the counted ballot} other{the {count} counted ballots}}. Names and colours stay.'**
+  String settingsResetWarning(int count);
+
+  /// No description provided for @saveAndReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Save and reset'**
+  String get saveAndReset;
 }
 
 class _AppLocalizationsDelegate

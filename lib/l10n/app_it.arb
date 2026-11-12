@@ -191,6 +191,8 @@
   "moreActions": "Altre azioni",
   "resetScrutiny": "Azzera scrutinio",
   "resetConfirmTitle": "Azzerare lo scrutinio?",
-  "resetConfirmBody": "Tutti i voti tornano a zero e i candidati riprendono i nomi predefiniti. Non si può annullare.",
-  "resetConfirm": "Azzera"
+  "resetConfirmBody": "Tutti i voti tornano a zero. Nomi e colori dei candidati restano. Non si può annullare.",
+  "resetConfirm": "Azzera",
+  "settingsResetWarning": "Cambiando candidati, bianche o nulle si azzerano {count, plural, =1{la scheda contata} other{le {count} schede contate}}. Nomi e colori restano.",
+  "saveAndReset": "Salva e azzera"
 }

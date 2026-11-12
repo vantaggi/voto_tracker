@@ -544,8 +544,8 @@ class ScrutinyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Azzera i voti (D2): nomi, colori e percentuali precedenti restano.
   void reset() {
-    _initializeCandidates();
     _voteLog.clear();
     _redoStack.clear();
     _recalculateState();
@@ -583,27 +583,46 @@ class ScrutinyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Le impostazioni [next] cambiano le righe dello scrutinio (numero di
+  /// candidati, bianche o nulle): salvarle azzera i voti.
+  bool _changesRows(Settings next) {
+    final real = _candidates.where((c) => !c.isTechnical).length;
+    final blank = _candidates.any((c) => c.type == CandidateType.blank);
+    final spoiled = _candidates.any((c) => c.type == CandidateType.spoiled);
+    return real != next.participantsCount ||
+        blank != next.showBlankVotes ||
+        spoiled != next.showNullVotes;
+  }
+
+  /// Schede contate che si perderebbero salvando [next] (0 se i voti restano).
+  int ballotsLostWith(Settings next) =>
+      _changesRows(next) ? totalVotesAssigned : 0;
+
+  /// Applica le impostazioni. Se cambiano le righe, i voti si azzerano ma i
+  /// primi candidati tengono nome, colore e percentuale precedente (D1).
   void updateSettings(Settings newSettings) {
+    final changesRows = _changesRows(newSettings);
     _settings = newSettings;
-    // When settings change (e.g. number of candidates), we usually reset.
-    // Ideally we should prompt user, but for now we follow simple logic:
-    // If participants count changed, reset.
-    // If just total voters changed, recalculate.
-
-    // We can try to be smart:
-    bool needsReset =
-        _candidates.length !=
-        (newSettings.participantsCount +
-            (newSettings.showBlankVotes ? 1 : 0) +
-            (newSettings.showNullVotes ? 1 : 0));
-
-    if (needsReset) {
-      reset();
-    } else {
+    if (!changesRows) {
       _calculateResults();
       _scheduleSave();
       notifyListeners();
+      return;
     }
+    final kept = _candidates.where((c) => !c.isTechnical).toList();
+    _initializeCandidates();
+    final real = _candidates.where((c) => !c.isTechnical).toList();
+    for (var i = 0; i < real.length && i < kept.length; i++) {
+      real[i]
+        ..name = kept[i].name
+        ..color = kept[i].color
+        ..previousPercentage = kept[i].previousPercentage;
+    }
+    _voteLog.clear();
+    _redoStack.clear();
+    _recalculateState();
+    _scheduleSave();
+    notifyListeners();
   }
 
   void renameCandidate(int index, String newName) {

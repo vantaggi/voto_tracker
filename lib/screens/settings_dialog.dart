@@ -59,6 +59,11 @@ class _SettingsDialogState extends State<SettingsDialog> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final localeProvider = context.watch<LocaleProvider>();
+    final cs = Theme.of(context).colorScheme;
+    // S1: avvisa prima di salvare se i voti contati si perderebbero.
+    final lost = context.watch<ScrutinyProvider>().ballotsLostWith(
+      _pendingSettings(),
+    );
     // Dialog theme is already handled by AppTheme (rounded corners, bg color)
     return AlertDialog(
       scrollable: true,
@@ -159,6 +164,24 @@ class _SettingsDialogState extends State<SettingsDialog> {
               ),
             ),
 
+            if (lost > 0) ...[
+              const SizedBox(height: AppSpacing.m),
+              Row(
+                key: const ValueKey('settingsResetWarning'),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.warning_amber_rounded, color: cs.error),
+                  const SizedBox(width: AppSpacing.s),
+                  Expanded(
+                    child: Text(
+                      l10n.settingsResetWarning(lost),
+                      style: Theme.of(context).textTheme.bodyMedium
+                          ?.copyWith(color: cs.error),
+                    ),
+                  ),
+                ],
+              ),
+            ],
             const SizedBox(height: AppSpacing.xl),
             _buildRulesSection(context),
             // P10: queste impostazioni anche per i nuovi scrutini.
@@ -277,23 +300,14 @@ class _SettingsDialogState extends State<SettingsDialog> {
           child: Text(l10n.cancel),
         ),
         FilledButton.tonal(
-          // Tonal button for save
+          style: lost > 0
+              ? FilledButton.styleFrom(
+                  backgroundColor: cs.errorContainer,
+                  foregroundColor: cs.onErrorContainer,
+                )
+              : null,
           onPressed: () {
-            final int voters = int.tryParse(_totalVotersController.text) ?? 100;
-            final newSettings = Settings(
-              totalVoters: voters,
-              participantsCount: _participantsCount.toInt(),
-              showBlankVotes: _showBlankVotes,
-              showNullVotes: _showNullVotes,
-              victoryRule: _rule,
-              eligibleVoters: _quorumOn
-                  ? int.tryParse(_eligibleController.text)
-                  : null,
-              quorumPercent: _quorumOn
-                  ? int.tryParse(_quorumController.text)?.clamp(1, 100)
-                  : null,
-            );
-
+            final newSettings = _pendingSettings();
             final provider = context.read<ScrutinyProvider>();
             final useAsDefaults = _useAsDefaults;
             final hadDefaults = provider.defaultSettings != null;
@@ -312,11 +326,24 @@ class _SettingsDialogState extends State<SettingsDialog> {
               }
             });
           },
-          child: Text(l10n.save),
+          child: Text(lost > 0 ? l10n.saveAndReset : l10n.save),
         ),
       ],
     );
   }
+
+  /// Le impostazioni come sono ora nel modulo.
+  Settings _pendingSettings() => Settings(
+    totalVoters: int.tryParse(_totalVotersController.text) ?? 100,
+    participantsCount: _participantsCount.toInt(),
+    showBlankVotes: _showBlankVotes,
+    showNullVotes: _showNullVotes,
+    victoryRule: _rule,
+    eligibleVoters: _quorumOn ? int.tryParse(_eligibleController.text) : null,
+    quorumPercent: _quorumOn
+        ? int.tryParse(_quorumController.text)?.clamp(1, 100)
+        : null,
+  );
 
   Future<void> _saveAsList(BuildContext context) async {
     final l10n = context.l10n;

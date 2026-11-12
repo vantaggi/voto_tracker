@@ -191,6 +191,9 @@
   "moreActions": "More actions",
   "resetScrutiny": "Reset count",
   "resetConfirmTitle": "Reset the count?",
-  "resetConfirmBody": "All votes go back to zero and candidates get their default names back. This can't be undone.",
-  "resetConfirm": "Reset"
+  "resetConfirmBody": "All votes go back to zero. Candidate names and colours stay. This can't be undone.",
+  "resetConfirm": "Reset",
+  "settingsResetWarning": "Changing candidates, blank or spoiled ballots resets {count, plural, =1{the counted ballot} other{the {count} counted ballots}}. Names and colours stay.",
+  "@settingsResetWarning": {"placeholders": {"count": {"type": "int"}}},
+  "saveAndReset": "Save and reset"
 }
