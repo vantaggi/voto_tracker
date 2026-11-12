@@ -79,7 +79,7 @@ void main() {
     expect(p.candidates[1].votes, 1);
   });
 
-  testWidgets('tocco sul nome apre Modifica Nome', (tester) async {
+  testWidgets('tocco sul nome apre Modifica candidato', (tester) async {
     await pumpHome(tester, const Size(412, 915));
     await tester.tap(find.text('Candidato 1'));
     await tester.pumpAndSettle();

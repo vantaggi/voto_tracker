@@ -22,28 +22,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get projectorMode => 'Projector Mode';
 
   @override
-  String get shareImageTitle => 'Share social image';
+  String get shareImageTitle => 'Image';
 
   @override
-  String get shareImageSubtitle => 'Optimized for Instagram/WhatsApp';
+  String get shareImageSubtitle => 'For WhatsApp and social media';
 
   @override
-  String get exportPdfTitle => 'Export PDF report';
+  String get exportPdfTitle => 'PDF report';
 
   @override
-  String get exportPdfSubtitle => 'Official document with charts';
+  String get exportPdfSubtitle => 'To print or archive';
 
   @override
-  String get exportCsvTitle => 'Export CSV';
+  String get exportCsvTitle => 'CSV';
 
   @override
-  String get exportCsvSubtitle => 'Table for spreadsheets';
+  String get exportCsvSubtitle => 'For spreadsheets';
 
   @override
-  String get exportJsonTitle => 'Export JSON';
+  String get exportJsonTitle => 'JSON';
 
   @override
-  String get exportJsonSubtitle => 'Full structured data';
+  String get exportJsonSubtitle => 'All the data';
 
   @override
   String get exportError => 'Export failed';
@@ -93,13 +93,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get spoiledVotes => 'Null votes';
 
   @override
-  String get editName => 'Edit name';
+  String get editName => 'Edit candidate';
 
   @override
-  String get candidateName => 'Candidate name';
+  String get candidateName => 'Name';
 
   @override
-  String get previousResultLabel => 'Previous result (%)';
+  String get previousResultLabel => 'Previous result';
 
   @override
   String get previousResultHint => 'E.g. 25.5';
@@ -635,5 +635,30 @@ class AppLocalizationsEn extends AppLocalizations {
       one: '1 vote',
     );
     return '$name, $_temp0';
+  }
+
+  @override
+  String exportSheetTitle(String title) {
+    return 'Share “$title”';
+  }
+
+  @override
+  String get exportDataLabel => 'Data only';
+
+  @override
+  String get candidateColor => 'Colour';
+
+  @override
+  String candidateColorOption(int n) {
+    return 'Colour $n';
+  }
+
+  @override
+  String get previousResultHelper =>
+      'The rows show how much it went up or down';
+
+  @override
+  String previousResultHintNumber(String example) {
+    return 'E.g. $example';
   }
 }

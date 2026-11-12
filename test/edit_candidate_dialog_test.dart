@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:voto_tracker/main.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/screens/home_page.dart';
+import 'package:voto_tracker/theme/candidate_palette.dart';
 
 /// FIX-006: il dialog "Modifica nome" chiudeva i suoi TextEditingController
 /// appena si chiudeva, mentre l'animazione di uscita li usava ancora
@@ -21,7 +22,7 @@ void main() {
       tester.element(find.byType(HomePage)),
       listen: false,
     );
-    await tester.tap(find.byTooltip('Modifica Nome').first);
+    await tester.tap(find.byTooltip('Modifica candidato').first);
     await tester.pumpAndSettle();
     expect(find.byType(AlertDialog), findsOneWidget);
     return p;
@@ -64,5 +65,21 @@ void main() {
     await tester.tap(find.text('Salva'));
     await tester.pumpAndSettle();
     expect(find.byType(AlertDialog), findsOneWidget);
+  });
+
+  testWidgets('S6: colore dalla tavolozza e % con la virgola', (tester) async {
+    final p = await openDialog(tester);
+    expect(find.text('Modifica candidato'), findsWidgets);
+    await tester.tap(find.bySemanticsLabel('Colore 5'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Salva'));
+    await tester.pumpAndSettle();
+    expect(p.candidates[0].color, CandidatePalette.candidates[4]);
+
+    p.setCandidatePreviousPercentage(0, 12.5);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Modifica candidato').first);
+    await tester.pumpAndSettle();
+    expect(find.text('12,5'), findsOneWidget);
   });
 }

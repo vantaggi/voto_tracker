@@ -6,14 +6,14 @@
   "exportShareTooltip": "Esporta / Condividi",
   "projectorMode": "Modalità Proiettore",
 
-  "shareImageTitle": "Condividi immagine social",
-  "shareImageSubtitle": "Ottimizzata per Instagram/WhatsApp",
-  "exportPdfTitle": "Esporta Report PDF",
-  "exportPdfSubtitle": "Documento ufficiale con grafici",
-  "exportCsvTitle": "Esporta CSV",
-  "exportCsvSubtitle": "Tabella per fogli di calcolo",
-  "exportJsonTitle": "Esporta JSON",
-  "exportJsonSubtitle": "Dati strutturati completi",
+  "shareImageTitle": "Immagine",
+  "shareImageSubtitle": "Per WhatsApp e social",
+  "exportPdfTitle": "Report PDF",
+  "exportPdfSubtitle": "Da stampare o archiviare",
+  "exportCsvTitle": "CSV",
+  "exportCsvSubtitle": "Per fogli di calcolo",
+  "exportJsonTitle": "JSON",
+  "exportJsonSubtitle": "Tutti i dati",
   "exportError": "Errore durante l'esportazione",
 
   "scrutinisedVotes": "Voti Scrutinati",
@@ -38,9 +38,9 @@
   "blankVotes": "Schede bianche",
   "spoiledVotes": "Schede nulle",
 
-  "editName": "Modifica Nome",
-  "candidateName": "Nome Candidato",
-  "previousResultLabel": "Risultato Precedente (%)",
+  "editName": "Modifica candidato",
+  "candidateName": "Nome",
+  "previousResultLabel": "Risultato precedente",
   "previousResultHint": "Es. 25.5",
   "cancel": "Annulla",
   "save": "Salva",
@@ -221,5 +221,11 @@
   "newFromCopyHint": "Stessi candidati e regole, nessuna scheda",
   "newFromList": "Da una lista salvata",
   "ballotBackToCount": "Torna allo scrutinio",
-  "ballotTileSemantics": "{name}, {votes, plural, =1{1 voto} other{{votes} voti}}"
+  "ballotTileSemantics": "{name}, {votes, plural, =1{1 voto} other{{votes} voti}}",
+  "exportSheetTitle": "Condividi «{title}»",
+  "exportDataLabel": "Solo i dati",
+  "candidateColor": "Colore",
+  "candidateColorOption": "Colore {n}",
+  "previousResultHelper": "Nelle righe compare di quanto è salito o sceso",
+  "previousResultHintNumber": "Es. {example}"
 }

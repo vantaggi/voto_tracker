@@ -50,9 +50,9 @@ void main() {
     expect(p.totalVotesAssigned, 2);
 
     // Il dialog che il 2026-11-11 mandava l'app in errore alla chiusura.
-    await tester.ensureVisible(find.byTooltip('Modifica Nome').first);
+    await tester.ensureVisible(find.byTooltip('Modifica candidato').first);
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Modifica Nome').first);
+    await tester.tap(find.byTooltip('Modifica candidato').first);
     await tester.pumpAndSettle();
     final field = find.byType(TextField).first;
     await tester.enterText(field, 'Rossi');

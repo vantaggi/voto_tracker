@@ -22,28 +22,28 @@ class AppLocalizationsIt extends AppLocalizations {
   String get projectorMode => 'Modalità Proiettore';
 
   @override
-  String get shareImageTitle => 'Condividi immagine social';
+  String get shareImageTitle => 'Immagine';
 
   @override
-  String get shareImageSubtitle => 'Ottimizzata per Instagram/WhatsApp';
+  String get shareImageSubtitle => 'Per WhatsApp e social';
 
   @override
-  String get exportPdfTitle => 'Esporta Report PDF';
+  String get exportPdfTitle => 'Report PDF';
 
   @override
-  String get exportPdfSubtitle => 'Documento ufficiale con grafici';
+  String get exportPdfSubtitle => 'Da stampare o archiviare';
 
   @override
-  String get exportCsvTitle => 'Esporta CSV';
+  String get exportCsvTitle => 'CSV';
 
   @override
-  String get exportCsvSubtitle => 'Tabella per fogli di calcolo';
+  String get exportCsvSubtitle => 'Per fogli di calcolo';
 
   @override
-  String get exportJsonTitle => 'Esporta JSON';
+  String get exportJsonTitle => 'JSON';
 
   @override
-  String get exportJsonSubtitle => 'Dati strutturati completi';
+  String get exportJsonSubtitle => 'Tutti i dati';
 
   @override
   String get exportError => 'Errore durante l\'esportazione';
@@ -93,13 +93,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get spoiledVotes => 'Schede nulle';
 
   @override
-  String get editName => 'Modifica Nome';
+  String get editName => 'Modifica candidato';
 
   @override
-  String get candidateName => 'Nome Candidato';
+  String get candidateName => 'Nome';
 
   @override
-  String get previousResultLabel => 'Risultato Precedente (%)';
+  String get previousResultLabel => 'Risultato precedente';
 
   @override
   String get previousResultHint => 'Es. 25.5';
@@ -637,5 +637,30 @@ class AppLocalizationsIt extends AppLocalizations {
       one: '1 voto',
     );
     return '$name, $_temp0';
+  }
+
+  @override
+  String exportSheetTitle(String title) {
+    return 'Condividi «$title»';
+  }
+
+  @override
+  String get exportDataLabel => 'Solo i dati';
+
+  @override
+  String get candidateColor => 'Colore';
+
+  @override
+  String candidateColorOption(int n) {
+    return 'Colore $n';
+  }
+
+  @override
+  String get previousResultHelper =>
+      'Nelle righe compare di quanto è salito o sceso';
+
+  @override
+  String previousResultHintNumber(String example) {
+    return 'Es. $example';
   }
 }

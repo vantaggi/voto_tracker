@@ -125,49 +125,49 @@ abstract class AppLocalizations {
   /// No description provided for @shareImageTitle.
   ///
   /// In en, this message translates to:
-  /// **'Share social image'**
+  /// **'Image'**
   String get shareImageTitle;
 
   /// No description provided for @shareImageSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Optimized for Instagram/WhatsApp'**
+  /// **'For WhatsApp and social media'**
   String get shareImageSubtitle;
 
   /// No description provided for @exportPdfTitle.
   ///
   /// In en, this message translates to:
-  /// **'Export PDF report'**
+  /// **'PDF report'**
   String get exportPdfTitle;
 
   /// No description provided for @exportPdfSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Official document with charts'**
+  /// **'To print or archive'**
   String get exportPdfSubtitle;
 
   /// No description provided for @exportCsvTitle.
   ///
   /// In en, this message translates to:
-  /// **'Export CSV'**
+  /// **'CSV'**
   String get exportCsvTitle;
 
   /// No description provided for @exportCsvSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Table for spreadsheets'**
+  /// **'For spreadsheets'**
   String get exportCsvSubtitle;
 
   /// No description provided for @exportJsonTitle.
   ///
   /// In en, this message translates to:
-  /// **'Export JSON'**
+  /// **'JSON'**
   String get exportJsonTitle;
 
   /// No description provided for @exportJsonSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Full structured data'**
+  /// **'All the data'**
   String get exportJsonSubtitle;
 
   /// No description provided for @exportError.
@@ -263,19 +263,19 @@ abstract class AppLocalizations {
   /// No description provided for @editName.
   ///
   /// In en, this message translates to:
-  /// **'Edit name'**
+  /// **'Edit candidate'**
   String get editName;
 
   /// No description provided for @candidateName.
   ///
   /// In en, this message translates to:
-  /// **'Candidate name'**
+  /// **'Name'**
   String get candidateName;
 
   /// No description provided for @previousResultLabel.
   ///
   /// In en, this message translates to:
-  /// **'Previous result (%)'**
+  /// **'Previous result'**
   String get previousResultLabel;
 
   /// No description provided for @previousResultHint.
@@ -1188,6 +1188,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{name}, {votes, plural, =1{1 vote} other{{votes} votes}}'**
   String ballotTileSemantics(String name, int votes);
+
+  /// No description provided for @exportSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share “{title}”'**
+  String exportSheetTitle(String title);
+
+  /// No description provided for @exportDataLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Data only'**
+  String get exportDataLabel;
+
+  /// No description provided for @candidateColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Colour'**
+  String get candidateColor;
+
+  /// No description provided for @candidateColorOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Colour {n}'**
+  String candidateColorOption(int n);
+
+  /// No description provided for @previousResultHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'The rows show how much it went up or down'**
+  String get previousResultHelper;
+
+  /// No description provided for @previousResultHintNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'E.g. {example}'**
+  String previousResultHintNumber(String example);
 }
 
 class _AppLocalizationsDelegate

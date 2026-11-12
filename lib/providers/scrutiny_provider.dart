@@ -634,6 +634,15 @@ class ScrutinyProvider extends ChangeNotifier {
     }
   }
 
+  /// Colore scelto per il candidato [index] (S6).
+  void setCandidateColor(int index, Color color) {
+    if (index >= 0 && index < _candidates.length) {
+      _candidates[index].color = color;
+      _scheduleSave();
+      notifyListeners();
+    }
+  }
+
   void setCandidatePreviousPercentage(int index, double? value) {
     if (index >= 0 && index < _candidates.length) {
       _candidates[index].previousPercentage = value;
