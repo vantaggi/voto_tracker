@@ -4,18 +4,23 @@ import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/services/data_export_service.dart';
 import 'package:voto_tracker/services/pdf_export_service.dart';
+import 'package:voto_tracker/services/pdf_palette.dart';
 import 'package:voto_tracker/services/social_share_service.dart';
 
 /// Unico punto che prepara lo stato corrente per gli export (PNG, PDF, CSV,
 /// JSON). I servizi girano fuori dall'albero dei widget: qui si risolvono una
 /// volta sola le stringhe localizzate e il vincitore da mostrare.
 class ExportController {
-  ExportController(this._provider, this._l10n)
-    : labels = ExportLabels.of(_l10n);
+  ExportController(this._provider, this._l10n, {PdfPalette? palette})
+    : labels = ExportLabels.of(_l10n),
+      palette = palette ?? PdfPalette.brand;
 
   final ScrutinyProvider _provider;
   final AppLocalizations _l10n;
   final ExportLabels labels;
+
+  /// Colori del PDF: lo schema chiaro dell'app (colore dinamico compreso).
+  final PdfPalette palette;
 
   /// Nome mostrato come vincitore: la label di pareggio in caso di parità.
   String? get winnerName => _provider.hasWinner
@@ -48,6 +53,8 @@ class ExportController {
     labels: labels,
     winner: winnerName,
     winnerLabel: winnerLabel,
+    status: _provider.winnerStatus,
+    palette: palette,
   );
 
   /// `false` se la condivisione è fallita.

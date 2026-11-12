@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/services/export_controller.dart';
+import 'package:voto_tracker/services/pdf_palette.dart';
+import 'package:voto_tracker/theme/app_theme.dart';
 
 /// Bottom sheet con le opzioni di esportazione e condivisione.
 Future<void> showExportSheet(BuildContext context) {
@@ -24,6 +26,9 @@ class _ExportSheet extends StatelessWidget {
       final controller = ExportController(
         context.read<ScrutinyProvider>(),
         l10n,
+        palette: PdfPalette.fromScheme(
+          context.read<AppThemes>().light.colorScheme,
+        ),
       );
       final messenger = ScaffoldMessenger.of(context);
       final errorMsg = l10n.exportError;
