@@ -17,15 +17,19 @@ Future<ScrutinyProvider> _freshProvider() async {
 
 /// Riduce lo scrutinio a `count` candidati "puri" (senza schede bianche/nulle)
 /// con un totale votanti noto: scenario controllato per i test sul vincitore.
-Future<ScrutinyProvider> _providerWith(
-    {required int candidates, required int voters}) async {
+Future<ScrutinyProvider> _providerWith({
+  required int candidates,
+  required int voters,
+}) async {
   final provider = await _freshProvider();
-  provider.updateSettings(Settings(
-    totalVoters: voters,
-    participantsCount: candidates,
-    showBlankVotes: false,
-    showNullVotes: false,
-  ));
+  provider.updateSettings(
+    Settings(
+      totalVoters: voters,
+      participantsCount: candidates,
+      showBlankVotes: false,
+      showNullVotes: false,
+    ),
+  );
   await Future<void>.delayed(Duration.zero);
   return provider;
 }
@@ -42,10 +46,11 @@ void main() {
 
     test('round-trip JSON', () {
       final s = Settings(
-          totalVoters: 250,
-          participantsCount: 5,
-          showBlankVotes: false,
-          showNullVotes: true);
+        totalVoters: 250,
+        participantsCount: 5,
+        showBlankVotes: false,
+        showNullVotes: true,
+      );
       final r = Settings.fromJson(s.toJson());
       expect(r.totalVoters, 250);
       expect(r.participantsCount, 5);
@@ -58,8 +63,8 @@ void main() {
     test('default: 4 candidati + bianche + nulle, nessun vincitore', () async {
       final p = await _freshProvider();
       expect(p.candidates.length, 6); // 4 + bianche + nulle
-      expect(p.winner, isNull);
-      expect(p.winnerLabel, isNull);
+      expect(p.winnerStatus, WinnerStatus.none);
+      expect(p.winnerName, isNull);
       expect(p.totalVotesAssigned, 0);
       expect(p.remainingVotes, 100);
       expect(p.canUndo, isFalse);
@@ -162,8 +167,8 @@ void main() {
       }
       p.vote(1);
       // gap 5 > remaining 3 -> vincitore deciso prima della fine
-      expect(p.winner, '${AppStrings.candidatePrefix} 1');
-      expect(p.winnerLabel, AppStrings.winnerMathematical);
+      expect(p.winnerName, '${AppStrings.candidatePrefix} 1');
+      expect(p.winnerStatus, WinnerStatus.mathematical);
     });
 
     test('pareggio a scrutinio chiuso', () async {
@@ -173,8 +178,8 @@ void main() {
       p.vote(1);
       p.vote(1);
       expect(p.remainingVotes, 0);
-      expect(p.winner, AppStrings.tie);
-      expect(p.winnerLabel, AppStrings.finalResult);
+      expect(p.winnerStatus, WinnerStatus.tie);
+      expect(p.winnerName, isNull);
     });
 
     test('eletto a scrutinio chiuso', () async {
@@ -183,30 +188,34 @@ void main() {
       p.vote(0);
       p.vote(1);
       expect(p.remainingVotes, 0);
-      expect(p.winner, '${AppStrings.candidatePrefix} 1');
-      expect(p.winnerLabel, AppStrings.winnerElected);
+      expect(p.winnerName, '${AppStrings.candidatePrefix} 1');
+      expect(p.winnerStatus, WinnerStatus.elected);
     });
 
-    test('winnerStatus e isTie riflettono lo stato (enum, non stringhe)',
-        () async {
-      final p = await _providerWith(candidates: 2, voters: 10);
-      expect(p.winnerStatus, WinnerStatus.none);
-      for (var i = 0; i < 6; i++) {
-        p.vote(0);
-      }
-      p.vote(1);
-      expect(p.winnerStatus, WinnerStatus.mathematical);
-      expect(p.hasWinner, isTrue);
-      expect(p.isTie, isFalse);
-      expect(p.winnerName, '${AppStrings.candidatePrefix} 1');
-    });
+    test(
+      'winnerStatus e isTie riflettono lo stato (enum, non stringhe)',
+      () async {
+        final p = await _providerWith(candidates: 2, voters: 10);
+        expect(p.winnerStatus, WinnerStatus.none);
+        for (var i = 0; i < 6; i++) {
+          p.vote(0);
+        }
+        p.vote(1);
+        expect(p.winnerStatus, WinnerStatus.mathematical);
+        expect(p.hasWinner, isTrue);
+        expect(p.isTie, isFalse);
+        expect(p.winnerName, '${AppStrings.candidatePrefix} 1');
+      },
+    );
   });
 
   group('ScrutinyProvider — tipi candidato', () {
     test('default: 4 normali + 1 bianca + 1 nulla', () async {
       final p = await _freshProvider();
       expect(
-          p.candidates.where((c) => c.type == CandidateType.normal).length, 4);
+        p.candidates.where((c) => c.type == CandidateType.normal).length,
+        4,
+      );
       expect(p.candidates.any((c) => c.type == CandidateType.blank), isTrue);
       expect(p.candidates.any((c) => c.type == CandidateType.spoiled), isTrue);
     });

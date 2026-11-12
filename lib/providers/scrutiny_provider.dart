@@ -47,40 +47,6 @@ class ScrutinyProvider extends ChangeNotifier {
   bool get isInconclusive => _winnerStatus.isInconclusive;
   String? get winnerName => _winnerName;
 
-  // Stringa di visualizzazione retro-compatibile: nome del vincitore, oppure
-  // l'etichetta di pareggio in caso di parità.
-  String? get winner {
-    switch (_winnerStatus) {
-      case WinnerStatus.none:
-      case WinnerStatus.noMajority:
-      case WinnerStatus.noQuorum:
-        return null;
-      case WinnerStatus.tie:
-        return AppStrings.tie;
-      case WinnerStatus.elected:
-      case WinnerStatus.mathematical:
-        return _winnerName;
-    }
-  }
-
-  // Etichetta coerente dello stato del vincitore (usata da UI, PDF e share).
-  // Il vincitore è dichiarato per vantaggio matematicamente incolmabile, non per
-  // maggioranza assoluta: l'etichetta riflette questa distinzione.
-  String? get winnerLabel {
-    switch (_winnerStatus) {
-      case WinnerStatus.none:
-        return null;
-      case WinnerStatus.tie:
-      case WinnerStatus.noMajority:
-      case WinnerStatus.noQuorum:
-        return AppStrings.finalResult;
-      case WinnerStatus.elected:
-        return AppStrings.winnerElected;
-      case WinnerStatus.mathematical:
-        return AppStrings.winnerMathematical;
-    }
-  }
-
   /// Magic number: voti che mancano al primo per un vantaggio incolmabile
   /// sul secondo (vedi [ScrutinyEngine.evaluate]).
   int? get votesUntilMajority => _votesToWin;
@@ -556,7 +522,7 @@ class ScrutinyProvider extends ChangeNotifier {
       'stats': {
         'totalVotes': _totalVotesAssigned,
         'totalVoters': _settings.totalVoters,
-        'winner': winner,
+        'winner': _winnerName,
         'winnerStatus': _winnerStatus.name,
       },
     };

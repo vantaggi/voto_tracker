@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:voto_tracker/l10n/app_localizations.dart';
 import 'package:voto_tracker/l10n/l10n_delegates.dart';
+import 'package:voto_tracker/l10n/l10n_ext.dart';
 import 'package:voto_tracker/providers/locale_provider.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
 
@@ -113,4 +114,26 @@ void main() {
       expect(find.text('Candidate 3'), findsOneWidget);
     });
   });
+
+  // P5: ogni esito ha la sua etichetta in tutte le lingue, senza stringhe
+  // fisse nel provider.
+  for (final code in ['it', 'en']) {
+    test('etichette di ogni esito in $code', () {
+      final l10n = lookupAppLocalizations(Locale(code));
+      for (final status in WinnerStatus.values) {
+        final label = localizedWinnerLabel(l10n, status);
+        final headline = localizedOutcomeHeadline(l10n, status, 'Rossi');
+        if (status == WinnerStatus.none) {
+          expect(label, isNull);
+        } else {
+          expect(label, isNotEmpty, reason: '$status');
+          expect(headline, isNotEmpty, reason: '$status');
+        }
+      }
+      expect(
+        localizedOutcomeHeadline(l10n, WinnerStatus.elected, 'Rossi'),
+        'Rossi',
+      );
+    });
+  }
 }

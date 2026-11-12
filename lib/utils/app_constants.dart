@@ -11,13 +11,6 @@ class AppStrings {
   static const String blankVotes = 'Schede Bianche';
   static const String nullVotes = 'Schede Nulle';
 
-  // Etichette IT dello stato del vincitore (usate dai getter retro-compatibili
-  // del provider `winner`/`winnerLabel` e dai test; la UI usa `context.l10n`).
-  static const String tie = 'Pareggio';
-  static const String winnerElected = 'ELETTO';
-  static const String winnerMathematical = 'VITTORIA MATEMATICA';
-  static const String finalResult = 'RISULTATO FINALE';
-
   // Numeri
   static const int minParticipants = 2;
   static const int maxParticipants = 8;
