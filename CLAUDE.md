@@ -38,3 +38,6 @@ Nel cloud Flutter non è preinstallato: scarica lo stable da
   Mai disinstallare la release dal telefono per provare: si perdono gli scrutini salvati.
 - `android/gradle.properties` ha `kotlin.incremental=false`: serve con il progetto su D: e la
   pub cache su C: (Windows).
+- Chiave di firma della release: non è nel repo. Sta in OneDrive di Cioti
+  (`Documenti\Key-ANDROID\VotoTracker\`), vedi "Chiave di firma" in `PLAY_STORE_LISTING.md`.
+  Mai generarne una nuova né stampare le password di `key.properties`.
