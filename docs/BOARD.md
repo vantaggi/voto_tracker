@@ -6,7 +6,7 @@ l'unico posto dove vive lo stato dei task.
 
 ## 🚀 Stato Corrente: v2.0.0 (in preparazione)
 
-**Branch attivo:** claude/release-2-0-0 (versione 2.0.0; PR #3 unita il 2026-11-12) · **Ultimo aggiornamento:** 2026-11-12
+**Branch attivo:** claude/project-thread-0j7sox (versione 2.0.0; PR #3 unita il 2026-11-12) · **Ultimo aggiornamento:** 2026-11-12
 
 L'app è funzionante e pubblicabile. Backlog Wave 1/1.1/2 completato: kit
 documentale, audit & bugfix, test, redo, performance e i18n IT/EN.
