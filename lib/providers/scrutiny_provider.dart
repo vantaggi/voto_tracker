@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:voto_tracker/data/scrutiny_repository.dart';
 import 'package:voto_tracker/domain/scrutiny_engine.dart';
@@ -150,10 +152,57 @@ class ScrutinyProvider extends ChangeNotifier {
     _recalculateState();
   }
 
+  // --- Salvataggio (P3) -------------------------------------------------------
+
+  /// Ritardo con cui si raggruppano i salvataggi dei voti: una raffica di
+  /// tocchi produce una sola scrittura dell'archivio.
+  static const Duration saveDelay = Duration(milliseconds: 300);
+  Timer? _saveTimer;
+  bool _disposed = false;
+
+  /// C'è un salvataggio in attesa del timer.
+  bool get hasPendingSave => _saveTimer?.isActive ?? false;
+
+  /// Pianifica un salvataggio raggruppato (voti, annulla, rinomina…).
+  void _scheduleSave() {
+    _saveTimer?.cancel();
+    _saveTimer = Timer(saveDelay, () {
+      _saveTimer = null;
+      _persistState();
+    });
+  }
+
+  /// Salva subito se c'è un salvataggio in attesa. Chiamato quando l'app va
+  /// in background o viene chiusa, e prima di ogni azione sull'archivio.
+  Future<void> flushPendingSave() async {
+    if (!hasPendingSave) return;
+    _saveTimer!.cancel();
+    _saveTimer = null;
+    await _persistState();
+  }
+
+  @override
+  void dispose() {
+    if (hasPendingSave) {
+      _saveTimer!.cancel();
+      _saveTimer = null;
+      _persistState(); // ultima scrittura, senza attendere
+    }
+    _disposed = true;
+    super.dispose();
+  }
+
+  @override
+  void notifyListeners() {
+    if (!_disposed) super.notifyListeners();
+  }
+
   Future<void> _persistState() async {
     final archive = _archive;
     final repository = _repository;
     if (archive == null || repository == null) return; // ancora in caricamento
+    _saveTimer?.cancel();
+    _saveTimer = null;
     final current = archive.current;
     current
       ..settings = _settings
@@ -293,7 +342,7 @@ class ScrutinyProvider extends ChangeNotifier {
     // Aggiornamento incrementale: ogni voto cambia un solo candidato di ±1,
     // quindi non serve rigiocare l'intero log (vedi PERF-001).
     _calculateResults();
-    _persistState();
+    _scheduleSave();
     notifyListeners();
   }
 
@@ -306,7 +355,7 @@ class ScrutinyProvider extends ChangeNotifier {
       _candidates[removed].votes--;
     }
     _calculateResults();
-    _persistState();
+    _scheduleSave();
     notifyListeners();
   }
 
@@ -319,7 +368,7 @@ class ScrutinyProvider extends ChangeNotifier {
       _candidates[restored].votes++;
     }
     _calculateResults();
-    _persistState();
+    _scheduleSave();
     notifyListeners();
   }
 
@@ -328,7 +377,7 @@ class ScrutinyProvider extends ChangeNotifier {
     _voteLog.clear();
     _redoStack.clear();
     _recalculateState();
-    _persistState();
+    _scheduleSave();
     notifyListeners();
   }
 
@@ -358,7 +407,7 @@ class ScrutinyProvider extends ChangeNotifier {
     _voteLog.clear();
     _redoStack.clear();
     _recalculateState();
-    _persistState();
+    _scheduleSave();
     notifyListeners();
   }
 
@@ -380,7 +429,7 @@ class ScrutinyProvider extends ChangeNotifier {
       reset();
     } else {
       _calculateResults();
-      _persistState();
+      _scheduleSave();
       notifyListeners();
     }
   }
@@ -389,7 +438,7 @@ class ScrutinyProvider extends ChangeNotifier {
     if (index >= 0 && index < _candidates.length) {
       _candidates[index].name = newName;
       // History is based on index, so renaming is fine, no log rewriting needed
-      _persistState();
+      _scheduleSave();
       notifyListeners();
     }
   }
@@ -397,7 +446,7 @@ class ScrutinyProvider extends ChangeNotifier {
   void setCandidatePreviousPercentage(int index, double? value) {
     if (index >= 0 && index < _candidates.length) {
       _candidates[index].previousPercentage = value;
-      _persistState();
+      _scheduleSave();
       notifyListeners();
     }
   }

@@ -152,7 +152,7 @@ void main() {
     p.vote(1);
     await p.newScrutiny();
     p.vote(0);
-    await Future<void>.delayed(Duration.zero);
+    await p.flushPendingSave();
 
     final again = ScrutinyProvider();
     await Future<void>.delayed(Duration.zero);

@@ -1,6 +1,8 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:provider/provider.dart';
 import 'package:voto_tracker/l10n/app_localizations.dart';
 import 'package:voto_tracker/l10n/l10n_ext.dart';
+import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/screens/archive_page.dart';
 import 'package:voto_tracker/screens/home_page.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
@@ -15,8 +17,33 @@ class AppShell extends StatefulWidget {
   State<AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends State<AppShell> {
+class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   int _index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// I voti si salvano a gruppi (P3): quando l'app esce dal primo piano si
+  /// scrive subito quello che è in attesa, così Android può chiuderla senza
+  /// perdere l'ultima scheda.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.detached) {
+      context.read<ScrutinyProvider>().flushPendingSave();
+    }
+  }
 
   // Chiave globale: passando da NavigationBar a NavigationRail (rotazione,
   // finestra ridimensionata) le pagine conservano il loro stato.
