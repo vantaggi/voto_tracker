@@ -37,20 +37,20 @@ lib/
 │
 ├── screens/
 │   ├── app_shell.dart                 # Navigazione Scrutinio / Archivio (NavigationBar o NavigationRail)
-│   ├── home_page.dart                 # Schermata principale (grafici + controlli, responsive)
+│   ├── home_page.dart                 # Home: riepilogo, righe, altre schede, grafici, pillola; due colonne da 840 dp
+│   ├── home_actions.dart              # Azioni della Home (impostazioni, lettura schede, proiettore, azzera con conferma)
 │   ├── archive_page.dart              # Archivio: nuovo (anche da lista), duplica, riapri, rinomina, elimina, esporta/importa; due colonne sui tablet
 │   ├── ballot_reading_screen.dart     # Lettura schede: una scheda alla volta
 │   ├── projector_mode_screen.dart     # Modalità proiettore fullscreen (una riga parlata per candidato)
 │   └── settings_dialog.dart           # Dialog di configurazione scrutinio
 │
 ├── widgets/
-│   ├── candidate_card.dart            # Card singolo candidato: voto +/-, %, swing, stato
-│   ├── candidates_section.dart        # Lista delle candidate card (+ StatsHeader e ControlButtons)
-│   ├── stats_header.dart              # Statistiche e confronto fra i primi due
-│   ├── control_buttons.dart           # Undo / redo e reset a pressione prolungata
-│   ├── charts_section.dart            # Tab Corrente / Storico / Percentuali
+│   ├── vote_summary_card.dart         # Riepilogo: barra impilata, schede, chi è in testa, esito
+│   ├── candidate_row.dart             # Righe dei candidati e "Altre schede" (bianche, nulle)
+│   ├── edit_candidate_dialog.dart     # Dialog "Modifica nome" (nome e risultato precedente)
+│   ├── undo_pill.dart                 # Pillola Annulla / Ripeti con il nome dell'ultimo voto
+│   ├── charts_card.dart               # Card apribile Storico / Percentuali
 │   ├── charts/                        # Un file per grafico (fl_chart)
-│   │   ├── current_results_chart.dart
 │   │   ├── history_chart.dart
 │   │   └── percentage_chart.dart
 │   ├── export_sheet.dart              # Bottom sheet delle esportazioni

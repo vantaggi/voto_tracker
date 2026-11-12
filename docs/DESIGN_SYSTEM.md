@@ -67,9 +67,23 @@ restano in `AppDimensions`.
 
 Già tematizzati centralmente — **non** ridefinirli inline nei widget: AppBar
 (piatta, centrata, senza tint), Card (bordo `outlineVariant`, elevation 0),
-Dialog, bottoni (Elevated/Filled/Text/Outlined/Icon), input (filled, senza
+Dialog, bottoni (Elevated/Filled/Text/Outlined), input (filled, senza
 bordo a riposo, bordo `primary` al focus), FAB, Slider, Switch, Divider,
 SnackBar (floating, `inverseSurface`).
+
+## 5.1 Home (ridisegno R1-R7)
+
+- Righe di conteggio: 84 dp di altezza minima (64 per bianche e nulle),
+  pallino del candidato da 40 dp con la posizione, + pieno da 56 dp
+  (`IconButton.filled`), − standard con area da 48 dp, voti in cifre
+  tabellari in un riquadro da 48 dp.
+- Il + è l'unico elemento pieno della riga; bianche e nulle usano il +
+  tonale. L'ordine delle righe non cambia mai: la classifica sta nel pallino.
+- Riepilogo su `surfaceContainerHigh`; esito su `primaryContainer`
+  (`tertiaryContainer` se senza vincitore) con tutto il testo `on*Container`.
+- Pillola Annulla su `inverseSurface`, a forma di stadio, alta 56 dp.
+- Niente `iconButtonTheme` con `foregroundColor`: renderebbe grigia l'icona
+  delle IconButton piene.
 
 ## 6. Regole pratiche
 

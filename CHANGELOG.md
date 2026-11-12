@@ -35,6 +35,14 @@ Le sezioni sono generate dai commit convenzionali (vedi
   ballottaggio e quorum non raggiunto con colori neutri.
 
 ### 🎨 Interfaccia & Design
+- **Home ridisegnata:** tutti i + nella prima schermata (righe da 84 dp al
+  posto delle card), riepilogo in cima con chi è in testa e quanti voti
+  mancano, pillola "Annulla Rossi" sempre a portata, grafici Storico e
+  Percentuali in una card apribile (il grafico "Corrente" non c'è più), titolo
+  dello scrutinio nella barra in alto. Proiettore, impostazioni e "Azzera
+  scrutinio" (ora con conferma) sono nel menu ⋮. Sul tablet lista, riepilogo
+  e grafico stanno insieme.
+- Percentuali con la virgola decimale in italiano.
 - Palette dei candidati ridisegnata (HCT) per essere leggibile in light e dark;
   le schede nulle non sono più nere (invisibili nel tema scuro).
 - Spaziature, raggi e testi solo da token e `textTheme`; aree di tocco ≥ 48 dp.
