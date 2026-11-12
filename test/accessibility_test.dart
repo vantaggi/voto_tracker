@@ -7,6 +7,8 @@ import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/screens/home_page.dart';
 import 'package:voto_tracker/services/wakelock_service.dart';
 
+import 'home_test_utils.dart';
+
 /// UI-004: testo grande (textScaler 2.0) senza overflow ed etichette parlate
 /// per voti e pulsanti.
 void main() {
@@ -57,19 +59,28 @@ void main() {
       find.bySemanticsLabel(RegExp(r'^Togli un voto a .+')),
       findsNWidgets(cards),
     );
-    // Il pulsante è in fondo alla lista: portalo in vista.
-    await tester.ensureVisible(find.text('TIENI PREMUTO PER RESETTARE'));
-    await tester.pumpAndSettle();
-    expect(
-      tester.getSemantics(find.bySemanticsLabel('TIENI PREMUTO PER RESETTARE')),
-      matchesSemantics(
-        label: 'TIENI PREMUTO PER RESETTARE',
-        hint: 'Tieni premuto per azzerare lo scrutinio',
-        isButton: true,
-        hasLongPressAction: true,
-      ),
-    );
     handle.dispose();
+  });
+
+  testWidgets('Azzera scrutinio: dal menu, solo dopo la conferma', (
+    tester,
+  ) async {
+    final provider = await pumpHome(tester, const Size(420, 900));
+    provider.vote(0);
+    provider.vote(1);
+    await tester.pumpAndSettle();
+
+    await tapHomeMenuItem(tester, Icons.restart_alt);
+    expect(find.text('Azzerare lo scrutinio?'), findsOneWidget);
+    await tester.tap(find.text('Annulla'));
+    await tester.pumpAndSettle();
+    expect(provider.totalVotesAssigned, 2);
+
+    await tapHomeMenuItem(tester, Icons.restart_alt);
+    await tester.tap(find.widgetWithText(FilledButton, 'Azzera'));
+    await tester.pumpAndSettle();
+    expect(provider.totalVotesAssigned, 0);
+    expect(provider.canUndo, isFalse);
   });
 
   group('proiettore (P9)', () {
@@ -87,8 +98,7 @@ void main() {
         p.vote(i);
       }
       await tester.pumpAndSettle();
-      await tester.tap(find.byTooltip('Modalità Proiettore'));
-      await tester.pumpAndSettle();
+      await openHomeProjector(tester);
       return p;
     }
 

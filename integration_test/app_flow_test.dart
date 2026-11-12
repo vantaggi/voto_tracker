@@ -9,6 +9,8 @@ import 'package:voto_tracker/screens/home_page.dart';
 import 'package:voto_tracker/screens/projector_mode_screen.dart';
 import 'package:voto_tracker/services/wakelock_service.dart';
 
+import '../test/home_test_utils.dart';
+
 /// P11: flusso completo sul dispositivo vero.
 ///
 /// Si lancia dal PC col telefono collegato, sulla build di debug:
@@ -91,8 +93,7 @@ void main() {
     p.vote(0);
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip('Modalità Proiettore'));
-    await tester.pumpAndSettle();
+    await openHomeProjector(tester);
     expect(tester.takeException(), isNull);
     Navigator.of(tester.element(find.byType(ProjectorModeScreen))).pop();
     await tester.pumpAndSettle();

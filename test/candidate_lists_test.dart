@@ -6,6 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:voto_tracker/data/templates_repository.dart';
 import 'package:voto_tracker/main.dart';
+
+import 'home_test_utils.dart';
+
 import 'package:voto_tracker/models/candidate.dart';
 import 'package:voto_tracker/models/settings.dart';
 import 'package:voto_tracker/providers/scrutiny_provider.dart';
@@ -128,8 +131,7 @@ void main() {
       p.renameCandidate(0, 'Rossi');
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.settings));
-      await tester.pumpAndSettle();
+      await openHomeSettings(tester);
       await tester.scrollUntilVisible(
         find.text('Salva i candidati come lista'),
         200,
