@@ -81,7 +81,7 @@ SnackBar (floating, `inverseSurface`).
   tonale. L'ordine delle righe non cambia mai: la classifica sta nel pallino.
 - Riepilogo su `surfaceContainerHigh`; esito su `primaryContainer`
   (`tertiaryContainer` se senza vincitore) con tutto il testo `on*Container`.
-- Pillola Annulla su `inverseSurface`, a forma di stadio, alta 56 dp.
+- Barra Annulla fissa in fondo al conteggio su `surfaceContainer` (come la barra di navigazione), alta 48 dp, sempre presente; Annulla e Ripeti a sinistra, lontani dai +.
 - Niente `iconButtonTheme` con `foregroundColor`: renderebbe grigia l'icona
   delle IconButton piene.
 

@@ -50,7 +50,13 @@ void main() {
     final p = await openDialog(tester);
     final before = p.candidates[0].name;
     await tester.enterText(find.byType(TextField).first, 'Non salvare');
-    await tester.tap(find.text('Annulla'));
+    // Quello del dialogo: anche la barra Annulla della Home dice "Annulla".
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text('Annulla'),
+      ),
+    );
     for (var i = 0; i < 20; i++) {
       await tester.pump(const Duration(milliseconds: 16));
     }

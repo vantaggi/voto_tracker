@@ -9,7 +9,7 @@ import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/theme/candidate_palette.dart';
 import 'package:voto_tracker/utils/app_constants.dart';
 import 'package:voto_tracker/widgets/keep_screen_on.dart';
-import 'package:voto_tracker/widgets/undo_pill.dart';
+import 'package:voto_tracker/widgets/undo_bar.dart';
 import 'package:voto_tracker/widgets/vote_stacked_bar.dart';
 
 /// Altezza minima e massima di una tessera candidato.
@@ -27,7 +27,7 @@ const Duration _flashDuration = Duration(milliseconds: 180);
 
 /// Modalità "lettura scheda" (FEAT-006, ridisegno S4): una tessera grande per
 /// candidato che riempie lo schermo, bianche e nulle più piccole in fondo,
-/// pillola Annulla con il nome dell'ultima scheda. Pensata per chi legge le
+/// barra Annulla con il nome dell'ultima scheda. Pensata per chi legge le
 /// schede ad alta voce e registra con una mano sola.
 class BallotReadingScreen extends StatefulWidget {
   const BallotReadingScreen({super.key});
@@ -105,9 +105,9 @@ class _BallotReadingScreenState extends State<BallotReadingScreen> {
         ),
         body: SafeArea(
           top: false,
-          child: Stack(
+          child: Column(
             children: [
-              Positioned.fill(
+              Expanded(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(
                     AppSpacing.l,
@@ -172,17 +172,12 @@ class _BallotReadingScreenState extends State<BallotReadingScreen> {
                           ],
                         ),
                       ],
-                      const SizedBox(height: UndoPill.clearance),
+                      const SizedBox(height: AppSpacing.l),
                     ],
                   ),
                 ),
               ),
-              const Positioned(
-                left: AppSpacing.l,
-                right: AppSpacing.l,
-                bottom: AppSpacing.l,
-                child: Center(child: UndoPill()),
-              ),
+              const UndoBar(),
             ],
           ),
         ),
