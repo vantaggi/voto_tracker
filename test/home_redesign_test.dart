@@ -44,6 +44,21 @@ void main() {
     expect(find.text('Condividi'), findsOneWidget);
   });
 
+  testWidgets('riepilogo: pareggio in testa con un voto a testa', (
+    tester,
+  ) async {
+    final p = await pumpHome(tester, const Size(412, 915));
+    p.renameCandidate(0, 'Rossi');
+    p.vote(0);
+    p.vote(1);
+    await tester.pumpAndSettle();
+    expect(find.text('Pareggio in testa'), findsOneWidget);
+    expect(find.textContaining('In testa Rossi'), findsNothing);
+    p.vote(1);
+    await tester.pumpAndSettle();
+    expect(find.text('In testa Candidato 2'), findsOneWidget);
+  });
+
   testWidgets('al primo voto i + non si spostano (FIX-014)', (tester) async {
     await pumpHome(tester, const Size(412, 915));
     final plus = find.byIcon(Icons.add).first;
