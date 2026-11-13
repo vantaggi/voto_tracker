@@ -16,7 +16,7 @@
   "exportJsonSubtitle": "Tutti i dati",
   "exportError": "Errore durante l'esportazione",
 
-  "votesToWin": "Mancano {count} voti per la vittoria",
+  "votesToWin": "{count, plural, =1{Manca 1 voto per la vittoria} other{Mancano {count} voti per la vittoria}}",
   "@votesToWin": {
     "placeholders": {
       "count": { "type": "int" }
@@ -132,7 +132,7 @@
   "summaryLeadingTie": "Pareggio in testa",
   "summaryEmptyTitle": "Nessuna scheda ancora",
   "summaryEmptyHint": "Tocca + per contare la prima scheda.",
-  "shareResults": "Condividi i risultati",
+  "shareResults": "Condividi",
   "otherBallots": "Altre schede",
   "candidateRowSemantics": "{name}: {votes} voti, {percent}",
   "@candidateRowSemantics": {"placeholders": {"name": {"type": "String"}, "votes": {"type": "int"}, "percent": {"type": "String"}}},

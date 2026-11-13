@@ -9,14 +9,15 @@ import 'package:voto_tracker/widgets/vote_stacked_bar.dart';
 
 const _tabular = [FontFeature.tabularFigures()];
 
-/// Riepilogo in cima alla Home (R2): barra con i colori dei candidati,
-/// schede contate e rimanenti, chi è in testa.
+/// Riepilogo in cima alla Home (R2): chi è in testa (o l'esito), barra con i
+/// colori dei candidati, schede contate e rimanenti.
 ///
 /// Stati: nessuna scheda, in corso, esito (eletto, vittoria matematica,
-/// pareggio, ballottaggio, quorum non raggiunto). Senza schede la card ha la
-/// stessa forma di quella in corso, con "Tocca + per contare" al posto di chi
-/// è in testa: al primo voto l'altezza non cambia e la lista sotto non sale,
-/// così il + resta sotto il dito (FIX-014).
+/// pareggio, ballottaggio, quorum non raggiunto). Tutti hanno la stessa
+/// struttura e la stessa altezza: due righe di testo da una riga ciascuna, la
+/// barra e la riga dei numeri, dove a scrutinio completo "Condividi" prende il
+/// posto delle schede rimanenti. Così la lista sotto non si sposta mai mentre
+/// si vota e il + resta sotto il dito (FIX-014, FIX-015).
 class VoteSummaryCard extends StatelessWidget {
   const VoteSummaryCard({super.key});
 
@@ -51,6 +52,17 @@ class _CountingSummary extends StatelessWidget {
     final secondary = outcome ? onBackground : cs.onSurfaceVariant;
     final completed = provider.remainingVotes <= 0;
 
+    final big = tt.headlineSmall?.copyWith(
+      color: onBackground,
+      fontWeight: FontWeight.bold,
+    );
+    final small = outcome
+        ? tt.labelLarge?.copyWith(color: onBackground, letterSpacing: 1.2)
+        : tt.bodyMedium?.copyWith(color: secondary);
+    final (:headline, :detail) = _texts(context);
+    final headlineText = _OneLine(headline, style: big);
+    final detailText = _OneLine(detail, style: small);
+
     return Card.filled(
       color: background,
       child: Padding(
@@ -60,81 +72,85 @@ class _CountingSummary extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // L'esito ha l'etichetta sopra ("ELETTO" e il nome); durante lo
+              // scrutinio la riga grande è chi è in testa e sotto quanto manca.
               if (outcome) ...[
-                Text(
-                  localizedWinnerLabel(l10n, provider.winnerStatus) ?? '',
-                  style: tt.labelLarge?.copyWith(
-                    color: onBackground,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-                Text(
-                  localizedOutcomeHeadline(
-                    l10n,
-                    provider.winnerStatus,
-                    provider.winnerName,
-                  ),
-                  style: tt.headlineMedium?.copyWith(
-                    color: onBackground,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.m),
+                detailText,
+                headlineText,
+              ] else ...[
+                headlineText,
+                detailText,
               ],
-              _StackedBar(provider: provider),
               const SizedBox(height: AppSpacing.m),
-              SizedBox(
-                width: double.infinity,
-                child: Wrap(
-                  alignment: WrapAlignment.spaceBetween,
-                  crossAxisAlignment: WrapCrossAlignment.end,
-                  spacing: AppSpacing.l,
-                  children: [
-                    Text.rich(
-                      TextSpan(
-                        children: [
+              _StackedBar(provider: provider),
+              const SizedBox(height: AppSpacing.s),
+              ConstrainedBox(
+                constraints: const BoxConstraints(
+                  minHeight: AppDimensions.summaryNumbersRow,
+                ),
+                // Una riga sola anche col testo grande: se andasse a capo il
+                // riepilogo cambierebbe altezza a ogni voto.
+                child: LayoutBuilder(
+                  builder: (context, constraints) => Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Text.rich(
                           TextSpan(
-                            text: '${provider.totalVotesAssigned} ',
-                            style: tt.headlineSmall?.copyWith(
-                              color: onBackground,
-                              fontWeight: FontWeight.bold,
-                              fontFeatures: _tabular,
-                            ),
+                            children: [
+                              TextSpan(
+                                text: '${provider.totalVotesAssigned} ',
+                                style: tt.headlineSmall?.copyWith(
+                                  color: onBackground,
+                                  fontWeight: FontWeight.bold,
+                                  fontFeatures: _tabular,
+                                ),
+                              ),
+                              TextSpan(
+                                text: l10n.summaryOfTotal(
+                                  provider.settings.totalVoters,
+                                ),
+                                style: tt.bodyLarge?.copyWith(color: secondary),
+                              ),
+                            ],
                           ),
-                          TextSpan(
-                            text: l10n.summaryOfTotal(
-                              provider.settings.totalVoters,
-                            ),
-                            style: tt.bodyLarge?.copyWith(color: secondary),
-                          ),
-                        ],
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                    ),
-                    Text(
-                      completed
-                          ? l10n.summaryCompleted
-                          : l10n.summaryRemaining(provider.remainingVotes),
-                      style: tt.bodyLarge?.copyWith(
-                        color: secondary,
-                        fontFeatures: _tabular,
+                      const SizedBox(width: AppSpacing.s),
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: constraints.maxWidth * 0.55,
+                        ),
+                        child: completed
+                            ? FilledButton.icon(
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: cs.surface,
+                                  foregroundColor: cs.primary,
+                                ),
+                                onPressed: () => showExportSheet(context),
+                                icon: const Icon(Icons.ios_share),
+                                label: Text(
+                                  l10n.shareResults,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              )
+                            : Text(
+                                l10n.summaryRemaining(provider.remainingVotes),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: tt.bodyLarge?.copyWith(
+                                  color: secondary,
+                                  fontFeatures: _tabular,
+                                ),
+                              ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-              if (!outcome) ..._leader(context),
-              if (completed) ...[
-                const SizedBox(height: AppSpacing.l),
-                FilledButton.icon(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: cs.surface,
-                    foregroundColor: cs.primary,
-                  ),
-                  onPressed: () => showExportSheet(context),
-                  icon: const Icon(Icons.ios_share),
-                  label: Text(l10n.shareResults),
-                ),
-              ],
             ],
           ),
         ),
@@ -142,76 +158,53 @@ class _CountingSummary extends StatelessWidget {
     );
   }
 
-  /// "In testa X" (o "Pareggio in testa") e i voti che mancano alla
-  /// vittoria; senza schede, "Tocca + per contare".
-  List<Widget> _leader(BuildContext context) {
+  /// Riga grande e riga piccola del riepilogo, secondo lo stato.
+  ({String headline, String detail}) _texts(BuildContext context) {
     final l10n = context.l10n;
+    if (provider.hasWinner) {
+      return (
+        headline: localizedOutcomeHeadline(
+          l10n,
+          provider.winnerStatus,
+          provider.winnerName,
+        ),
+        detail: localizedWinnerLabel(l10n, provider.winnerStatus) ?? '',
+      );
+    }
     final leaders = [
       for (final c in provider.candidates)
         if (!c.isTechnical && c.rank == 1 && c.votes > 0) c,
     ];
     if (leaders.isEmpty) {
-      return [
-        const SizedBox(height: AppSpacing.s),
-        _InfoLine(icon: Icons.touch_app_outlined, text: l10n.summaryEmptyHint),
-      ];
+      return (headline: l10n.summaryEmptyTitle, detail: l10n.summaryEmptyHint);
     }
     final toWin = provider.votesUntilMajority;
-    return [
-      const SizedBox(height: AppSpacing.s),
-      _InfoLine(
-        icon: Icons.emoji_events_outlined,
-        text: [
-          leaders.length == 1
-              ? l10n.summaryLeading(leaders.first.name)
-              : l10n.summaryLeadingTie,
-          if (toWin != null && toWin > 0) l10n.votesToWin(toWin),
-        ].join(' · '),
-      ),
-    ];
+    return (
+      headline: leaders.length == 1
+          ? l10n.summaryLeading(leaders.first.name)
+          : l10n.summaryLeadingTie,
+      detail: toWin != null && toWin > 0 ? l10n.votesToWin(toWin) : '',
+    );
   }
 }
 
-/// Riga con icona del riepilogo. Tiene sempre il posto di due righe di testo:
-/// quando cambia chi è in testa, o al primo voto, l'altezza non cambia e la
-/// lista sotto resta ferma (FIX-014).
-class _InfoLine extends StatelessWidget {
-  const _InfoLine({required this.icon, required this.text});
+/// Testo su una sola riga che occupa sempre la stessa altezza, anche vuoto:
+/// i cambi di testo non cambiano l'altezza del riepilogo.
+class _OneLine extends StatelessWidget {
+  const _OneLine(this.text, {required this.style});
 
-  final IconData icon;
   final String text;
+  final TextStyle? style;
 
   @override
   Widget build(BuildContext context) {
-    final style = Theme.of(context).textTheme.bodyMedium;
-    final cs = Theme.of(context).colorScheme;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, size: AppDimensions.summaryInfoIcon, color: cs.primary),
-        const SizedBox(width: AppSpacing.s),
-        Expanded(
-          child: Stack(
-            children: [
-              ExcludeSemantics(
-                child: Visibility(
-                  visible: false,
-                  maintainState: true,
-                  maintainAnimation: true,
-                  maintainSize: true,
-                  child: Text('\n', style: style),
-                ),
-              ),
-              Text(
-                text,
-                style: style,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
-      ],
+    return Text(
+      // Uno spazio non separabile tiene l'altezza della riga se il testo è
+      // vuoto.
+      text.isEmpty ? '\u00A0' : text,
+      style: style,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
     );
   }
 }

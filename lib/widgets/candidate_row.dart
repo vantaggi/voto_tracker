@@ -260,18 +260,31 @@ class _NameAndShare extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: AppSpacing.xs),
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: AppSpacing.s,
+          // Una riga sola: se la tendenza andasse a capo la riga crescerebbe
+          // e i + sotto si sposterebbero durante il voto (FIX-015).
+          Row(
             children: [
-              Text(
-                percent,
-                style: tt.bodyMedium?.copyWith(
-                  color: cs.onSurfaceVariant,
-                  fontFeatures: _tabular,
+              Flexible(
+                child: Text(
+                  percent,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: tt.bodyMedium?.copyWith(
+                    color: cs.onSurfaceVariant,
+                    fontFeatures: _tabular,
+                  ),
                 ),
               ),
-              if (delta != null) _Trend(delta: delta),
+              if (delta != null) ...[
+                const SizedBox(width: AppSpacing.s),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: AlignmentDirectional.centerStart,
+                    child: _Trend(delta: delta),
+                  ),
+                ),
+              ],
             ],
           ),
           if (!compact) ...[
