@@ -14,8 +14,10 @@ class AppStrings {
 }
 
 class AppDimensions {
-  /// Icona delle righe "In testa" e "Tocca + per contare" del riepilogo.
-  static const double summaryInfoIcon = 18;
+  /// Altezza minima della riga dei numeri del riepilogo: l'area di tocco del
+  /// pulsante "Condividi", che a scrutinio completo prende il posto delle
+  /// schede rimanenti.
+  static const double summaryNumbersRow = 48;
 
   static const double paddingAll = 16.0;
   static const double paddingIconText = 12.0;

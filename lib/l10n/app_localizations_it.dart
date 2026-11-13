@@ -50,7 +50,13 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String votesToWin(int count) {
-    return 'Mancano $count voti per la vittoria';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Mancano $count voti per la vittoria',
+      one: 'Manca 1 voto per la vittoria',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -353,7 +359,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get summaryEmptyHint => 'Tocca + per contare la prima scheda.';
 
   @override
-  String get shareResults => 'Condividi i risultati';
+  String get shareResults => 'Condividi';
 
   @override
   String get otherBallots => 'Altre schede';

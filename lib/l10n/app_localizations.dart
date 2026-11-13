@@ -179,7 +179,7 @@ abstract class AppLocalizations {
   /// No description provided for @votesToWin.
   ///
   /// In en, this message translates to:
-  /// **'{count} votes left to win'**
+  /// **'{count, plural, =1{1 vote left to win} other{{count} votes left to win}}'**
   String votesToWin(int count);
 
   /// No description provided for @winnerElected.
@@ -688,7 +688,7 @@ abstract class AppLocalizations {
   /// No description provided for @shareResults.
   ///
   /// In en, this message translates to:
-  /// **'Share results'**
+  /// **'Share'**
   String get shareResults;
 
   /// No description provided for @otherBallots.

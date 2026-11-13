@@ -50,7 +50,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String votesToWin(int count) {
-    return '$count votes left to win';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count votes left to win',
+      one: '1 vote left to win',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -351,7 +357,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get summaryEmptyHint => 'Tap + to count the first ballot.';
 
   @override
-  String get shareResults => 'Share results';
+  String get shareResults => 'Share';
 
   @override
   String get otherBallots => 'Other ballots';

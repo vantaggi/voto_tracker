@@ -41,8 +41,7 @@ void main() {
     p.updateSettings(Settings(totalVoters: 3));
     await tester.pumpAndSettle();
     expect(find.text('ELETTO'), findsOneWidget);
-    expect(find.text('Completato'), findsOneWidget);
-    expect(find.text('Condividi i risultati'), findsOneWidget);
+    expect(find.text('Condividi'), findsOneWidget);
   });
 
   testWidgets('al primo voto i + non si spostano (FIX-014)', (tester) async {

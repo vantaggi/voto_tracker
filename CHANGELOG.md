@@ -13,6 +13,20 @@ Le sezioni sono generate dai commit convenzionali (vedi
 
 ## [Unreleased]
 
+### 🐞 Bug Fix
+- **Home: i + e i − non si spostano più durante lo scrutinio.** Il riepilogo
+  in cima cambiava altezza alla vittoria matematica e a scrutinio chiuso
+  (comparivano "ELETTO" e il pulsante Condividi), e su schermi stretti la
+  tendenza accanto alla percentuale andava a capo allungando la riga: in
+  entrambi i casi i tasti si spostavano sotto il dito. Ora il riepilogo ha la
+  stessa struttura e altezza in ogni stato (riga grande con chi è in testa o
+  l'esito, riga piccola sotto, barra, numeri; "Condividi" prende il posto
+  delle schede rimanenti) e percentuale e tendenza stanno su una riga sola.
+  L'ordine dei candidati resta quello di inserimento. Test
+  `home_stable_layout_test.dart` su uno scrutinio intero a 360 e 412 dp
+  (FIX-015).
+- "Manca 1 voto per la vittoria" al singolare (prima "Mancano 1 voti").
+
 ## [2.0.0] - 2026-11-12
 
 ### 🐞 Bug Fix

@@ -16,7 +16,7 @@
   "exportJsonSubtitle": "All the data",
   "exportError": "Export failed",
 
-  "votesToWin": "{count} votes left to win",
+  "votesToWin": "{count, plural, =1{1 vote left to win} other{{count} votes left to win}}",
   "@votesToWin": {
     "placeholders": {
       "count": { "type": "int" }
@@ -132,7 +132,7 @@
   "summaryLeadingTie": "Tie for the lead",
   "summaryEmptyTitle": "No ballots yet",
   "summaryEmptyHint": "Tap + to count the first ballot.",
-  "shareResults": "Share results",
+  "shareResults": "Share",
   "otherBallots": "Other ballots",
   "candidateRowSemantics": "{name}: {votes} votes, {percent}",
   "@candidateRowSemantics": {"placeholders": {"name": {"type": "String"}, "votes": {"type": "int"}, "percent": {"type": "String"}}},
