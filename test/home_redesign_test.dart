@@ -8,8 +8,9 @@ import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/screens/home_page.dart';
 import 'package:voto_tracker/widgets/charts/compare_chart.dart';
 import 'package:voto_tracker/widgets/charts/trend_chart.dart';
+import 'package:voto_tracker/widgets/undo_bar.dart';
 
-/// Ridisegno della Home (R2-R6): riepilogo, righe, pillola Annulla, grafici.
+/// Ridisegno della Home (R2-R6): riepilogo, righe, barra Annulla, grafici.
 void main() {
   Future<ScrutinyProvider> pumpHome(WidgetTester tester, Size size) async {
     await tester.binding.setSurfaceSize(size);
@@ -92,23 +93,66 @@ void main() {
     expect(adds.every((b) => b.onPressed == null), isTrue);
   });
 
-  testWidgets('pillola: compare dopo un voto e annulla quel voto', (
+  testWidgets('barra Annulla: sempre presente, annulla l\'ultimo voto', (
     tester,
   ) async {
     final p = await pumpHome(tester, const Size(412, 915));
-    expect(find.byIcon(Icons.undo), findsNothing);
+    // C'è già prima del primo voto, disattivata: non compare dal nulla.
+    final bar = find.byType(UndoBar);
+    expect(bar, findsOneWidget);
+    final barTop = tester.getTopLeft(bar);
+    expect(find.text('Annulla'), findsOneWidget);
+    expect(
+      tester
+          .widget<TextButton>(
+            find.ancestor(
+              of: find.text('Annulla'),
+              matching: find.byWidgetPredicate((w) => w is TextButton),
+            ),
+          )
+          .onPressed,
+      isNull,
+    );
+
     p.renameCandidate(1, 'Bianchi');
     p.vote(1);
     await tester.pumpAndSettle();
     expect(find.text('Annulla Bianchi'), findsOneWidget);
+    expect(tester.getTopLeft(bar), barTop);
 
     await tester.tap(find.text('Annulla Bianchi'));
     await tester.pumpAndSettle();
     expect(p.totalVotesAssigned, 0);
-    // Resta per poter ripristinare.
     await tester.tap(find.byIcon(Icons.redo));
     await tester.pumpAndSettle();
     expect(p.candidates[1].votes, 1);
+    expect(tester.getTopLeft(bar), barTop);
+  });
+
+  testWidgets('barra Annulla: comandi lontani dalla colonna dei +', (
+    tester,
+  ) async {
+    await pumpHome(tester, const Size(360, 780));
+    final p = Provider.of<ScrutinyProvider>(
+      tester.element(find.byType(HomePage)),
+      listen: false,
+    );
+    final redo = tester.getCenter(find.byIcon(Icons.redo));
+    final plusButton = find
+        .ancestor(
+          of: find.byIcon(Icons.add).first,
+          matching: find.byType(IconButton),
+        )
+        .first;
+    expect(
+      tester.getTopRight(find.byIcon(Icons.redo)).dx,
+      lessThan(tester.getTopLeft(plusButton).dx),
+    );
+    // Ripeti non si sposta con la lunghezza del nome annullato.
+    p.renameCandidate(0, 'Maria Antonietta De Santis Bevilacqua');
+    p.vote(0);
+    await tester.pumpAndSettle();
+    expect(tester.getCenter(find.byIcon(Icons.redo)), redo);
   });
 
   testWidgets('tocco sul nome apre Modifica candidato', (tester) async {
@@ -131,6 +175,8 @@ void main() {
     await tester.tap(find.text('Andamento e grafici'));
     await tester.pumpAndSettle();
     expect(find.byType(TrendChart), findsOneWidget);
+    await tester.ensureVisible(find.text('Confronto'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Confronto'));
     await tester.pumpAndSettle();
     expect(find.byType(CompareChart), findsOneWidget);

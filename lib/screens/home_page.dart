@@ -8,7 +8,7 @@ import 'package:voto_tracker/widgets/candidate_row.dart';
 import 'package:voto_tracker/widgets/charts_card.dart';
 import 'package:voto_tracker/widgets/export_sheet.dart';
 import 'package:voto_tracker/widgets/keep_screen_on.dart';
-import 'package:voto_tracker/widgets/undo_pill.dart';
+import 'package:voto_tracker/widgets/undo_bar.dart';
 import 'package:voto_tracker/widgets/vote_summary_card.dart';
 
 /// Larghezza da cui la Home mette lista e riepilogo affiancati (classe
@@ -20,7 +20,7 @@ const double _twoPaneBreakpoint = 840;
 const double _singlePaneMaxWidth = 640;
 
 /// Home dello scrutinio (ridisegno R6): titolo dello scrutinio in alto,
-/// riepilogo, righe dei candidati, altre schede, grafici e pillola Annulla.
+/// riepilogo, righe dei candidati, altre schede, grafici e barra Annulla.
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -55,7 +55,7 @@ class _SinglePane extends StatelessWidget {
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: _singlePaneMaxWidth),
-        child: const _WithPill(
+        child: const _WithUndoBar(
           child: _CountingList(
             header: [
               VoteSummaryCard(),
@@ -80,7 +80,7 @@ class _TwoPane extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Expanded(flex: 5, child: _WithPill(child: _CountingList())),
+        const Expanded(flex: 5, child: _WithUndoBar(child: _CountingList())),
         Expanded(
           flex: 4,
           child: ListView(
@@ -117,7 +117,7 @@ class _CountingList extends StatelessWidget {
         AppSpacing.l,
         AppSpacing.s,
         AppSpacing.l,
-        UndoPill.clearance,
+        AppSpacing.l,
       ),
       children: [
         ...header,
@@ -129,22 +129,18 @@ class _CountingList extends StatelessWidget {
   }
 }
 
-class _WithPill extends StatelessWidget {
-  const _WithPill({required this.child});
+/// Il conteggio con la barra Annulla fissa sotto (FIX-017).
+class _WithUndoBar extends StatelessWidget {
+  const _WithUndoBar({required this.child});
 
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return Column(
       children: [
-        Positioned.fill(child: child),
-        const Positioned(
-          left: AppSpacing.l,
-          right: AppSpacing.l,
-          bottom: AppSpacing.l,
-          child: Center(child: UndoPill()),
-        ),
+        Expanded(child: child),
+        const UndoBar(),
       ],
     );
   }

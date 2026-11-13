@@ -37,10 +37,10 @@ lib/
 │
 ├── screens/
 │   ├── app_shell.dart                 # Navigazione Scrutinio / Archivio (NavigationBar o NavigationRail)
-│   ├── home_page.dart                 # Home: riepilogo, righe, altre schede, grafici, pillola; due colonne da 840 dp
+│   ├── home_page.dart                 # Home: riepilogo, righe, altre schede, grafici, barra Annulla; due colonne da 840 dp
 │   ├── home_actions.dart              # Azioni della Home (impostazioni, lettura schede, proiettore, azzera con conferma)
 │   ├── archive_page.dart              # Archivio: Aperto ora / Altri, ricerca, dettaglio (pagina o pannello), Nuovo vuoto/copia/lista, esporta/importa
-│   ├── ballot_reading_screen.dart     # Lettura schede: tessere che riempiono lo schermo, bianche e nulle in fondo, pillola Annulla
+│   ├── ballot_reading_screen.dart     # Lettura schede: tessere che riempiono lo schermo, bianche e nulle in fondo, barra Annulla
 │   ├── projector_mode_screen.dart     # Proiettore a schermo intero: intestazione, righe animate, bianche e nulle in fondo
 │   ├── settings_page.dart             # Impostazioni dello scrutinio: pagina sul telefono, finestra sul tablet
 │   └── app_settings_page.dart         # Impostazioni dell'app: lingua e aspetto
@@ -50,7 +50,7 @@ lib/
 │   ├── vote_stacked_bar.dart          # Barra impilata dei voti (Home, Archivio, Lettura, Proiettore, Condividi)
 │   ├── candidate_row.dart             # Righe dei candidati e "Altre schede" (bianche, nulle)
 │   ├── edit_candidate_dialog.dart     # Dialog "Modifica candidato" (nome, colore, risultato precedente)
-│   ├── undo_pill.dart                 # Pillola Annulla / Ripeti con il nome dell'ultimo voto
+│   ├── undo_bar.dart                  # Barra Annulla / Ripeti fissa in fondo, con il nome dell'ultimo voto
 │   ├── charts_card.dart               # Card apribile Andamento / Confronto
 │   ├── charts/                        # Un file per grafico (fl_chart)
 │   │   ├── trend_chart.dart           # Andamento: linee a gradini, chip, lettura a una scheda

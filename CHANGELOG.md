@@ -13,6 +13,15 @@ Le sezioni sono generate dai commit convenzionali (vedi
 
 ## [Unreleased]
 
+### 💄 Interfaccia
+- **Barra Annulla fissa al posto della pillola.** La pillola scura "Annulla
+  Nome" galleggiava in mezzo allo schermo e copriva le ultime righe. Ora c'è
+  una barra sottile sempre presente sopra Scrutinio/Archivio (e in fondo a
+  Lettura schede), dello stesso colore della navigazione: "↶ Annulla Nome" a
+  sinistra, Ripeti in un punto fisso, niente comandi sotto la colonna dei +.
+  Non compare e non scompare, quindi non sposta né copre nulla. Scelta fra
+  tre bozze dopo un confronto difesa/accusa (FIX-017).
+
 ### 🐞 Bug Fix
 - **Home: i + e i − non si spostano più durante lo scrutinio.** Il riepilogo
   in cima cambiava altezza alla vittoria matematica e a scrutinio chiuso
