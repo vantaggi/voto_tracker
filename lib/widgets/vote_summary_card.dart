@@ -171,9 +171,13 @@ class _CountingSummary extends StatelessWidget {
         detail: localizedWinnerLabel(l10n, provider.winnerStatus) ?? '',
       );
     }
+    // Tutti quelli col massimo dei voti: il rank a parità segue l'ordine di
+    // inserimento, quindi da solo non vede i pareggi in testa.
+    final real = provider.candidates.where((c) => !c.isTechnical);
+    final top = real.fold(0, (m, c) => c.votes > m ? c.votes : m);
     final leaders = [
-      for (final c in provider.candidates)
-        if (!c.isTechnical && c.rank == 1 && c.votes > 0) c,
+      for (final c in real)
+        if (top > 0 && c.votes == top) c,
     ];
     if (leaders.isEmpty) {
       return (headline: l10n.summaryEmptyTitle, detail: l10n.summaryEmptyHint);

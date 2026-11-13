@@ -26,6 +26,9 @@ Le sezioni sono generate dai commit convenzionali (vedi
   `home_stable_layout_test.dart` su uno scrutinio intero a 360 e 412 dp
   (FIX-015).
 - "Manca 1 voto per la vittoria" al singolare (prima "Mancano 1 voti").
+- **Riepilogo: pareggio in testa.** Con lo stesso numero di voti il riepilogo
+  diceva "In testa" al primo inserito; ora dice "Pareggio in testa"
+  (FIX-016, trovato provando FIX-015 sul telefono).
 
 ## [2.0.0] - 2026-11-12
 

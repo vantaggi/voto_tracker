@@ -120,6 +120,7 @@ tutto") il 12/11.
 | FIX-013 | **Andamento: candidati con lo stesso nome** (C5) | 🏗️ In corso | 🟡 Media | 🟢 Basso | - | La storia era per nome e due omonimi diventavano una linea; ora è per posizione |
 | FIX-014 | **Home: i + saltavano al primo voto** | ✅ Fatto | 🔴 Alta | 🟢 Basso | - | Trovato sul telefono il 12/11: lista su di ~60 dp al primo voto, 19 tocchi su 20 persi. Riepilogo ora di altezza fissa; test `al primo voto i + non si spostano` |
 | FIX-015 | **Home: i tasti si spostavano durante lo scrutinio** | ✅ Fatto | 🔴 Alta | 🟢 Basso | - | Segnalato il 13/11: il riepilogo cresceva alla vittoria matematica e a fine scrutinio, la tendenza andava a capo sotto i 400 dp. Riepilogo e righe ora ad altezza fissa; test `home_stable_layout_test.dart` (rosso prima, verde dopo) |
+| FIX-016 | **Riepilogo: "In testa" con un pareggio** | ✅ Fatto | 🟡 Media | 🟢 Basso | - | Trovato sul telefono il 13/11: con un voto a testa diceva "In testa" al primo inserito. Ora conta tutti quelli col massimo; test `pareggio in testa con un voto a testa` |
 
 P1 e P2 fatti: PR #3 unita il 2026-11-12. P12 saltato: non ci sono ancora dati
 veri da migrare. Restano P13 (giro sul telefono) e P14 (release 2.0.0: versione
