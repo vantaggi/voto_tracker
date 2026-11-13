@@ -122,6 +122,7 @@ tutto") il 12/11.
 | FIX-015 | **Home: i tasti si spostavano durante lo scrutinio** | ✅ Fatto | 🔴 Alta | 🟢 Basso | - | Segnalato il 13/11: il riepilogo cresceva alla vittoria matematica e a fine scrutinio, la tendenza andava a capo sotto i 400 dp. Riepilogo e righe ora ad altezza fissa; test `home_stable_layout_test.dart` (rosso prima, verde dopo) |
 | FIX-016 | **Riepilogo: "In testa" con un pareggio** | ✅ Fatto | 🟡 Media | 🟢 Basso | - | Trovato sul telefono il 13/11: con un voto a testa diceva "In testa" al primo inserito. Ora conta tutti quelli col massimo; test `pareggio in testa con un voto a testa` |
 | FIX-017 | **Annulla: barra fissa al posto della pillola** | ✅ Fatto | 🟡 Media | 🟢 Basso | - | Richiesta del 13/11: la pillola era grande e in mezzo. Scelta la bozza C fra tre (bozze e confronto in project files `annulla/`). Test `barra Annulla: sempre presente…` e `…lontani dalla colonna dei +` |
+| FIX-018 | **Home in orizzontale: una riga sola visibile** | ✅ Fatto | 🟡 Media | 🟢 Basso | - | Visto sul telefono il 13/11 provando FIX-017: in orizzontale riepilogo e barra coprivano quasi tutto. Due colonne sotto 500 dp di altezza; test `telefono in orizzontale: riepilogo accanto alla lista` |
 
 P1 e P2 fatti: PR #3 unita il 2026-11-12. P12 saltato: non ci sono ancora dati
 veri da migrare. Restano P13 (giro sul telefono) e P14 (release 2.0.0: versione

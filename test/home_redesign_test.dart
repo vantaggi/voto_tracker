@@ -8,7 +8,9 @@ import 'package:voto_tracker/providers/scrutiny_provider.dart';
 import 'package:voto_tracker/screens/home_page.dart';
 import 'package:voto_tracker/widgets/charts/compare_chart.dart';
 import 'package:voto_tracker/widgets/charts/trend_chart.dart';
+import 'package:voto_tracker/widgets/candidate_row.dart';
 import 'package:voto_tracker/widgets/undo_bar.dart';
+import 'package:voto_tracker/widgets/vote_summary_card.dart';
 
 /// Ridisegno della Home (R2-R6): riepilogo, righe, barra Annulla, grafici.
 void main() {
@@ -153,6 +155,19 @@ void main() {
     p.vote(0);
     await tester.pumpAndSettle();
     expect(tester.getCenter(find.byIcon(Icons.redo)), redo);
+  });
+
+  testWidgets('telefono in orizzontale: riepilogo accanto alla lista', (
+    tester,
+  ) async {
+    await pumpHome(tester, const Size(891, 411));
+    final summary = tester.getTopLeft(find.byType(VoteSummaryCard));
+    final rows = tester.getTopRight(find.byType(CandidateGroup));
+    expect(summary.dx, greaterThanOrEqualTo(rows.dx));
+    // Almeno due righe di candidati visibili sopra la barra Annulla.
+    final barTop = tester.getTopLeft(find.byType(UndoBar)).dy;
+    final second = find.byType(CandidateRow).at(1);
+    expect(tester.getBottomLeft(second).dy, lessThanOrEqualTo(barTop));
   });
 
   testWidgets('tocco sul nome apre Modifica candidato', (tester) async {
