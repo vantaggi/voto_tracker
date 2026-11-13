@@ -37,7 +37,7 @@ lib/
 │
 ├── screens/
 │   ├── app_shell.dart                 # Navigazione Scrutinio / Archivio (NavigationBar o NavigationRail)
-│   ├── home_page.dart                 # Home: riepilogo, righe, altre schede, grafici, barra Annulla; due colonne da 840 dp
+│   ├── home_page.dart                 # Home: riepilogo, righe, altre schede, grafici, barra Annulla; due colonne da 840 dp o in orizzontale (altezza < 500 dp)
 │   ├── home_actions.dart              # Azioni della Home (impostazioni, lettura schede, proiettore, azzera con conferma)
 │   ├── archive_page.dart              # Archivio: Aperto ora / Altri, ricerca, dettaglio (pagina o pannello), Nuovo vuoto/copia/lista, esporta/importa
 │   ├── ballot_reading_screen.dart     # Lettura schede: tessere che riempiono lo schermo, bianche e nulle in fondo, barra Annulla

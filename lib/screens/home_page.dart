@@ -19,6 +19,12 @@ const double _twoPaneBreakpoint = 840;
 /// piccolo): oltre, le righe sarebbero troppo larghe da leggere.
 const double _singlePaneMaxWidth = 640;
 
+/// Telefono in orizzontale: sotto questa altezza, se c'è almeno la larghezza
+/// minima, anche la Home in una colonna va su due colonne. Altrimenti il
+/// riepilogo e la barra Annulla lascerebbero spazio per una riga sola.
+const double _lowHeight = 500;
+const double _lowHeightTwoPaneMinWidth = 600;
+
 /// Home dello scrutinio (ridisegno R6): titolo dello scrutinio in alto,
 /// riepilogo, righe dei candidati, altre schede, grafici e barra Annulla.
 class HomePage extends StatelessWidget {
@@ -37,7 +43,9 @@ class HomePage extends StatelessWidget {
           bottom: false,
           child: LayoutBuilder(
             builder: (context, constraints) =>
-                constraints.maxWidth >= _twoPaneBreakpoint
+                constraints.maxWidth >= _twoPaneBreakpoint ||
+                    (constraints.maxHeight < _lowHeight &&
+                        constraints.maxWidth >= _lowHeightTwoPaneMinWidth)
                 ? const _TwoPane()
                 : const _SinglePane(),
           ),

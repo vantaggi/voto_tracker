@@ -21,6 +21,9 @@ Le sezioni sono generate dai commit convenzionali (vedi
   sinistra, Ripeti in un punto fisso, niente comandi sotto la colonna dei +.
   Non compare e non scompare, quindi non sposta né copre nulla. Scelta fra
   tre bozze dopo un confronto difesa/accusa (FIX-017).
+- **Telefono in orizzontale: due colonne.** Con poca altezza (sotto 500 dp)
+  e almeno 600 dp di larghezza la Home mette il riepilogo accanto alla lista:
+  prima riepilogo e barra Annulla lasciavano vedere una riga sola (FIX-018).
 
 ### 🐞 Bug Fix
 - **Home: i + e i − non si spostano più durante lo scrutinio.** Il riepilogo
